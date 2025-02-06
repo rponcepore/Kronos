@@ -9,12 +9,12 @@ Kronos is a task management system designed to reduce administrative load on the
 - Jacob Horton
 
 ## Configuration
-This repo employs multiple makefiles based on what you are trying to do. Run "make <args>" to acocmplish the following:
+This repo employs multiple makefiles based on what you are trying to do. Run "make <args>" to accomplish the following:
 
-- `front` will rebuild the front
-- `back` will check, build, test, and check vulnerabilities through cargo
+- `make front` will rebuild the front
+- `make back` will check, build, test, and check vulnerabilities through cargo
 - `make` will conduct a full project rebuild, and is equivalent to running `make front` and `make back`
-- `clean` will remove any generated binaries
+- `make clean` will remove any generated binaries
 
 ## Testing
 To launch a test-only instance of the frontend without backend DB support, run:
