@@ -1,15 +1,14 @@
 # Kronos
 
-
-# Summary
+## Summary
 Kronos is a task management system designed to reduce administrative load on the operations staff, primarily in a garrison environemnt, but with extensibility to the tactical environment after proof-of-concept. Kronos provides a centralized Operations Management System that streamlines tasking, planning, and time/manpower allocation for Army units, Brigade to Company level. The system is designed to improve efficiency, reduce over-tasking, enhance situational awareness , and provide better data-driven decision-making for leaders.
 
-# Collaborators
+## Collaborators
 - Remington Ponce-Pore
 - Olivia Beattie
 - Jacob Horton
 
-# Configuration
+## Configuration
 This repo employs multiple makefiles based on what you are trying to do. Run "make <args>" to acocmplish the following:
 
 - `front` will rebuild the front
@@ -17,7 +16,7 @@ This repo employs multiple makefiles based on what you are trying to do. Run "ma
 - `make` will conduct a full project rebuild, and is equivalent to running `make front` and `make back`
 - `clean` will remove any generated binaries
 
-# Testing
+## Testing
 To launch a test-only instance of the frontend without backend DB support, run:
 ```
     # in frontend_kronos directory
@@ -31,7 +30,7 @@ To launch a backend instance, run:
     cargo run
 ```
 
-# Prototype
+## Prototype
 A (mostly functional) prototype that we will emulate (partially) is packaged as a linux container on docker registry. Pull and run the prototype with:
 ```
     docker pull rponcepore/kronos_prototype:kronos_prototype
