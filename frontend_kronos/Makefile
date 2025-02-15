@@ -1,6 +1,6 @@
-.PHONY: all begin test lint run report clean
+.PHONY: all begin test lint build report clean
 
-all: begin test lint report
+all: begin test lint build report
 
 # Variables
 PROJECT_NAME := $(shell basename $(PWD))
@@ -13,6 +13,10 @@ test:
 
 lint:
 	@npm run lint
+
+# Build will output files to default vite build dir, in this case, frontend_kronos/dist
+build: 
+	@npm run build 
 
 report:
 	@echo ""

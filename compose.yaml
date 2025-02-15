@@ -1,0 +1,35 @@
+services:
+  rev_proxy:
+  # This is the nginx reverse proxy for serving the frontend
+    build:
+      dockerfile: Dockerfile
+      context: ./frontend_kronos
+    ports:
+      - "9000:80"
+      - "9001:9001"
+    restart: always
+    args:
+       - VITE_APP_BACKEND_ADDRESS=https://localhost/ops/
+  
+  webserver:
+  # This is the API server connecting the db to the frontend
+    build:
+      dockerfile: Dockerfile
+      context: ./backend_kronos
+  
+  database:
+  # This is the Postgres instance that we'll be using
+    image: postgres:latest
+    restart: unless-stopped
+    volumes:
+      # syntax is local:container
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      # change in prod
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+
+#Postgres needs a place locally to save data between instantiations...in prod, this has to be a dedicated server.
+volumes:
+  postgres-data:
