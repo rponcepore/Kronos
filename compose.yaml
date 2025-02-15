@@ -16,11 +16,19 @@ services:
     build:
       dockerfile: Dockerfile
       context: ./backend_kronos
+    ports: 
+      - "9001:9001"
+      - "9002:9002"
+    
   
   database:
   # This is the Postgres instance that we'll be using
     image: postgres:latest
-    restart: unless-stopped
+    restart: always
+    # restart: unless-stopped
+
+    # set shared memory limit when using docker-compose
+    shm_size: 128mb
     volumes:
       # syntax is local:container
       - postgres-data:/var/lib/postgresql/data
@@ -29,6 +37,8 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres
       POSTGRES_DB: postgres
+    ports:
+      - "____:9002"
 
 #Postgres needs a place locally to save data between instantiations...in prod, this has to be a dedicated server.
 volumes:

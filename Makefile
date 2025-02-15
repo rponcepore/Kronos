@@ -2,6 +2,10 @@
 
 all: begin front back report
 
+dev: front back docker_dev
+
+prod: front back docker_prod
+
 # Variables
 PROJECT_NAME := $(shell basename $(PWD))
 
@@ -20,6 +24,9 @@ report:
 	@echo ""
 	@echo "make complete. Frontend and backend are rebuilt."
 	@echo ""
+
+docker_prod:
+	@echo docker-compose build
 
 clean:
 	@echo "make clean no implemented"
