@@ -8,7 +8,7 @@ services:
       - "9000:80"
       - "9001:9001"
     restart: always
-    args:
+    environment:
        - VITE_APP_BACKEND_ADDRESS=https://localhost/ops/
   
   webserver:

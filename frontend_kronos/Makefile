@@ -24,4 +24,4 @@ report:
 	@echo ""
 
 clean:
-	@echo "make clean no implemented"
+	@echo "make clean not implemented"
