@@ -1,6 +1,6 @@
-.PHONY: all begin check build test report clean
+.PHONY: all begin check build test report clean test
 
-all: begin front back report
+all: begin front back test report
 
 dev: front back docker_dev
 
@@ -19,6 +19,9 @@ back:
 front:
 	@echo "Executing make for the frontend"
 	$(MAKE) -C frontend_kronos
+
+test:
+	cd integration_tests_kronos && ./basic_tests.sh
 
 report:
 	@echo ""

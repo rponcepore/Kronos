@@ -1,15 +1,4 @@
-use actix_web::{web, App, HttpRequest, HttpServer, HttpResponse, Responder};
-
-/*
- * This is a request handler. It is disused.
- * @param req: type HttpRequest
- * @return: impl Responder (in this case, String)
- */
-
-async fn greet(req: HttpRequest) -> impl Responder {
-    let name = req.match_info().get("name").unwrap_or("World");
-    format!("Hello {}!", &name)
-}
+use actix_web::{web, App, HttpRequest, HttpResponse, HttpServer, Responder};
 
 /*
  * This is the healthcheck handler
@@ -25,11 +14,8 @@ async fn health_check(_req: HttpRequest) -> impl Responder {
  */
 #[tokio::main]
 async fn main() -> Result<(), std::io::Error> {
-    HttpServer::new(|| {
-        App::new()
-            .route("/health_check", web::get().to(health_check))
-    })
-    .bind("127.0.0.1:8000")?
-    .run()
-    .await
+    HttpServer::new(|| App::new().route("/health_check", web::get().to(health_check)))
+        .bind("127.0.0.1:8000")?
+        .run()
+        .await
 }
