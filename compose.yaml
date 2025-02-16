@@ -6,7 +6,7 @@ services:
       context: ./frontend_kronos
     ports:
       - "9000:80"
-      - "9001:9001"
+      - "8001:8000"
     restart: always
     environment:
        - VITE_APP_BACKEND_ADDRESS=https://localhost/ops/
@@ -17,7 +17,7 @@ services:
       dockerfile: Dockerfile
       context: ./backend_kronos
     ports: 
-      - "9001:9001"
+      - "8000:8000"
       - "9002:9002"
     
   
@@ -38,7 +38,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_DB: postgres
     ports:
-      - "____:9002"
+      - "8080:9002"
 
 #Postgres needs a place locally to save data between instantiations...in prod, this has to be a dedicated server.
 volumes:
