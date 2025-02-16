@@ -21,7 +21,7 @@ front:
 	$(MAKE) -C frontend_kronos
 
 test:
-	cd integration_tests_kronos && ./basic_tests.sh
+	@cd integration_tests_kronos && ./basic_tests.sh
 
 report:
 	@echo ""
