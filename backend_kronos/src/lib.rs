@@ -9,7 +9,6 @@ mod database;
 // The modules we wrote, that we will use here
 use database::run_database;
 
-
 /*
  * This is the healthcheck handler
  * @param req: must be a HttpRequest, GET

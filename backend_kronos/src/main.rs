@@ -2,7 +2,7 @@
 use backend_kronos::run_server;
 use std::net::TcpListener;
 
-pub mod database;
+
 
 /*
  * The entrypoint of the entire application.
