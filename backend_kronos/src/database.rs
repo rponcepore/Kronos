@@ -8,8 +8,9 @@ use futures::executor::block_on;
 use sea_orm::{ConnectionTrait, Database, DbBackend, DbErr, Statement};
 
 const DATABASE_URL: &str = "mysql://root:root@localhost:3306";
-const DB_NAME: &str = "bakeries_db";
+const DB_NAME: &str = "kronos_db";
 
 pub async fn run_database() -> Result<(), DbErr> {
     let db = Database::connect(DATABASE_URL).await?;
- }
+    todo! ()
+}
