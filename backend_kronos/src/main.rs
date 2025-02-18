@@ -1,6 +1,9 @@
 //! main.rs
-use backend_kronos::run;
+use backend_kronos::run_server;
 use std::net::TcpListener;
+
+pub mod database;
+
 /*
  * The entrypoint of the entire application.
  */
@@ -10,5 +13,5 @@ async fn main() -> Result<(), std::io::Error> {
     // Otherwise call .await on our Server
     let listener = TcpListener::bind("127.0.0.1:8000")
         .expect("Failed to bind port 8000");
-    run(listener)?.await
+    run_server(listener)?.await
 }

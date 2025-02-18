@@ -1,0 +1,15 @@
+//! database.rs
+
+/*
+ * This file contains the logic of the ORM used to connect to the database.
+ *  */
+
+use futures::executor::block_on;
+use sea_orm::{ConnectionTrait, Database, DbBackend, DbErr, Statement};
+
+const DATABASE_URL: &str = "mysql://root:root@localhost:3306";
+const DB_NAME: &str = "bakeries_db";
+
+pub async fn run_database() -> Result<(), DbErr> {
+    let db = Database::connect(DATABASE_URL).await?;
+ }
