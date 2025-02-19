@@ -10,6 +10,7 @@ use actix_web::{HttpRequest, HttpResponse, Responder};
  * @return 200 OK with no body
  */
 pub async fn health_check(_req: HttpRequest) -> impl Responder {
+    println!("health_check called!");
     HttpResponse::Ok().finish()
 }
 

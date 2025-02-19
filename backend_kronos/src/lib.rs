@@ -20,6 +20,7 @@ use crate::handlers::healthchecks::database_health_check;
 pub fn run_server(listener: TcpListener) -> Result<Server, std::io::Error> {
     let server = HttpServer::new(|| {
             App::new()
+                .route("/healthcheck", web::get().to(health_check))
                 .route("/health_check", web::get().to(health_check))
                 .route("/database_health_check", web::get().to(database_health_check))
         })
