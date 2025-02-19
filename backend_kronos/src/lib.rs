@@ -19,6 +19,7 @@ use crate::handlers::healthchecks::health_check_body;
  * The main driver function of the entire application.
  */
 pub fn run_server(listener: TcpListener) -> Result<Server, std::io::Error> {
+    let clone = listener.try_clone().unwrap();
     let server = HttpServer::new(|| {
             App::new()
                 .route("/healthcheck", web::get().to(health_check))
@@ -29,5 +30,6 @@ pub fn run_server(listener: TcpListener) -> Result<Server, std::io::Error> {
         .listen(listener)?
         .run();
     println! ("Server initialization successful.");
+    println! ("Server is located at {}:{}", clone.local_addr().unwrap().ip(), clone.local_addr().unwrap().port());
     Ok(server)
 }
