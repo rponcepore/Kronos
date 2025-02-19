@@ -1,5 +1,5 @@
 services:
-  rev_proxy:
+  front:
   # This is the nginx reverse proxy for serving the frontend
     build:
       dockerfile: Dockerfile
@@ -18,7 +18,7 @@ services:
       context: ./backend_kronos
     ports: 
       - "8000:8000"
-      - "9002:9002"
+      - "9002:5432"
     
   
   database:
@@ -38,7 +38,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_DB: postgres
     ports:
-      - "8080:9002"
+      - "5432:5432"
 
 #Postgres needs a place locally to save data between instantiations...in prod, this has to be a dedicated server.
 volumes:
