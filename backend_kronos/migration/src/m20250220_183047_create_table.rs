@@ -12,7 +12,7 @@ impl MigrationTrait for Migration {
         manager
             .create_table(
                 Table::create()
-                    .table(Post::Table)
+                    .table(Test_Table::Table)
                     .if_not_exists()
                     .col(pk_auto(Post::Id))
                     .col(string(Post::Title))
@@ -23,8 +23,6 @@ impl MigrationTrait for Migration {
     }
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-        // Replace the sample below with your own migration scripts
-        todo!();
 
         manager
             .drop_table(Table::drop().table(Post::Table).to_owned())
@@ -33,8 +31,8 @@ impl MigrationTrait for Migration {
 }
 
 #[derive(DeriveIden)]
-enum Post {
-    Table,
+enum Test_Table {
+    Table, // This is a special case; it will be mapped to the table name, Test_Table
     Id,
     Title,
     Text,

@@ -10,4 +10,5 @@ Our database was created in the standard way. This should be done in the backend
 `sea-orm-cli migrate init`
 I referenced this documentation in creating it: https://www.sea-ql.org/SeaORM/docs/migration/setting-up-migration/
 
-
+Migrations within the database are named by the following convention, and placed in backend_kronos/migrations/src/<file>.rs
+'mYYYYMMDD_HHMMSS_migration_name.rs'
