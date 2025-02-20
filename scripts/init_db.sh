@@ -60,6 +60,10 @@ then
   # Pull the latest image
   docker pull postgres
 
+  #Turn off old container, so we can run this one
+  docker kill postgres || true
+  docker remove postgres || true
+
   # Launch postgres using Docker
   CONTAINER_NAME="postgres"
   docker run \
@@ -90,6 +94,10 @@ then
   # Grant create db privileges to the app user
   GRANT_QUERY="ALTER USER ${APP_USER} CREATEDB;"
   docker exec -it "${CONTAINER_NAME}" psql -U "${SUPERUSER}" -c "${GRANT_QUERY}"
+
+  # Grant public schema rights to the user
+  GRANT_USAGE="GRANT USAGE ON SCHEMA public TO ${APP_USER}"
+  docker exec -it "${CONTAINER_NAME}" psql -U "${SUPERUSER}" -c "${GRANT_USAGE}"
 fi
 
   echo "Postgres is up and running on port ${DB_PORT}. Running migrations now." 
@@ -100,8 +108,11 @@ DATABASE_URL=postgres://${APP_USER}:${APP_USER_PWD}@localhost:${DB_PORT}/${APP_D
 # Note: This export only sets this env variable for the rest of the shel session, not permanently.
 export DATABASE_URL=$DATABASE_URL
 
+echo $APP_DB_NAME
+
 #Create the application database inside the container.
-OUTPUT=$(psql -U "$APP_USER" -h "localhost" -p "$DB_PORT" -c "CREATE DATABASE $APP_DB_NAME;" 2>&1)
+OUTPUT=$(docker exec -it "${CONTAINER_NAME}" psql -U "${APP_USER}" postgres -c "CREATE DATABASE ${APP_DB_NAME};" 2>&1)
+#psql -U "$APP_USER" -h "localhost" -p "$DB_PORT" -c "CREATE DATABASE $APP_DB_NAME;" 
 
 # Check if an error occurred
 if [[ "$OUTPUT" == *"ERROR:"* ]]; then
@@ -109,15 +120,20 @@ if [[ "$OUTPUT" == *"ERROR:"* ]]; then
 
     # Check if the error is "database does not exist"
     if [[ "$OUTPUT" == *"database \"$APP_DB_NAME\" already exists"* ]]; then
+        echo ""
         echo "Database '$APP_DB_NAME' already exists. No action needed."
     elif [[ "$OUTPUT" == *"database \"$APP_DB_NAME\" does not exist"* ]]; then
+        echo ""
         echo "Database '$APP_DB_NAME' does not exist. You may need to create it manually."
     else
+        echo ""
         echo "Unexpected error: $OUTPUT"
     fi
 else
     echo "Database '$APP_DB_NAME' created successfully."
 fi
+
+echo "Applying migrations"
 
 # We now are confident that the database exists.
 # Apply all pending migrations
