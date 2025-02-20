@@ -21,12 +21,12 @@ This repo employs multiple makefiles based on what you are trying to do. Run "ma
 These ports are used in development mode. 
 - 8000: Backend Server
     - 8000 Local = 8000 Container
-    - 9002 Server = 5432 Container (Postgres calls)
+    - 9002 Local = 5432 Container (Postgres calls)
 - Postgres
     - 5432 Local = 5432 Container
 - Frontend:
     - 9000 Local = 80 Container (Client Connection)
-    - 9001 Local = 90001 Container (API calls to backend server)
+    - 9001 Local = 9001 Container (API calls to backend server)
 
 ## Testing
 To launch a test-only instance of the frontend without backend DB support, run:

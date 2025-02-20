@@ -48,7 +48,7 @@ impl Config{
         match build {
             BuildType::Dev => {
                 Self {  build : build,
-                        server_address : "127.0.0.1:8000".to_string(), //this actually might need to become 0.0.0.0:8000 for dockerization
+                        server_address : "0.0.0.0:8000".to_string(), //this actually might need to become 0.0.0.0:8000 for dockerization
                         //link: 
                         //database_name : "TODO".to_string(),
                         //database_url : "TODO".to_string(),
