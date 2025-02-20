@@ -2,9 +2,22 @@
 
 # This script is meant just to fire up a postgres instance for testing
 # Do NOT use this script for persistent postgres data
- 
-set -x 
-set -eo pipefail 
+
+#First, make sure that we are in the correct directory:
+
+EXPECTED_DIR="/home/$USER/Kronos/backend_kronos"
+CURRENT_DIR="$(pwd)"
+
+if [ "$CURRENT_DIR" == "$EXPECTED_DIR" ]; then
+    echo "You are in the correct directory: $CURRENT_DIR"
+else
+    echo "Warning: You are in the wrong directory!"
+    echo "Current directory: $CURRENT_DIR"
+    echo "Expected directory: $EXPECTED_DIR"
+    echo ""
+    echo "Moving to correct directory."
+    cd $EXPECTED_DIR
+fi
 
 # Make sure that sea-orm-cli is installed
 
@@ -16,6 +29,19 @@ if ! [ -x "$(command -v sea-orm-cli)" ]; then
   echo >&2 "to install it."
   exit 1
 fi
+
+
+# Make sure that the postgres-sql client is installed.
+if ! [ -x "$(command -v psql)" ]; then
+  echo >&2 "Error: psql is not installed."
+  echo >&2 "Use:"
+  echo >&2 "    sudo apt-get install postgresql-client   "
+  echo >&2 "to install it."
+  exit 1
+fi
+
+set -x 
+set -eo pipefail 
 
 # Check if custom parameter has been set, otherwise use default postgres values
 # CHANGE IN PROD
@@ -37,7 +63,6 @@ then
   # Launch postgres using Docker
   CONTAINER_NAME="postgres"
   docker run \
-    # --env POSTGRES_USER=${SUPERUSER}  \
     --env POSTGRES_PASSWORD=${SUPERUSER_PWD}  \
     --health-cmd="pg_isready -U ${SUPERUSER} || exit 1"  \
     --health-interval=1s \
@@ -48,6 +73,7 @@ then
     --name "${CONTAINER_NAME}" \
     postgres -N 1000  
     # ^ Increased maximum number of connections for testing purposes
+    # removed for reasons beyond my imagination:  --env POSTGRES_USER=${SUPERUSER}  \
 
   # Wait for Postgres to be ready to accept connections
   until [ \
@@ -57,8 +83,6 @@ then
     >&2 echo "Postgres is still unavailable - sleeping"
     sleep 1  
   done 
-
-
 
   CREATE_QUERY="CREATE USER ${APP_USER} WITH PASSWORD '${APP_USER_PWD}';"
   docker exec -it "${CONTAINER_NAME}" psql -U "${SUPERUSER}" -c "${CREATE_QUERY}"
@@ -77,5 +101,24 @@ DATABASE_URL=postgres://${APP_USER}:${APP_USER_PWD}@localhost:${DB_PORT}/${APP_D
 export DATABASE_URL=$DATABASE_URL
 
 #Create the application database inside the container.
-sea-orm-cli database create
-sea-orm-cli migrate up # Apply all pending migrations
+OUTPUT=$(psql -U "$APP_USER" -h "localhost" -p "$DB_PORT" -c "CREATE DATABASE $APP_DB_NAME;" 2>&1)
+
+# Check if an error occurred
+if [[ "$OUTPUT" == *"ERROR:"* ]]; then
+    echo "Error detected while creating database."
+
+    # Check if the error is "database does not exist"
+    if [[ "$OUTPUT" == *"database \"$APP_DB_NAME\" already exists"* ]]; then
+        echo "Database '$APP_DB_NAME' already exists. No action needed."
+    elif [[ "$OUTPUT" == *"database \"$APP_DB_NAME\" does not exist"* ]]; then
+        echo "Database '$APP_DB_NAME' does not exist. You may need to create it manually."
+    else
+        echo "Unexpected error: $OUTPUT"
+    fi
+else
+    echo "Database '$APP_DB_NAME' created successfully."
+fi
+
+# We now are confident that the database exists.
+# Apply all pending migrations
+sea-orm-cli migrate up 
