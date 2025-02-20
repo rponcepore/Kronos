@@ -43,7 +43,7 @@ until [ \
   sleep 1  
 done 
 
->&2 echo "Postgres is up and running on port ${DB_PORT}!" 
+echo "Postgres is up and running on port ${DB_PORT}!" 
 
 CREATE_QUERY="CREATE USER ${APP_USER} WITH PASSWORD '${APP_USER_PWD}';"
 docker exec -it "${CONTAINER_NAME}" psql -U "${SUPERUSER}" -c "${CREATE_QUERY}"
