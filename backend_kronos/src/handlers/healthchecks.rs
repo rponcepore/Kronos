@@ -20,7 +20,7 @@ pub async fn health_check(_req: HttpRequest) -> impl Responder {
  * @return 200 OK with no body
  */
 pub async fn health_check_body(_req: HttpRequest) -> impl Responder {
-    println!("health_check called!");
+    println!("health_check_body called!");
     HttpResponse::Ok().body("check success!")
 }
 

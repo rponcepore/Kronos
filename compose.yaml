@@ -1,5 +1,5 @@
 services:
-  front:
+  frontend_kronos:
   # This is the nginx reverse proxy for serving the frontend
     build:
       dockerfile: Dockerfile
@@ -11,7 +11,7 @@ services:
     environment:
        - VITE_APP_BACKEND_ADDRESS=https://localhost/ops/
   
-  webserver:
+  backend_kronos:
   # This is the API server connecting the db to the frontend
     build:
       dockerfile: Dockerfile

@@ -18,7 +18,7 @@ async fn main() -> Result<(), std::io::Error> {
             std::process::exit(1);
             }
     };
-    println!("Arguments parsed correctly. Server will be located at: {}", kenv.server_address);
+    
     let address = kenv.server_address;
     // Bubble up the io::Error if we failed to bind the address
     // Otherwise call .await on our Server
