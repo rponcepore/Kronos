@@ -178,4 +178,3 @@ echo "Applying migrations"
 # We now are confident that the database exists.
 # Apply all pending migrations
 sea-orm-cli migrate up 
-
