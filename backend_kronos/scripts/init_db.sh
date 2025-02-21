@@ -40,19 +40,56 @@ if ! [ -x "$(command -v psql)" ]; then
   exit 1
 fi
 
-# set -x 
+#set -x 
 set -eo pipefail 
+
+# Ensure `yq` is installed
+if ! command -v yq &>/dev/null; then
+    echo "Error: yq is not installed. Install it with 'sudo snap install yq' or 'brew install yq'."
+    exit 1
+fi
 
 # Check if custom parameter has been set, otherwise use default postgres values
 # CHANGE IN PROD
-RUST_BACKTRACE=1
-DB_PORT="${POSTGRES_PORT:=5432}" 
-SUPERUSER="${SUPERUSER:=postgres}" 
-SUPERUSER_PWD="${SUPERUSER_PWD:=password}" 
+# These need to be read in from backend_configuration.yaml
 
-APP_USER="${APP_USER:=app}" 
-APP_USER_PWD="${APP_USER_PWD:=secret}" 
-APP_DB_NAME="${APP_DB_NAME:=kronos_db}" 
+CONFIG_FILE="backend_configuration.yaml"
+
+echo "Reading from config file: ${CONFIG_FILE}"
+
+# Function to read YAML values with fallback to default
+read_config() {
+    local key="$1"
+    local default="$2"
+    local value
+    value=$(yq e "$key // \"$default\"" "$CONFIG_FILE" 2>/dev/null)
+    echo "$value"
+}
+
+# Read values from the config file or use defaults
+DB_PORT=$(read_config '.database.port' "5432")
+SUPERUSER=$(read_config '.database.superuser' "postgres")
+SUPERUSER_PWD=$(read_config '.database.superuser_pwd' "password")
+
+APP_USER=$(read_config '.database.app_user' "app")
+APP_USER_PWD=$(read_config '.database.app_user_pwd' "secret")
+APP_DB_NAME=$(read_config '.database.app_db_name' "kronos_db")
+
+# Print values (for debugging)
+echo "DB_PORT=${DB_PORT}"
+echo "SUPERUSER=${SUPERUSER}"
+echo "SUPERUSER_PWD=${SUPERUSER_PWD}"
+echo "APP_USER=${APP_USER}"
+echo "APP_USER_PWD=${APP_USER_PWD}"
+echo "APP_DB_NAME=${APP_DB_NAME}"
+
+# DB_PORT="${POSTGRES_PORT:=5432}" 
+# SUPERUSER="${SUPERUSER:=postgres}" 
+# SUPERUSER_PWD="${SUPERUSER_PWD:=password}" 
+
+# APP_USER="${APP_USER:=app}" 
+# APP_USER_PWD="${APP_USER_PWD:=secret}" 
+# APP_DB_NAME="${APP_DB_NAME:=kronos_db}" 
 
 # We are about to spin up a new docker container. Skip this step if one is already running.
 # We only know if one is running if we set the env variable SKIP_DOCKER in a previous instantiation.

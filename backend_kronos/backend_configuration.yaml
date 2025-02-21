@@ -7,3 +7,9 @@ database:
   username: "postgres"
   password: "password"
   database_name: "kronos_db"
+  # TODO: CHANGE THE BELOW IN PROD
+  superuser: postgres
+  superuser_pwd: password
+  app_user: app
+  app_user_pwd: secret
+  app_db_name: kronos_db
