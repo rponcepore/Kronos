@@ -14,6 +14,8 @@ path = "src/lib.rs"
 actix-web = "4.9.0"
 clap = { version = "4.5.30", features = ["derive"] }
 futures = "0.3.31"
+# by default, we will also get the following features that zero2prod recommends: chronos, uuid.
+# migrate is handled by sea-orm.
 sea-orm = {version = "1.1.5", features = ["sqlx-postgres", "runtime-tokio-rustls",  "macros"]}
 tokio = {version = "1", features = ["macros", "rt-multi-thread"]}
 

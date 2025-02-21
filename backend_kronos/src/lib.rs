@@ -5,15 +5,15 @@ use std::net::TcpListener;
 
 // Module tree declarations (I don't like this "feature" yet)
 mod database; // effectively means "import the module called database"
-mod handlers; // points to our handlers routines
+mod routes; // points to our route folder
 pub mod environment; 
 
 
 // The modules we wrote, that we will use here
 // use database::run_database; // means reference run_database as just "run_database""
-use crate::handlers::healthchecks::health_check;
-use crate::handlers::healthchecks::database_health_check;
-use crate::handlers::healthchecks::health_check_body;
+use crate::routes::healthchecks::health_check;
+use crate::routes::healthchecks::database_health_check;
+use crate::routes::healthchecks::health_check_body;
 
 /*
  * The main driver function of the entire application.
