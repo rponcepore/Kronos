@@ -1,1 +1,9 @@
 #! backend_configuration.yaml
+application_port: 8000
+application_address: 127.0.0.1
+database:
+  host: "127.0.0.1"
+  port: 5432
+  username: "postgres"
+  password: "password"
+  database_name: "kronos_db"

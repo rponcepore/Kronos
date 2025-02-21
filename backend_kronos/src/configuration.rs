@@ -3,7 +3,8 @@
 #[derive(serde::Deserialize)]
 pub struct Settings {
     pub database: DatabaseSettings,
-    pub application_port: u16
+    pub application_port: u16,
+    pub application_address: String,
 }
 
 #[derive(serde::Deserialize, Clone)]
@@ -28,4 +29,35 @@ pub fn get_configuration() -> Result<Settings, config::ConfigError> {
     .build()?;
     // Try to convert the config values it reads into our Settings type
     settings.try_deserialize::<Settings>()
+}
+
+
+impl DatabaseSettings {
+    // This method creates a postgres connection string from settings defined in backend_configuration.yaml
+    pub fn connection_string(&self) -> String {
+        format! (
+            "postgres:://{}:{}@{}:{}/{}",
+            self.username,
+            self.password,
+            self.host,
+            self.port,
+            self.database_name,
+        )
+    }
+}
+
+mod tests{
+    use crate::configuration::get_configuration;
+
+    #[tokio::test]
+    async fn test_read_configs () {
+        let result = match get_configuration() {
+            Ok(result) => true,
+            Err(error) => {
+                println!("Error: {}", error);
+                false
+            }
+        };
+        assert!(result);
+    }
 }

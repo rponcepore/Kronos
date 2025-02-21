@@ -51,7 +51,7 @@ SUPERUSER_PWD="${SUPERUSER_PWD:=password}"
 
 APP_USER="${APP_USER:=app}" 
 APP_USER_PWD="${APP_USER_PWD:=secret}" 
-APP_DB_NAME="${APP_DB_NAME:=kronos_test}" 
+APP_DB_NAME="${APP_DB_NAME:=kronos_DB}" 
 
 # We are about to spin up a new docker container. Skip this step if one is already running.
 # We only know if one is running if we set the env variable SKIP_DOCKER in a previous instantiation.
