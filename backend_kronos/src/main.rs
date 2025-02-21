@@ -5,11 +5,17 @@ use backend_kronos::environment::*;
 use std::net::TcpListener;
 use clap::Parser;
 
+// Imports that I wrote
+use backend_kronos::configuration::get_configuration;
+
 /*
  * The entrypoint of the entire application.
  */
 #[tokio::main]
 async fn main() -> Result<(), std::io::Error> {
+    // Read in our configuration settings.
+    let configuration = get_configuration().expect("Failed to read configuration.");
+
     let kargs:Kargs = Kargs::parse(); 
     let kenv = match parse_args(kargs) {
         Ok(config) => config,

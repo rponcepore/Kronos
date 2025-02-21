@@ -3,10 +3,12 @@ use actix_web::{web, App, HttpServer};
 use actix_web::dev::Server;
 use std::net::TcpListener;
 
-// Module tree declarations (I don't like this "feature" yet)
+// Module tree declarations 
 mod database; // effectively means "import the module called database"
 mod routes; // points to our route folder
 pub mod environment; 
+pub mod configuration;
+pub mod startup;
 
 
 // The modules we wrote, that we will use here

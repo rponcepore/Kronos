@@ -13,6 +13,7 @@ path = "src/lib.rs"
 [dependencies]
 actix-web = "4.9.0"
 clap = { version = "4.5.30", features = ["derive"] }
+config = "0.15.8"
 futures = "0.3.31"
 # by default, we will also get the following features that zero2prod recommends: chronos, uuid.
 # migrate is handled by sea-orm.
