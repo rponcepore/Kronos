@@ -40,6 +40,7 @@ async fn database_health_check () {
     let connection_string = configuration.database.connection_string();
     
     // Now attempt to connect to the database.
+    
 
 }
 

@@ -40,18 +40,19 @@ if ! [ -x "$(command -v psql)" ]; then
   exit 1
 fi
 
-set -x 
+# set -x 
 set -eo pipefail 
 
 # Check if custom parameter has been set, otherwise use default postgres values
 # CHANGE IN PROD
+RUST_BACKTRACE=1
 DB_PORT="${POSTGRES_PORT:=5432}" 
 SUPERUSER="${SUPERUSER:=postgres}" 
 SUPERUSER_PWD="${SUPERUSER_PWD:=password}" 
 
 APP_USER="${APP_USER:=app}" 
 APP_USER_PWD="${APP_USER_PWD:=secret}" 
-APP_DB_NAME="${APP_DB_NAME:=kronos_DB}" 
+APP_DB_NAME="${APP_DB_NAME:=kronos_db}" 
 
 # We are about to spin up a new docker container. Skip this step if one is already running.
 # We only know if one is running if we set the env variable SKIP_DOCKER in a previous instantiation.
@@ -105,14 +106,13 @@ fi
 #Export the DATABASE_URL environmental variable
 DATABASE_URL=postgres://${APP_USER}:${APP_USER_PWD}@localhost:${DB_PORT}/${APP_DB_NAME}
 
-# Note: This export only sets this env variable for the rest of the shel session, not permanently.
-export DATABASE_URL=$DATABASE_URL
+# Note: This export only sets this env variable for the rest of the shell session, not permanently.
+export DATABASE_URL
 
-echo $APP_DB_NAME
+echo "CREATING THE APPLICATION DATABASE: ${APP_DB_NAME}"
 
 #Create the application database inside the container.
-OUTPUT=$(docker exec -it "${CONTAINER_NAME}" psql -U "${APP_USER}" postgres -c "CREATE DATABASE ${APP_DB_NAME};" 2>&1)
-#psql -U "$APP_USER" -h "localhost" -p "$DB_PORT" -c "CREATE DATABASE $APP_DB_NAME;" 
+OUTPUT=$(docker exec -it "${CONTAINER_NAME}" psql -U "${APP_USER}" postgres -c "CREATE DATABASE $APP_DB_NAME;" 2>&1)
 
 # Check if an error occurred
 if [[ "$OUTPUT" == *"ERROR:"* ]]; then
@@ -122,12 +122,15 @@ if [[ "$OUTPUT" == *"ERROR:"* ]]; then
     if [[ "$OUTPUT" == *"database \"$APP_DB_NAME\" already exists"* ]]; then
         echo ""
         echo "Database '$APP_DB_NAME' already exists. No action needed."
+        exit 1
     elif [[ "$OUTPUT" == *"database \"$APP_DB_NAME\" does not exist"* ]]; then
         echo ""
         echo "Database '$APP_DB_NAME' does not exist. You may need to create it manually."
+        exit 1
     else
         echo ""
         echo "Unexpected error: $OUTPUT"
+        exit 1
     fi
 else
     echo "Database '$APP_DB_NAME' created successfully."
@@ -138,3 +141,4 @@ echo "Applying migrations"
 # We now are confident that the database exists.
 # Apply all pending migrations
 sea-orm-cli migrate up 
+
