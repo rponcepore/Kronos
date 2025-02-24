@@ -39,7 +39,10 @@ async fn database_health_check () {
     let configuration = get_configuration().expect("Failed to read configuration.");
     let connection_string = configuration.database.connection_string();
     
-    // Now attempt to connect to the database.
+    // Now attempt to connect to the database. 
+    
+    // We'll insert and retrieve a test record, then delete the record.
+
     
 
 }

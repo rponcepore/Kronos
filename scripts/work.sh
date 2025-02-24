@@ -7,4 +7,4 @@ echo "Database - local at Port 6000 (local) Port ____ (docker)"
 echo "Webserver - local at Port 9001 (local) Port ____ (docker)"
 echo "Nginx - local at Port 9000 (local) Port 80 (docker)"
 
-docker compose up -d --build webserver database
+# docker compose up -d --build webserver database
