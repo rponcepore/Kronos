@@ -7,6 +7,7 @@ Kronos is a task management system designed to reduce administrative load on the
 - Remington Ponce-Pore
 - Olivia Beattie
 - Jacob Horton
+- Advisor: Vijay Sai
 
 ## Configuration
 This repo employs multiple makefiles based on what you are trying to do. Run "make <args>" to accomplish the following:
