@@ -1,9 +1,8 @@
 //! main.rs
 
-use backend_kronos::run_server; // main automatically can see lib.rs files
+use backend_kronos::startup::run_server; // main automatically can see lib.rs files
 // use backend_kronos::environment::*;
 use std::net::TcpListener;
-use clap::Parser;
 
 // Imports that I wrote
 use backend_kronos::configuration::get_configuration;
@@ -13,6 +12,7 @@ use backend_kronos::configuration::get_configuration;
  */
 #[tokio::main]
 async fn main() -> Result<(), std::io::Error> {
+    
     // Read in our configuration settings.
     let configuration = get_configuration().expect("Failed to read configuration.");
     

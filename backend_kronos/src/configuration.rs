@@ -44,6 +44,16 @@ impl DatabaseSettings {
             self.database_name,
         )
     }
+    // This method returns a postgres database url WITHOUT a database name, for use in the SeaOrm library
+    pub fn database_url(&self) -> String {
+        format! (
+            "postgres:://{}:{}@{}:{}",
+            self.username,
+            self.password,
+            self.host,
+            self.port,
+        )
+    }
 }
 
 mod tests{

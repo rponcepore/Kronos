@@ -46,8 +46,30 @@ fi
 cd ..
 
 # The frontend is located at port 9000, so there should be no collisions!
+# make back can fail for lots of reasons. If it's something manageable, proceed.
+
+make back; retval=$?
+echo "retval = $retval"  ## now, adding more logging won't break the logic.
+case $retval in
+  0) 
+    echo "Make back successful"
+    ;;
+  *)   
+    echo "Backend construction failed. Would you like to proceed anyway?" 
+    read -p "Enter [Y]/[n]: " answer
+
+    if [[ "$answer" =~ ^[Yy]$ || -z "$answer" ]]; then
+      echo "Proceeding..."
+      
+    else
+      echo "Aborting..."
+      exit 1
+    fi
+    ;;
+esac
 
 cd backend_kronos
+cargo build
 echo "Target built. Building container."
 
 # We're going to try to run docker. First, check if the docker daemon is running.
