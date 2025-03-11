@@ -1,15 +1,17 @@
 #! backend_configuration.yaml
-application_port: 8000
-application_address: 127.0.0.1
+application:
+  port: 8000
+  host: 0.0.0.0 # should be 127.0.0.1 locally, but need 0.0.0.0 to work with docker, egad.
 database:
+  SKIP_DOCKER: "" # Keep this empty string to always create a new database, for testing. Can be set to "1" to keep old PG instance.
   host: "127.0.0.1"
   port: 5432
   username: "postgres"
   password: "password"
   database_name: "kronos_db"
   # TODO: CHANGE THE BELOW IN PROD
-  superuser: postgres
-  superuser_pwd: password
-  app_user: app
-  app_user_pwd: secret
-  app_db_name: kronos_db
+  superuser: "postgres"
+  superuser_pwd: "password"
+  app_user: "app"
+  app_user_pwd: "password"
+  app_db_name: "kronos_db"

@@ -3,8 +3,13 @@
 #[derive(serde::Deserialize)]
 pub struct Settings {
     pub database: DatabaseSettings,
-    pub application_port: u16,
-    pub application_address: String,
+    pub application: ApplicationSettings,
+}
+
+#[derive(serde::Deserialize)]
+pub struct ApplicationSettings {
+    pub port: u16,
+    pub host: String,
 }
 
 #[derive(serde::Deserialize, Clone)]
@@ -36,7 +41,7 @@ impl DatabaseSettings {
     // This method creates a postgres connection string from settings defined in backend_configuration.yaml
     pub fn connection_string(&self) -> String {
         format! (
-            "postgres:://{}:{}@{}:{}/{}",
+            "postgres://{}:{}@{}:{}/{}",
             self.username,
             self.password,
             self.host,
@@ -47,7 +52,7 @@ impl DatabaseSettings {
     // This method returns a postgres database url WITHOUT a database name, for use in the SeaOrm library
     pub fn database_url(&self) -> String {
         format! (
-            "postgres:://{}:{}@{}:{}",
+            "postgres://{}:{}@{}:{}",
             self.username,
             self.password,
             self.host,

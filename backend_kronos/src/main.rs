@@ -16,7 +16,8 @@ async fn main() -> Result<(), std::io::Error> {
     // Read in our configuration settings.
     let configuration = get_configuration().expect("Failed to read configuration.");
     
-    let address = format!("{}:{}", configuration.application_address, configuration.application_port);
+    let address = format!("{}:{}", 
+        configuration.application.host, configuration.application.port);
     // Bubble up the io::Error if we failed to bind the address
     // Otherwise call .await on our Server
     let listener = TcpListener::bind(&address)

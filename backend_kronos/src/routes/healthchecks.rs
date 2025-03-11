@@ -50,8 +50,8 @@ pub async fn database_health_check(_req: HttpRequest) -> impl Responder {
             // Connection failed
             eprintln!("Failed to connect to the database: {}", err);
             return HttpResponse::build(StatusCode::INTERNAL_SERVER_ERROR)
-        .insert_header(ContentType::html())
-        .body(format!("Failed to connect to the database: {}", err))
+                .insert_header(ContentType::html())
+                .body(format!("Failed to connect to the database: {}", err))
         }
     };
 }

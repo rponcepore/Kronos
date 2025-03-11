@@ -34,6 +34,7 @@ CURRENT_DIR="$(pwd)"
 
 if [ "$CURRENT_DIR" == "$EXPECTED_DIR" ]; then
     echo "You are in the correct directory: $CURRENT_DIR"
+    echo "Building environment."
 else
     echo "Warning: You are in the wrong directory!"
     echo "Current directory: $CURRENT_DIR"
@@ -43,34 +44,13 @@ else
     cd $EXPECTED_DIR
 fi
 
-cd ..
+chmod +x start_back.sh
+chmod +x start_front.sh
+
+INIT_DB_SCRIPT="../backend_kronos/scripts/init_db.sh"
 
 # The frontend is located at port 9000, so there should be no collisions!
 # make back can fail for lots of reasons. If it's something manageable, proceed.
-
-make back; retval=$?
-echo "retval = $retval"  ## now, adding more logging won't break the logic.
-case $retval in
-  0) 
-    echo "Make back successful"
-    ;;
-  *)   
-    echo "Backend construction failed. Would you like to proceed anyway?" 
-    read -p "Enter [Y]/[n]: " answer
-
-    if [[ "$answer" =~ ^[Yy]$ || -z "$answer" ]]; then
-      echo "Proceeding..."
-      
-    else
-      echo "Aborting..."
-      exit 1
-    fi
-    ;;
-esac
-
-cd backend_kronos
-cargo build
-echo "Target built. Building container."
 
 # We're going to try to run docker. First, check if the docker daemon is running.
 if ! docker info &> /dev/null
@@ -81,32 +61,28 @@ then
     exit 1
 fi
 
+pwd
+
+# Build the backend container in a new shell
+wt.exe --window last new-tab wsl -e bash -i -c "../scripts/start_back.sh"
+echo ""
+echo "Building postgres container."
+echo ""
+
+# Start the frontend (locally) in a new shell
+wt.exe --window last new-tab wsl -e bash -i -c "../scripts/start_front.sh"
 
 
-# Build
-docker build --tag backend_kronos . 2>&1 
-dock_ret_val=$?  # Capture the actual exit code of docker build
+# Open a browser window to the frontend.
+cmd.exe /c start "http://localhost:9000"
+echo ""
+echo "Frontend running locally on port 9000."
+echo ""
+
+# Create a new database for testing.
+echo "Running start_back.sh to create a new database for testing."
+echo ""
+./${INIT_DB_SCRIPT}
 
 
-echo "$docker_output"
 
-# Check if the specific error message is in the output
-if echo "$docker_output" | grep -q "The command 'docker-compose' could not be found in this WSL 2 distro."; then
-  echo "ERROR: Docker Compose is not installed or not available in this WSL 2 environment."
-  echo ""
-  echo "FIX: If you installed docker desktop on windows, it needs to be running to support docker compose in WSL."
-  echo "FIX: Run docker desktop, then re-run this script."
-  exit 1
-fi
-
-# Handle other potential failures
-if [[ $dock_ret_val -ne 0 ]]; then
-  echo "ERROR: Docker Compose command failed with exit code $dock_ret_val."
-  exit $dock_ret_val
-fi
-
-#Container built
-echo "Backend container built. Running."
-echo "To run the frontend container, in a separate shell, run \"npm run dev\" from the frontend_kronos directory."
-
-docker run -p 8000:8000 backend_kronos 

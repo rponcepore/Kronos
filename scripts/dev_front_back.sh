@@ -84,7 +84,12 @@ if [[ $dock_ret_val -ne 0 ]]; then
 fi
 
 #Container built
-echo "Backend container built. Running."
+echo "Backend container built."
 echo "To run the frontend container, in a separate shell, run \"npm run dev\" from the frontend_kronos directory."
+
+echo "Building the database, if necessary."
+./init_db
+
+echo "Running the backend."
 
 docker run -p 8000:8000 backend_kronos 

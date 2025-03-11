@@ -3,6 +3,18 @@
 # This script is meant just to fire up a postgres instance for testing
 # Do NOT use this script for persistent postgres data
 
+#It's also possible that this script is being executed when a postgres instance is already available.
+# In that case, we don't want to run anything.
+
+if docker ps --filter "name=postgres" --format "{{.Names}}" | grep -q "^postgres$"; then
+    echo "PostgreSQL container is already running. Exiting script."
+    exit 0
+else
+    echo "No running PostgreSQL container found. Continuing script..."
+    # Start your PostgreSQL container or run the rest of your script
+fi
+
+
 #First, make sure that we are in the correct directory:
 
 EXPECTED_DIR="/home/$USER/Kronos/backend_kronos"
@@ -71,7 +83,7 @@ SUPERUSER=$(read_config '.database.superuser' "postgres")
 SUPERUSER_PWD=$(read_config '.database.superuser_pwd' "password")
 
 APP_USER=$(read_config '.database.app_user' "app")
-APP_USER_PWD=$(read_config '.database.app_user_pwd' "secret")
+APP_USER_PWD=$(read_config '.database.app_user_pwd' "password")
 APP_DB_NAME=$(read_config '.database.app_db_name' "kronos_db")
 
 # Print values (for debugging)
