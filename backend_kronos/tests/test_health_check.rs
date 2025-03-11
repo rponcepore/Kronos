@@ -2,6 +2,8 @@
 
 use std::net::TcpListener;
 
+use backend_kronos::configuration::{self, get_configuration};
+
 const RANDOM_PORT: &str = "127.0.0.1:0";
 
 // `tokio::test` is the testing equivalent of `tokio::main`.
@@ -28,6 +30,24 @@ async fn health_check_works () {
     assert!(response.status().is_success());
     assert_eq!(Some(0), response.content_length());
 }
+
+
+
+#[tokio::test]
+async fn database_health_check () {
+    let app_address = spawn_app();
+    let configuration = get_configuration().expect("Failed to read configuration.");
+    let connection_string = configuration.database.connection_string();
+    
+    // Now attempt to connect to the database. 
+    
+    // We'll insert and retrieve a test record, then delete the record.
+
+    
+
+}
+
+
 
 /* Spawn application in the background as a helper function */
 fn spawn_app() -> String {
