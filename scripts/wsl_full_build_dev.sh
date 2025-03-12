@@ -36,9 +36,9 @@ if [ "$CURRENT_DIR" == "$EXPECTED_DIR" ]; then
     echo "You are in the correct directory: $CURRENT_DIR"
     echo "Building environment."
 else
-    echo "Warning: You are in the wrong directory!"
-    echo "Current directory: $CURRENT_DIR"
-    echo "Expected directory: $EXPECTED_DIR"
+    # echo "Warning: You are in the wrong directory!"
+    # echo "Current directory: $CURRENT_DIR"
+    # echo "Expected directory: $EXPECTED_DIR"
     echo ""
     echo "Moving to correct directory."
     cd $EXPECTED_DIR
@@ -61,16 +61,15 @@ then
     exit 1
 fi
 
-pwd
 
 # Build the backend container in a new shell
-wt.exe --window last new-tab wsl -e bash -i -c "../scripts/start_back.sh"
+wt.exe --window last new-tab --title "Backend-Actix" wsl -e bash -i -c "../scripts/start_back.sh"
 echo ""
 echo "Building postgres container."
 echo ""
 
 # Start the frontend (locally) in a new shell
-wt.exe --window last new-tab wsl -e bash -i -c "../scripts/start_front.sh"
+wt.exe --window last new-tab --title "Frontend-Vite" wsl -e bash -i -c "../scripts/start_front.sh"
 
 
 # Open a browser window to the frontend.

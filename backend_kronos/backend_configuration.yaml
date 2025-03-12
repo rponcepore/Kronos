@@ -15,3 +15,4 @@ database:
   app_user: "app"
   app_user_pwd: "password"
   app_db_name: "kronos_db"
+ 

@@ -8,8 +8,6 @@ RUN curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh -s --  -y
 ENV PATH="/root/.cargo/bin:${PATH}"
 RUN rustup update
 
-#EXPOSE 8000:8000
-
 # The rest of this is from "Zero to Prod in Rust", Palmieri.
 # Let's switch our working directory to `app` (equivalent to `cd app`)
 # The `app` folder will be created for us by Docker in case it does not 
