@@ -39,3 +39,10 @@
     ```sh
     cargo run -- status
     ```
+- Build the entities file:
+    ```sh
+    # In backend_kronos directory
+    sea-orm-cli generate entity \
+        -u postgres://postgres:password@localhost:5432/kronos_db \
+        -o src/entities
+    ```

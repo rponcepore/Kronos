@@ -15,4 +15,7 @@ database:
   app_user: "app"
   app_user_pwd: "password"
   app_db_name: "kronos_db"
- 
+
+
+# In dev, this means the connectino string is: 
+# postgres://postgres:password@localhost:5432/kronos_db
