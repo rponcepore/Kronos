@@ -11,4 +11,4 @@ Our database was created in the standard way. This should be done in the backend
 I referenced this documentation in creating it: https://www.sea-ql.org/SeaORM/docs/migration/setting-up-migration/
 
 Migrations within the database are named by the following convention, and placed in backend_kronos/migrations/src/<file>.rs
-'mYYYYMMDD_HHMMSS_migration_name.rs'
+'mYYYYMMDD_HHMMSS_migration_name.rs' The exception to this is manually written migrations, where HHMMSS can be replaced by a simple serial (000001, 000002, etc.)
