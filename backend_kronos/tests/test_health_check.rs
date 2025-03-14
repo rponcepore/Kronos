@@ -1,6 +1,9 @@
 //! tests/health_check.rs
 
 use std::net::TcpListener;
+use sea_orm::*;
+
+use backend_kronos::migration::entities::*;
 
 use backend_kronos::configuration::{self, get_configuration};
 
@@ -31,21 +34,53 @@ async fn health_check_works () {
     assert_eq!(Some(0), response.content_length());
 }
 
-
-
 #[tokio::test]
-async fn database_health_check () {
+async fn database_alive_test () {
     let app_address = spawn_app();
     let configuration = get_configuration().expect("Failed to read configuration.");
     let connection_string = configuration.database.connection_string();
     
     // Now attempt to connect to the database. 
-    
-    // We'll insert and retrieve a test record, then delete the record.
+    match Database::connect(connection_string) {
+        Ok(..) => println!("Connection successful."),
+        Err(error) => panic!("Failed to connect to database."),
+    };
+}
 
+#[tokio::test]
+async fn database_insert_read_test () {
+    let app_address = spawn_app();
+    let configuration = get_configuration().expect("Failed to read configuration.");
+    let connection_string = configuration.database.connection_string();
     
+    // Now attempt to connect to the database. 
+    let connection = Database::connect(connection_string).expect("Failed to connect to database.");
+
+    // We'll insert and retrieve a test record, then delete the record.
+    let test_record = test_table::ActiveModel {
+        id: ActiveValue::Set(0),
+        name: ActiveValue::Set("Test_Name".to_owned()), //to_owned converts &str to String
+        text: ActiveValue::Set("Test_Text".to_owned()),
+    };
+    let res = TestTable::insert(test_record).exec(connection).await?;
+
+    // Check for one and only one insertion into test_table
+    let test_records: Vec<test_table::Model> = TestTable::find().all(connection).await?;
+    assert_eq!(test_records.len(), 1);
+
+    // Find by the id
+    let test_record_single : Option<test_table::Model> = TestTable::find_by_id(0).one(connection).await?;
+    assert_eq!(test_record_single.unwrap().id, 0);
+
+    // Find the record by filter matching
+    let test_record_filter_one : Option<test_table::Model> = TestTable::find()
+        .filter(test_Table::Column::Text.eq("Test_Text"))
+        .one(connection)
+        .await?;
+    assert_eq!(test_record_filter_one.unwrap().id, 0);
 
 }
+
 
 
 

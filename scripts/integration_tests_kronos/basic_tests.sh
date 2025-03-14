@@ -69,5 +69,3 @@ echo ""
 
 
 
-# Done
-echo "Tests complete."
