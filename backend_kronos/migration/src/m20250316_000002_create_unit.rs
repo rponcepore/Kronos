@@ -3,6 +3,23 @@ use sea_orm_migration::{prelude::*, schema::*};
 #[derive(DeriveMigrationName)]
 pub struct Migration;
 
+#[derive(DeriveIden)]
+pub enum Unit {
+    Table, // Special case, maped to "Unit" enum. 
+    Uic,
+    Echelon,
+    Nickname,
+    DisplayName,
+    ShortName,
+    Component,
+    StateAbbrev,
+    ParentUIC,
+    Level,
+    ServiceMemberCapacity,
+
+
+}
+
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
@@ -24,9 +41,17 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(Unit::ShortName).string().not_null())
                     .col(ColumnDef::new(Unit::Component).string().not_null())
                     .col(ColumnDef::new(Unit::StateAbbrev).string().not_null())
-                    .col(ColumnDef::new(Unit::ParentUIC).string().not_null())
                     .col(ColumnDef::new(Unit::Level).integer().not_null())
                     .col(ColumnDef::new(Unit::ServiceMemberCapacity).integer().not_null())
+                    .col(ColumnDef::new(Unit::ParentUIC).string().not_null())
+                    .foreign_key(
+                        ForeignKey::create()
+                            .name("fk-uic-parentuic")
+                            .from(Unit::Table, Unit::Uic)
+                            .to(Unit::Table, Unit::Uic)
+                            .on_delete(ForeignKeyAction::Cascade)
+                            .on_update(ForeignKeyAction::Cascade),
+                    )
                 .to_owned(),
             )
             .await
@@ -40,19 +65,4 @@ impl MigrationTrait for Migration {
     }
 }
 
-#[derive(DeriveIden)]
-enum Unit {
-    Table, // Special case, maped to "Unit" enum. 
-    Uic,
-    Echelon,
-    Nickname,
-    DisplayName,
-    ShortName,
-    Component,
-    StateAbbrev,
-    ParentUIC,
-    Level,
-    ServiceMemberCapacity,
 
-
-}
