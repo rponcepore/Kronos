@@ -2,13 +2,15 @@ import React from "react";
 import Navbar from "./Navbar";
 import Notifications from "./Notifications";
 import HighPriorityTasks from "./HighPriorityTasks";
-import MissionReadinessChart from "./missionReadinessChart";
+import MissionReadinessChart from "./MissionReadinessChart";
 import WeeklyActivityChart from "./WeeklyActivityChart";
+import BackgroundOverlay from "./BackgroundOverlay"; // Import background component
 
 const Dashboard = () => (
-  <div className="p-4 bg-gray-900 text-white min-h-screen">
+  <div className="p-4 bg-gray-900 text-white min-h-screen relative">
+    <BackgroundOverlay /> {/* Background always present */}
     <Navbar />
-    <div className="p-4 grid grid-cols-2 gap-4">
+    <div className="p-4 grid grid-cols-2 gap-4 relative">
       <Notifications />
       <HighPriorityTasks />
       <MissionReadinessChart />
@@ -18,4 +20,3 @@ const Dashboard = () => (
 );
 
 export default Dashboard;
-
