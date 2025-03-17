@@ -12,7 +12,14 @@ impl MigrationTrait for Migration {
                 Table::create()
                     .table(TestTable::Table)
                     .if_not_exists()
-                    .col(pk_auto(TestTable::Id))
+                    .col(
+                        // Define 'id' as an auto-incrementing primary key
+                        ColumnDef::new(TestTable::Id)
+                            .integer()
+                            .not_null()
+                            .primary_key()
+                            .auto_increment(), 
+                    )
                     .col(string(TestTable::Title))
                     .col(string(TestTable::Text))
                     .to_owned(),

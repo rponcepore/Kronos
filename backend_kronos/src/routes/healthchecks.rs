@@ -2,7 +2,7 @@
 
 // This file contains the various healthcheck routes employed by the server. 
 
-use actix_web::{error,  
+use actix_web::{
     http::{header::ContentType, StatusCode}, 
     HttpRequest, HttpResponse, Responder};
 use sea_orm::*;

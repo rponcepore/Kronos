@@ -28,10 +28,10 @@ pub fn get_configuration() -> Result<Settings, config::ConfigError> {
     // Initialize the congif reader
     let settings = config::Config::builder()
     // Add config vals from a file
-    .add_source(
-        config::File::new("backend_configuration.yaml", config::FileFormat::Yaml)
-    )
-    .build()?;
+        .add_source(
+            config::File::new("backend_configuration.yaml", config::FileFormat::Yaml)
+        )
+        .build()?;
     // Try to convert the config values it reads into our Settings type
     settings.try_deserialize::<Settings>()
 }
@@ -67,7 +67,7 @@ mod tests{
     #[tokio::test]
     async fn test_read_configs () {
         let result = match get_configuration() {
-            Ok(result) => true,
+            Ok(_result) => true,
             Err(error) => {
                 println!("Error: {}", error);
                 false

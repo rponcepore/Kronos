@@ -1,5 +1,12 @@
 # Running Migrator CLI
 
+- Build the entities file (added to readme by me):
+    ```sh
+    # In backend_kronos directory
+    sea-orm-cli generate entity \
+        -u postgres://postgres:password@localhost:5432/kronos_db \
+        -o src/models/entities
+    ```
 - Generate a new migration file
     ```sh
     cargo run -- generate MIGRATION_NAME

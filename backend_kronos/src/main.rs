@@ -1,11 +1,12 @@
 //! main.rs
 
-use backend_kronos::startup::run_server; // main automatically can see lib.rs files
-// use backend_kronos::environment::*;
+
+// Bring into scope items from cargo.toml
 use std::net::TcpListener;
 
 // Imports that I wrote
 use backend_kronos::configuration::get_configuration;
+use backend_kronos::startup::run_server; // main automatically can see lib.rs files
 
 /*
  * The entrypoint of the entire application.
