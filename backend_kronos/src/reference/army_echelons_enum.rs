@@ -1,4 +1,4 @@
-//! army_echelons.rs
+//! army_echelons_enum.rs
 
 // Echelons for units in the US Army
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
