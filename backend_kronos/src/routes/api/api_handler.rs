@@ -33,7 +33,6 @@ pub async fn api_handler(kronos_request_as_json: Result<web::Json<KronosRequest>
             let http_method = &req.http_method;
             let action = &req.action;
             let unit = &req.unit;
-
             println!("Method: {}, Action: {}, Unit: {}", http_method, action, unit);
             HttpResponse::Ok().finish()
         }
@@ -42,8 +41,4 @@ pub async fn api_handler(kronos_request_as_json: Result<web::Json<KronosRequest>
             HttpResponse::BadRequest().body(format!("Invalid JSON: {}\n", err))
         }
     }
-    
 }
-
-
-

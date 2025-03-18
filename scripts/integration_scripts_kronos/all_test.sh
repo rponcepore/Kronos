@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd /home/$USER/Kronos/scripts/integration_tests_kronos/
+cd /home/$USER/Kronos/scripts/integration_scripts_kronos/
 
 echo "Running all tests"
 
