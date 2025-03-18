@@ -10,7 +10,7 @@ use actix_web::{
 use sea_orm::*;
 use serde::{Deserialize, Serialize};
 
-use debug_print::debug_println;
+use debug_print::debug_println as dprintln;
 
 #[derive(serde::Deserialize, Serialize)]
 #[derive(Debug)]
@@ -52,6 +52,13 @@ pub async fn api_handler(kronos_request_as_json: Result<web::Json<KronosRequest>
 }
 
 pub fn get_plans(req: Json<KronosRequest>) -> HttpResponse {
-    debug_println!("Debug mode only print!");
+    dprintln!("get_plans method called. ");
+
+    // Get all the plans for that unit
+
+    // Serialize them into a KronosResponse Object
+
+    // Send back to the client
+
     HttpResponse::Ok().finish()
 }
