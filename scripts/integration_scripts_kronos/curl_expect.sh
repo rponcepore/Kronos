@@ -26,7 +26,7 @@ test_service_response() {
         datatype="Content-Type: application/json"  # explicit JSON
         echo "    Header: "$datatype" "
         echo "    Body: "$body" "
-        http_code=$(curl -X "$method" -s -o "$response_catch" -h "$datatype" -d "$body" -w "%{response_code}" "$url")
+        http_code=$(curl -X "$method" -s -o "$response_catch" -H "$datatype" -d "$body" -w "%{response_code}" "$url")
     fi
 
 
