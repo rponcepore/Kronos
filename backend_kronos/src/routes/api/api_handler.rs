@@ -1,13 +1,16 @@
 //! api.rs
 
 // This file defines the api for calls from the frontend.
-
+use actix_web::web;
 use actix_web::{
-    web,
+    web::Json,
     http::{header::ContentType, StatusCode}, 
-    HttpRequest, HttpResponse, Responder};
+    HttpRequest, HttpResponse, Responder
+    };
 use sea_orm::*;
 use serde::{Deserialize, Serialize};
+
+use debug_print::debug_println;
 
 #[derive(serde::Deserialize, Serialize)]
 #[derive(Debug)]
@@ -30,15 +33,25 @@ pub async fn api_handler(kronos_request_as_json: Result<web::Json<KronosRequest>
     match kronos_request_as_json {
         Ok(req) => {
             println!("api_handler called, request body: {:?}", req);
-            let http_method = &req.http_method;
-            let action = &req.action;
-            let unit = &req.unit;
+            let http_method = req.http_method.as_str();
+            let action = req.action.as_str();
+            let unit = req.unit.as_str();
             println!("Method: {}, Action: {}, Unit: {}", http_method, action, unit);
-            HttpResponse::Ok().finish()
+
+            match action {
+                "get_plans" => get_plans(req),
+                _ => return HttpResponse::BadRequest().body(format!("Invalid action: {}\n", action)),
+            }
+            
         }
         Err(err) => {
             println!("API handler called, but failed to deserialize JSON: {}", err);
             HttpResponse::BadRequest().body(format!("Invalid JSON: {}\n", err))
         }
     }
+}
+
+pub fn get_plans(req: Json<KronosRequest>) -> HttpResponse {
+    debug_println!("Debug mode only print!");
+    HttpResponse::Ok().finish()
 }
