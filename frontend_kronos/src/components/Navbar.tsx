@@ -1,6 +1,7 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom"; // useLocation determines the active route
 import "../styles/NavBar.css"; // CSS File 
+import logo from "../assets/KronosLogo.png"; // Import the logo image
 
 const NavBar = () => {
   const location = useLocation(); // Hook to get the current location/path
@@ -36,6 +37,7 @@ const NavBar = () => {
           <Link to="/settings">Settings</Link>
         </li>
       </ul>
+      <img src={logo} alt="Logo" className="logo" /> {/* Display the logo */}
     </nav>
   );
 };
