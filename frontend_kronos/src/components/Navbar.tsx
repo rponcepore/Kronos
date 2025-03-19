@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom"; // Import useLocation to determine the active route
-import "./NavBar.css"; // Make sure to create a CSS file for styles
+import "./styles/NavBar.css"; // Make sure to create a CSS file for styles
 
 const NavBar = () => {
   const location = useLocation(); // Hook to get the current location/path
