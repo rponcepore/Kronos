@@ -27,3 +27,4 @@ tokio = {version = "1", features = ["macros", "rt-multi-thread"]}
 # They do not get included in the final application binary!
 [dev-dependencies]
 reqwest = {version = "0.12", features = ["json"]}
+

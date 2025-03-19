@@ -10,7 +10,7 @@ use crate::routes::healthchecks::health_check;
 use crate::routes::healthchecks::database_health_check;
 use crate::routes::healthchecks::health_check_body;
 use crate::routes::api::api_handler::api_handler;
-
+use debug_print::debug_println as dprintln;
 /*
  * The main driver function of the entire application.
  */

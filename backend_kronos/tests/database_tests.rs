@@ -13,7 +13,7 @@ async fn database_alive_test () {
     
     // Now attempt to connect to the database. 
     match Database::connect(connection_string).await {
-        Ok(..) => println!("Connection successful."),
+        Ok(..) => {},
         Err(e) => panic!("Failed to connect to database: {}", e),
     };
 }

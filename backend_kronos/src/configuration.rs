@@ -63,13 +63,11 @@ impl DatabaseSettings {
 
 mod tests{
     use crate::configuration::get_configuration;
-
     #[tokio::test]
     async fn test_read_configs () {
         let result = match get_configuration() {
             Ok(_result) => true,
             Err(error) => {
-                println!("Error: {}", error);
                 false
             }
         };
