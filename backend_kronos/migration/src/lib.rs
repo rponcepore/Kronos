@@ -6,6 +6,8 @@ mod m20250316_000002_create_unit;
 mod m20250316_000003_create_plan;
 mod m20250317_000004_create_order;
 mod m20250317_000005_create_paragraph;
+mod m20250319_000006_seed_plans_data;
+
 
 pub struct Migrator;
 
@@ -19,6 +21,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20250316_000003_create_plan::Migration),
             Box::new(m20250317_000004_create_order::Migration),
             Box::new(m20250317_000005_create_paragraph::Migration),
+            Box::new(m20250319_000006_seed_plans_data::Migration),
         ]
     }
 }
