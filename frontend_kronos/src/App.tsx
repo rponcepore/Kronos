@@ -1,6 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import NavBar from "./components/Navbar"; // Adjust the path to the correct location of Navbar
+import NavBar from "./components/Navbar.tsx"; // Adjust the path to the correct location of Navbar
 import "./App.css"; // Import your global styles
 
 // Placeholder components for the pages
