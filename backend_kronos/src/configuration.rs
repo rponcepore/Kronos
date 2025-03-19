@@ -22,7 +22,7 @@ pub struct DatabaseSettings {
 }
 
 /*
- *This method allows us to read our config settings from the backend_configuration.yaml file
+ * This method allows us to read our config settings from the backend_configuration.yaml file
  *  */
 pub fn get_configuration() -> Result<Settings, config::ConfigError> {
     // Initialize the congif reader
