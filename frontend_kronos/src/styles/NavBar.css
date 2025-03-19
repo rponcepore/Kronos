@@ -35,5 +35,8 @@
     text-decoration: underline;
   }
   
-
-  
+  .logo {
+    height: 40px;  /* Adjust logo size */
+    width: auto;   /* Maintain aspect ratio */
+    margin-right: 20px;  /* Space between logo and nav links */
+  }

@@ -11,7 +11,7 @@ const NavBar = () => {
 
   return (
     <nav className="navbar">
-              <img src={logo} alt="Logo" className="logo" /> {/* Logo on the left */}
+        <img src={logo} alt="Logo" className="logo" /> {/* Logo on the left */}
 
       <ul className="nav-links">
         <li className={isActive("/") ? "active" : ""}>
