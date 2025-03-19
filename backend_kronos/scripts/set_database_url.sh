@@ -6,7 +6,7 @@ EXPECTED_DIR="/home/$USER/Kronos/backend_kronos"
 cd $EXPECTED_DIR
 
 # Read the config file to get teh database URL
-CONFIG_FILE="backend_configuration.yaml"
+CONFIG_FILE="configs/backend_configuration.yaml"
 
 echo "Reading from config file: ${CONFIG_FILE}"
 

@@ -29,7 +29,7 @@ pub fn get_configuration() -> Result<Settings, config::ConfigError> {
     let settings = config::Config::builder()
     // Add config vals from a file
         .add_source(
-            config::File::new("backend_configuration.yaml", config::FileFormat::Yaml)
+            config::File::new("configs/backend_configuration.yaml", config::FileFormat::Yaml)
         )
         .build()?;
     // Try to convert the config values it reads into our Settings type
