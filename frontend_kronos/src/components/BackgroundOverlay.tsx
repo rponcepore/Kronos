@@ -1,5 +1,5 @@
 import React from "react";
-import overlayImage from "/src/assets/rectangle-1.svg";
+import overlayImage from "/src/assets/rectangle-1.png";
 import "../styles/BackgroundOverlay.css";
 
 const BackgroundOverlay = () => {

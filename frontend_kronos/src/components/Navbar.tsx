@@ -1,18 +1,44 @@
-const Navbar = () => (
-    <nav className="bg-black text-white p-4 flex justify-between">
-      <div className="text-xl font-bold">KRONOS</div>
-      <div className="flex space-x-4">
-        {["Overview", "Dashboard", "Plans", "Task Management", "Calendar", "Analytics", "Search", "Settings"].map(
-          (item) => (
-            <a key={item} href="#" className="hover:underline">
-              {item}
-            </a>
-          )
-        )}
-      </div>
+import React from "react";
+import { Link, useLocation } from "react-router-dom"; // Import useLocation to determine the active route
+import "./NavBar.css"; // Make sure to create a CSS file for styles
+
+const NavBar = () => {
+  const location = useLocation(); // Hook to get the current location/path
+  
+  // Helper function to check if the link is active
+  const isActive = (path: string) => location.pathname === path;
+
+  return (
+    <nav className="navbar">
+      <ul className="nav-links">
+        <li className={isActive("/") ? "active" : ""}>
+          <Link to="/">Overview</Link>
+        </li>
+        <li className={isActive("/dashboard") ? "active" : ""}>
+          <Link to="/dashboard">Dashboard</Link>
+        </li>
+        <li className={isActive("/plans") ? "active" : ""}>
+          <Link to="/plans">Plans</Link>
+        </li>
+        <li className={isActive("/task-management") ? "active" : ""}>
+          <Link to="/task-management">Task Management</Link>
+        </li>
+        <li className={isActive("/calendar") ? "active" : ""}>
+          <Link to="/calendar">Calendar</Link>
+        </li>
+        <li className={isActive("/analytics") ? "active" : ""}>
+          <Link to="/analytics">Analytics</Link>
+        </li>
+        <li className={isActive("/search") ? "active" : ""}>
+          <Link to="/search">Search</Link>
+        </li>
+        <li className={isActive("/settings") ? "active" : ""}>
+          <Link to="/settings">Settings</Link>
+        </li>
+      </ul>
     </nav>
   );
-  
-  export default Navbar;
+};
 
-  
+export default NavBar;
+

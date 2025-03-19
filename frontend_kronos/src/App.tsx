@@ -1,8 +1,34 @@
 import React from "react";
-import Dashboard from "./components/Dashboard";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import NavBar from "./components/Navbar"; // Adjust the path to the correct location of Navbar
+import "./App.css"; // Import your global styles
+
+// Placeholder components for the pages
+const Overview = () => <div>Overview Page</div>;
+const Dashboard = () => <div>Dashboard Page</div>;
+const Plans = () => <div>Plans Page</div>;
+const TaskManagement = () => <div>Task Management Page</div>;
+const Calendar = () => <div>Calendar Page</div>;
+const Analytics = () => <div>Analytics Page</div>;
+const Search = () => <div>Search Page</div>;
+const Settings = () => <div>Settings Page</div>;
 
 function App() {
-  return <Dashboard />;
+  return (
+    <Router>
+      <NavBar />
+      <Routes>
+        <Route path="/" element={<Overview />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/plans" element={<Plans />} />
+        <Route path="/task-management" element={<TaskManagement />} />
+        <Route path="/calendar" element={<Calendar />} />
+        <Route path="/analytics" element={<Analytics />} />
+        <Route path="/search" element={<Search />} />
+        <Route path="/settings" element={<Settings />} />
+      </Routes>
+    </Router>
+  );
 }
 
 export default App;
