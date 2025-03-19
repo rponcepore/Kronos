@@ -1,38 +1,9 @@
-//! tests/health_check.rs
+//! tests/local_tests.rs
 
-use std::net::TcpListener;
 use sea_orm::*;
 
-
-use backend_kronos::entities::{prelude::*, *};
+use backend_kronos::models::entities::{prelude::*, *};
 use backend_kronos::configuration::{self, get_configuration};
-
-const RANDOM_PORT: &str = "127.0.0.1:0";
-
-// `tokio::test` is the testing equivalent of `tokio::main`.
-// It also spares you from having to specify the `#[test]` attribute.
-//
-// You can inspect what code gets generated using 
-// `cargo expand --test health_check` (<- name of the test file)
-#[tokio::test]
-async fn health_check_works () {
-    //Arrange
-    let address = spawn_app();
-    //reqwest is a library tha performs HTTP requests against our application.
-    let client = reqwest::Client::new();
-
-    //Act
-    let response = client
-        // Use the returned application address
-        .get(&format!("{}/health_check", &address))
-        .send()
-        .await
-        .expect("Failed to execute request.");
-
-    // Assert
-    assert!(response.status().is_success());
-    assert_eq!(Some(0), response.content_length());
-}
 
 #[tokio::test]
 async fn database_alive_test () {
@@ -42,7 +13,7 @@ async fn database_alive_test () {
     
     // Now attempt to connect to the database. 
     match Database::connect(connection_string).await {
-        Ok(..) => println!("Connection successful."),
+        Ok(..) => {},
         Err(e) => panic!("Failed to connect to database: {}", e),
     };
 }
@@ -129,16 +100,3 @@ async fn database_crud_test () {
 
 
 
-/* Spawn application in the background as a helper function */
-fn spawn_app() -> String {
-    let listener = TcpListener::bind(RANDOM_PORT)
-        .expect("Failed to bind random port");
-    let port = listener.local_addr().unwrap().port();
-    let server = backend_kronos::startup::run_server(listener).expect("Failed to bind address");
-    // Launch the server as a background task
-    // tokio::spawn returns a handle to the spawned future,
-    // but we have no use for it here, hence the non-binding let
-    let _ = tokio::spawn(server);
-    // return the port to the calling function, so the test goes to the correct port!
-    format! ("http://127.0.0.1:{}", port)
-}

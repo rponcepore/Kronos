@@ -10,7 +10,7 @@ pub enum Order {
     Table,
     Id,
     ParentPlan,
-    Type,
+    OrderType,
     SerialNumber,
     IsPublished,
     DerivedFrom,
@@ -41,7 +41,7 @@ impl MigrationTrait for Migration {
                             .on_delete(ForeignKeyAction::Cascade) // delete this item if the plan is deleted
                             .on_update(ForeignKeyAction::Cascade),
                     )
-                    .col(string(Order::Type))
+                    .col(string(Order::OrderType))
                     .col(integer(Order::SerialNumber))
                     .col(boolean(Order::IsPublished))
                     .col(

@@ -24,7 +24,8 @@ IMHO, SeaORM explains this only adequately. I took the route of writing migratio
     # In backend_kronos directory
     sea-orm-cli generate entity \
         -u postgres://postgres:password@localhost:5432/kronos_db \
-        -o src/models/entities
+        -o src/models/entities \
+        --with-serde both
 ```
 
 ## Types, and Safety

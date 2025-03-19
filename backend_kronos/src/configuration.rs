@@ -22,14 +22,14 @@ pub struct DatabaseSettings {
 }
 
 /*
- *This method allows us to read our config settings from the backend_configuration.yaml file
+ * This method allows us to read our config settings from the backend_configuration.yaml file
  *  */
 pub fn get_configuration() -> Result<Settings, config::ConfigError> {
     // Initialize the congif reader
     let settings = config::Config::builder()
     // Add config vals from a file
         .add_source(
-            config::File::new("backend_configuration.yaml", config::FileFormat::Yaml)
+            config::File::new("configs/backend_configuration.yaml", config::FileFormat::Yaml)
         )
         .build()?;
     // Try to convert the config values it reads into our Settings type
@@ -63,13 +63,11 @@ impl DatabaseSettings {
 
 mod tests{
     use crate::configuration::get_configuration;
-
     #[tokio::test]
     async fn test_read_configs () {
         let result = match get_configuration() {
             Ok(_result) => true,
             Err(error) => {
-                println!("Error: {}", error);
                 false
             }
         };

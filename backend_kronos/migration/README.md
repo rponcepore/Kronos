@@ -5,7 +5,8 @@
     # In backend_kronos directory
     sea-orm-cli generate entity \
         -u postgres://postgres:password@localhost:5432/kronos_db \
-        -o src/models/entities
+        -o src/models/entities \
+        --with-serde both
     ```
 - Generate a new migration file
     ```sh

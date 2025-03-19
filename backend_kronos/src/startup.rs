@@ -9,7 +9,8 @@ use std::net::TcpListener;
 use crate::routes::healthchecks::health_check;
 use crate::routes::healthchecks::database_health_check;
 use crate::routes::healthchecks::health_check_body;
-
+use crate::routes::api::api_handler::api_handler;
+use debug_print::debug_println as dprintln;
 /*
  * The main driver function of the entire application.
  */
@@ -21,6 +22,7 @@ pub fn run_server(listener: TcpListener) -> Result<Server, std::io::Error> {
                 .route("/health_check", web::get().to(health_check))
                 .route("/health_check_body", web::get().to(health_check_body))
                 .route("/database_health_check", web::get().to(database_health_check))
+                .route("/api", web::post().to(api_handler))
         })
         .listen(listener)?
         .run();
