@@ -11,6 +11,8 @@ const NavBar = () => {
 
   return (
     <nav className="navbar">
+              <img src={logo} alt="Logo" className="logo" /> {/* Logo on the left */}
+
       <ul className="nav-links">
         <li className={isActive("/") ? "active" : ""}>
           <Link to="/">Overview</Link>
@@ -37,7 +39,6 @@ const NavBar = () => {
           <Link to="/settings">Settings</Link>
         </li>
       </ul>
-      <img src={logo} alt="Logo" className="logo" /> {/* Display the logo */}
     </nav>
   );
 };
