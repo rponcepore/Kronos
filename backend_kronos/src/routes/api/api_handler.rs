@@ -73,7 +73,10 @@ pub async fn api_handler(kronos_request_as_json: Result<web::Json<KronosRequest>
     };
 
     match kronos_response {
-        Ok(kronos_response) => HttpResponse::Ok().json(kronos_response),
+        Ok(kronos_response) => {
+            dprintln!("{:?}", kronos_response);
+            HttpResponse::Ok().json(kronos_response)
+        },
         Err(kronos_api_error) => match kronos_api_error{
             KronosApiError::DbErr(err) => {
                 // Handle database errors
