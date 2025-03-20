@@ -1,7 +1,3 @@
-#!/bin/bash
-
-# This file defines a helper function for testing. Eventually I'll refactor the other tests to mimic it.
-
 test_service_response() {
     local testname=$1
     local method=$2
@@ -10,6 +6,7 @@ test_service_response() {
     local expected_body=$5
     local datatype=$6 #-H "Content-Type:application/json"
     local body=$7
+    local print_output=$8
 
     local response_catch="response_body.txt"
 
@@ -43,11 +40,13 @@ test_service_response() {
         else
             if  echo "$response_body" | grep -q "$expected_body" ; then
                 echo "  Success: Received HTTP/1.1 $http_code OK and correct response body:"
-                # echo "  Response Body: $response_body"
             else
                 echo "^^FAILURE: Incorrect response body; does not contain $expected_body"
                 echo "  Response Body: $response_body"
             fi
+        fi
+        if [ "$print_output" == "true" ]; then
+            echo "  Response Body: $response_body"
         fi
     else
         if [ "$http_code" == "000" ]; then

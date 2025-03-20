@@ -16,8 +16,6 @@ pub enum Unit {
     ParentUIC,
     Level,
     ServiceMemberCapacity,
-
-
 }
 
 #[async_trait::async_trait]
@@ -40,13 +38,13 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(Unit::DisplayName).string().not_null())
                     .col(ColumnDef::new(Unit::ShortName).string().not_null())
                     .col(ColumnDef::new(Unit::Component).string().not_null())
-                    .col(ColumnDef::new(Unit::StateAbbrev).string().not_null())
-                    .col(ColumnDef::new(Unit::Level).integer().not_null())
-                    .col(ColumnDef::new(Unit::ServiceMemberCapacity).integer().not_null())
-                    .col(ColumnDef::new(Unit::ParentUIC).string().not_null())
+                    .col(ColumnDef::new(Unit::StateAbbrev).string())
+                    .col(ColumnDef::new(Unit::Level).integer())
+                    .col(ColumnDef::new(Unit::ServiceMemberCapacity).integer())
+                    .col(ColumnDef::new(Unit::ParentUIC).string())
                     .foreign_key(
                         ForeignKey::create()
-                            .name("fk-uic-parentuic")
+                            .name("fk-uic-parent-uic")
                             .from(Unit::Table, Unit::Uic)
                             .to(Unit::Table, Unit::Uic)
                             .on_delete(ForeignKeyAction::Cascade)

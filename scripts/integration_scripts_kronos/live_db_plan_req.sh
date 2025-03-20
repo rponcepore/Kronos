@@ -1,13 +1,12 @@
 #!/bin/bash
 
-# External integration tests for the service
+#!/bin/bash
+
+# This file defines a helper function for testing. Eventually I'll refactor the other tests to mimic it.
 
 source ./curl_expect.sh
 
-echo " Block C: Service Tests"
-
-# Test 1: Ensure that a blank api request fails
-test_service_response "Test 1: Blank API call fails." "POST" "http://127.0.0.1:8000/api" "400"
+echo "Printing output for a Plans Post Request"
 
 # Test 2: Send a small (legitimate) KronosRequest to the API
 expected_response_body=""
@@ -22,3 +21,4 @@ test_service_response \
 "$expected_response_body" \
 "$datatype" \
 "$json_data" \
+"true"
