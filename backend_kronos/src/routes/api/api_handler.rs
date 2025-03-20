@@ -149,8 +149,6 @@ pub async fn get_plans(req: Json<KronosRequest>) -> Result<KronosResponse, Krono
         Err(error) => return Err(KronosApiError::DbErr(error)),
     };
 
-    
-
     // Get all the plans for that unit
     let plan_vec: Vec<plan::Model> = match Plan::find()
         .filter(plan::Column::Unit.contains(req.unit.as_str()))
