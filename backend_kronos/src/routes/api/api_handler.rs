@@ -100,11 +100,6 @@ pub async fn api_handler(kronos_request_as_json: Result<web::Json<KronosRequest>
 
 pub async fn get_plans(req: Json<KronosRequest>) -> Result<KronosResponse, KronosApiError>  {
     dprintln!("get_plans method called. ");
-    // Connect to the database
-    let db = match access_kronos_database().await{
-        Ok(db) => db,
-        Err(error) => return Err(KronosApiError::DbErr(error)),
-    };
 
     // TODO: Delete this bad, very bad, hack, that is used only for development:
     if req.unit == "tstUIC" {
@@ -146,6 +141,15 @@ pub async fn get_plans(req: Json<KronosRequest>) -> Result<KronosResponse, Krono
         };
         return Ok(kronos_response);
     } //END of teh very bad hack that should be deleted. (I need to install mocking, oof.)
+
+    // NORMAL execution:
+    // Connect to the database
+    let db = match access_kronos_database().await{
+        Ok(db) => db,
+        Err(error) => return Err(KronosApiError::DbErr(error)),
+    };
+
+    
 
     // Get all the plans for that unit
     let plan_vec: Vec<plan::Model> = match Plan::find()
