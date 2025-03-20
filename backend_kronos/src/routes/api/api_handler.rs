@@ -105,6 +105,48 @@ pub async fn get_plans(req: Json<KronosRequest>) -> Result<KronosResponse, Krono
         Ok(db) => db,
         Err(error) => return Err(KronosApiError::DbErr(error)),
     };
+
+    // TODO: Delete this bad, very bad, hack, that is used only for development:
+    if req.unit == "tstUIC" {
+        let plan_vec = vec![
+            plan::Model {
+                id: 1,
+                unit: "WJH8C0".to_string(),
+                parent_plan: None,
+                fiscal_year: 2025,
+                serial_number: 1,
+                classification: "Top Secret".to_string(),
+                name: "Operation Blackbeard".to_string(),
+            },
+            plan::Model {
+                id: 2,
+                unit: "WJH8C0".to_string(),
+                parent_plan: None,
+                fiscal_year: 2025,
+                serial_number: 2,
+                classification: "CUI".to_string(),
+                name: "Revenge Strategy".to_string(),
+            },
+            plan::Model {
+                id: 3,
+                unit: "WJH8C0".to_string(),
+                parent_plan: None,
+                fiscal_year: 2025,
+                serial_number: 3,
+                classification: "Secret".to_string(),
+                name: "Jack Sparrow's Gambit".to_string(),
+            },
+        ];
+        let kronos_response = KronosResponse {
+            kronos_request: req.into_inner(),
+            plans_vec: Some(plan_vec),
+            orders_vec: None,
+            paragraphs_vec: None,
+            units_vec: None,
+        };
+        return Ok(kronos_response);
+    } //END of teh very bad hack that should be deleted. (I need to install mocking, oof.)
+
     // Get all the plans for that unit
     let plan_vec: Vec<plan::Model> = match Plan::find()
         .filter(plan::Column::Unit.contains(req.unit.as_str()))
