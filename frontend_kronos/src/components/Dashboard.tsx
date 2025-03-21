@@ -8,7 +8,7 @@ import BackgroundOverlay from "./BackgroundOverlay"; // Import background compon
 
 const Dashboard = () => (
   <div className="p-4 bg-gray-900 text-white min-h-screen relative">
-    <BackgroundOverlay /> {/* Background always present */}
+    <BackgroundOverlay /> {/* Background always presentt */}
     <Navbar />
     <div className="p-4 grid grid-cols-2 gap-4 relative">
       <Notifications />
