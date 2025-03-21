@@ -1,17 +1,18 @@
 import React from "react";
-import { Link, useLocation } from "react-router-dom"; // useLocation determines the active route
-import "../styles/NavBar.css"; // CSS File 
-import logo from "../assets/KronosLogo.png"; // Import the logo image
+import { Link, useLocation } from "react-router-dom";
+import "../styles/NavBar.css";
+import logo from "../assets/KronosLogo.png";
 
 const NavBar = () => {
-  const location = useLocation(); // Hook to get the current location/path
-  
-  // Helper function to check if the link is active
+  const location = useLocation();
+
   const isActive = (path: string) => location.pathname === path;
 
   return (
     <nav className="navbar">
-        <img src={logo} alt="Logo" className="logo" /> {/* Logo on the left */}
+      <div className="nav-left">
+        <img src={logo} alt="Kronos Logo" className="logo" />
+      </div>
 
       <ul className="nav-links">
         <li className={isActive("/") ? "active" : ""}>
@@ -44,4 +45,3 @@ const NavBar = () => {
 };
 
 export default NavBar;
-

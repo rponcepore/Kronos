@@ -13,7 +13,7 @@ const PlansPage: React.FC = () => {
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
 
   return (
-    <div className="p-6">
+    <div className="p-6 mt-16">
       {selectedPlan ? (
         <PlanDetails plan={selectedPlan} goBack={() => setSelectedPlan(null)} />
       ) : (

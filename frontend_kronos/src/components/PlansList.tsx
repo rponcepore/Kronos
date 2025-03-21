@@ -9,9 +9,11 @@ interface PlansListProps {
 
 const PlansList: React.FC<PlansListProps> = ({ plans, selectPlan }) => {
   return (
-    <div className="p-6 space-y-4">
+    <div className="plans-container">
       {plans.map((plan) => (
+        <div className="mb-6"> 
         <PlanCard key={plan.id} plan={plan} selectPlan={selectPlan} />
+        </div>
       ))}
     </div>
   );
