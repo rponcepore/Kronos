@@ -64,7 +64,7 @@ fi
 # Check if custom parameter has been set, otherwise use default postgres values
 # These need to be read in from backend_configuration.yaml
 
-CONFIG_FILE="backend_configuration.yaml"
+CONFIG_FILE="configs/backend_configuration.yaml"
 
 echo "Reading from config file: ${CONFIG_FILE}"
 

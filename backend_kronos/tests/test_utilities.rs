@@ -1,0 +1,33 @@
+//! test_utilities.rs
+
+// This file provides necessary support for the testing packages.
+use serde::{Serialize, Deserialize};
+use backend_kronos::routes::api::api_handler::KronosRequest;
+use std::net::TcpListener;
+
+const RANDOM_PORT: &str = "127.0.0.1:0"; // This is a special case: says, "use local host, but bind port 0--any random port."
+
+
+/* Return a dummy JSON for a post request asking for all plans */
+pub fn dummy_plan_request() -> KronosRequest {
+    let result = KronosRequest{
+        http_method: "POST".to_string(),
+        action: "get_plans".to_string(),
+        unit: "WHJ8C0".to_string(),
+    };
+    result
+}
+
+/* Spawn application in the background as a helper function */
+pub fn spawn_app() -> String {
+    let listener = TcpListener::bind(RANDOM_PORT)
+        .expect("Failed to bind random port");
+    let port = listener.local_addr().unwrap().port();
+    let server = backend_kronos::startup::run_server(listener).expect("Failed to bind address");
+    // Launch the server as a background task
+    // tokio::spawn returns a handle to the spawned future,
+    // but we have no use for it here, hence the non-binding let
+    let _ = tokio::spawn(server);
+    // return the port to the calling function, so the test goes to the correct port!
+    format! ("http://127.0.0.1:{}", port)
+}

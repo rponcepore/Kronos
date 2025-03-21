@@ -6,6 +6,7 @@ use actix_web::{
     http::{header::ContentType, StatusCode}, 
     HttpRequest, HttpResponse, Responder};
 use sea_orm::*;
+use debug_print::debug_println as dprintln;
 
 use crate::configuration::get_configuration;
 
@@ -15,7 +16,7 @@ use crate::configuration::get_configuration;
  * @return 200 OK with no body
  */
 pub async fn health_check(_req: HttpRequest) -> impl Responder {
-    println!("health_check called!");
+    dprintln!("health_check called!");
     HttpResponse::Ok().finish()
 }
 
@@ -25,7 +26,7 @@ pub async fn health_check(_req: HttpRequest) -> impl Responder {
  * @return 200 OK with no body
  */
 pub async fn health_check_body(_req: HttpRequest) -> impl Responder {
-    println!("health_check_body called!");
+    dprintln!("health_check_body called!");
     HttpResponse::Ok().body("health_check_body success!")
 }
 
@@ -35,20 +36,20 @@ pub async fn health_check_body(_req: HttpRequest) -> impl Responder {
  * @return 200 OK with no body
  */
 pub async fn database_health_check(_req: HttpRequest) -> impl Responder {
-    println!("database_health_check called!");
+    dprintln!("database_health_check called!");
     let configuration = get_configuration().expect("Failed to read configuration.");
-    println!("Configuration read successfully.");
+    dprintln!("Configuration read successfully.");
     let connection_string = configuration.database.connection_string();
-    println!("Connection string: {}", connection_string);
+    dprintln!("Connection string: {}", connection_string);
     match Database::connect(connection_string).await {
         Ok(..) => {
             // Connection successful
-            println!("Successfully connected to the database.");
+            dprintln!("Successfully connected to the database.");
             return HttpResponse::Ok().finish();
         }
         Err(err) => {
             // Connection failed
-            eprintln!("Failed to connect to the database: {}", err);
+            dprintln!("Failed to connect to the database: {}", err);
             return HttpResponse::build(StatusCode::INTERNAL_SERVER_ERROR)
                 .insert_header(ContentType::html())
                 .body(format!("Failed to connect to the database: {}", err))

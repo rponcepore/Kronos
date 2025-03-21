@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# This script populates the database with synthetic data.
+
+# Set env variable
 # Move to the correct directory
 EXPECTED_DIR="/home/$USER/Kronos/backend_kronos"
 
@@ -29,9 +32,25 @@ APP_USER_PWD=$(read_config '.database.app_user_pwd' "password")
 APP_DB_NAME=$(read_config '.database.app_db_name' "kronos_db")
 
 DATABASE_URL=postgres://${APP_USER}:${APP_USER_PWD}@localhost:${DB_PORT}/${APP_DB_NAME}
-
-# Then do the migrations
+echo "read url as: $DATABASE_URL"
 
 export DATABASE_URL
 
-sea-orm-cli migrate up
+echo "env variable \"DATABASE_URL\" set to:"
+
+# Wait for Postgres to be ready to accept connections
+CONTAINER_NAME="postgres"
+
+  until [ \
+    "$(docker inspect -f "{{.State.Health.Status}}" ${CONTAINER_NAME})" == \
+    "healthy" \
+  ]; do
+    >&2 echo "Postgres is still unavailable - sleeping"
+    sleep 1  
+  done 
+
+# Connect to the database
+STATEMENT=""
+docker exec -it "${CONTAINER_NAME}" psql -U "${APP_USER}" -c "${STATEMENT}"
+
+# Begin executing queries
