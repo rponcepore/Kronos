@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import NavBar from "./components/Navbar.tsx"; // Adjust the path to the correct location of Navbar
 import "./App.css"; // Import your global styles
 import PlansPage from "./pages/PlansPage";
+import PlansOverview from "./components/PlansOverview";
+import PlanDetails from "./components/PlansDetails";
 import "./styles/plans.css";
 
 
