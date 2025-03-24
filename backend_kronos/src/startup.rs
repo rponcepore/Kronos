@@ -22,7 +22,7 @@ pub fn run_server(listener: TcpListener) -> Result<Server, std::io::Error> {
                 // Adding some middleware. I am allowing these explicitly for now until I learn more.
                 .wrap(
                     Cors::default()
-                        .allowed_origin("http://localhost:5173") // Only allow this origin (React App)
+                        .allowed_origin("http://localhost:9000") // Only allow this origin (React App)
                         .allowed_origin("http://localhost:5173") // (Other react app)
                         .allowed_methods(vec!["GET", "POST"]) 
                         .allowed_headers(vec!["Content-Type"]) // Allow specific headers

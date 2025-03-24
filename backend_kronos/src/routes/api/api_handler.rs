@@ -7,6 +7,7 @@ use actix_web::{
     http::{header::ContentType, StatusCode}, 
     HttpRequest, HttpResponse, Responder
     };
+    
 use sea_orm::*;
 use serde::{Deserialize, Serialize};
 use debug_print::debug_println as dprintln;
@@ -20,9 +21,9 @@ use crate::configuration::get_configuration;
 #[derive(Debug)]
 pub struct KronosRequest {
     //pub request_id: Integer,
-    pub http_method: String,
-    pub action: String,
-    pub unit: String,
+    pub http_method: Option<String>,
+    pub action: Option<String>,
+    pub unit: Option<String>,
 }
 
 #[derive(serde::Deserialize, Serialize)]
@@ -60,10 +61,15 @@ pub async fn api_handler(kronos_request_as_json: Result<web::Json<KronosRequest>
 
     // Deserialization successful
     dprintln!("api_handler called, request body: {:?}", req);
-    let http_method = req.http_method.as_str();
-    let action = req.action.as_str();
-    let unit = req.unit.as_str();
-    dprintln!("Method: {}, Action: {}, Unit: {}", http_method, action, unit);
+    let action = match &req.action {
+        Some(action) => action.as_str(),
+        None => return HttpResponse::BadRequest().body(format!("No action returned.")),
+    };
+
+    match &req.unit {
+        Some(unit) => unit,
+        None => return HttpResponse::BadRequest().body(format!("Invalid request: No unit provided")),
+    };
 
     let kronos_response: Result<KronosResponse, KronosApiError> = match action {
         "get_plans" => get_plans(req).await,
@@ -102,7 +108,7 @@ pub async fn get_plans(req: Json<KronosRequest>) -> Result<KronosResponse, Krono
     dprintln!("get_plans method called. ");
 
     // TODO: Delete this bad, very bad, hack, that is used only for development:
-    if req.unit == "tstUIC" {
+    if req.unit.as_deref().unwrap_or("") == "tstUIC" { // This is a same unwrap because unit was already checked for None
         let plan_vec = vec![
             plan::Model {
                 id: 1,
@@ -149,9 +155,14 @@ pub async fn get_plans(req: Json<KronosRequest>) -> Result<KronosResponse, Krono
         Err(error) => return Err(KronosApiError::DbErr(error)),
     };
 
+    let unit_str = match &req.unit {
+        Some(unit) => unit.as_str(),
+        None => return Err(KronosApiError::Unknown("Deserialization error: unit string failure.".to_string())),
+    };
+
     // Get all the plans for that unit
     let plan_vec: Vec<plan::Model> = match Plan::find()
-        .filter(plan::Column::Unit.contains(req.unit.as_str()))
+        .filter(plan::Column::Unit.contains(unit_str))
         .order_by_asc(plan::Column::FiscalYear)
         .order_by_asc(plan::Column::SerialNumber)
         .all(&db)
