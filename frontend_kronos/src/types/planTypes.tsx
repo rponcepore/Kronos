@@ -9,4 +9,3 @@ export interface Plan {
     taskedTo: string;
     mission: string;
   }
-  
