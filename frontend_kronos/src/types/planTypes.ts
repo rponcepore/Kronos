@@ -1,6 +1,6 @@
 export interface Plan {
     id: number;
-    type: "OPORD" | "FRAGO" | "WARNO";
+    type: "PLAN" | "OPORD" | "FRAGO" | "WARNO";
     number: string;
     date: string;
     published: string;

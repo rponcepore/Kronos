@@ -5,18 +5,28 @@ import { Plan } from "../types/planTypes";
 interface PlansListProps {
   plans: Plan[];
   selectPlan: (plan: Plan) => void;
+  hideTypeBadge?: boolean;
 }
 
-const PlansList: React.FC<PlansListProps> = ({ plans, selectPlan }) => {
+const PlansList: React.FC<PlansListProps> = ({
+  plans,
+  selectPlan,
+  hideTypeBadge = false
+}) => {
   return (
     <div className="plans-container">
       {plans.map((plan) => (
-        <div className="mb-6"> 
-        <PlanCard key={plan.id} plan={plan} selectPlan={selectPlan} />
+        <div key={plan.id} className="mb-6">
+          <PlanCard
+            plan={plan}
+            selectPlan={selectPlan}
+            hideTypeBadge={hideTypeBadge}
+          />
         </div>
       ))}
     </div>
   );
 };
 
-export default PlansList;
+
+export default PlansList; 
