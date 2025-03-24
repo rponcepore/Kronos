@@ -39,7 +39,7 @@ test_service_response() {
             echo "  Success: Received HTTP/$http_code"
         else
             if  echo "$response_body" | grep -q "$expected_body" ; then
-                echo "  Success: Received HTTP/1.1 $http_code OK and correct response body:"
+                echo "  Success: Received HTTP/1.1 $http_code and correct response body."
             else
                 echo "^^FAILURE: Incorrect response body; does not contain $expected_body"
                 echo "  Response Body: $response_body"

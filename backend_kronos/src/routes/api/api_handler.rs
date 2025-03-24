@@ -63,7 +63,7 @@ pub async fn api_handler(kronos_request_as_json: Result<web::Json<KronosRequest>
     dprintln!("api_handler called, request body: {:?}", req);
     let action = match &req.action {
         Some(action) => action.as_str(),
-        None => return HttpResponse::BadRequest().body(format!("No action returned.")),
+        None => return HttpResponse::BadRequest().body(format!("Request action field is null.")),
     };
 
     match &req.unit {
