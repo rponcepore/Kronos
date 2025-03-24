@@ -1,23 +1,37 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PlansList from "../components/PlansList";
 import PlanDetails from "../components/PlansDetails";
-import { Plan } from "../types/planTypes";
-import plansData from "../data/plansData";
+import { Plan, serializeToPlan } from "../types/planTypes";
 
 const PlansPage: React.FC = () => {
+  const [plansData, setPlansData] = useState<Plan[]>([]);
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState<"default" | "alpha" | "published">("default");
   const [filterYear, setFilterYear] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  // Get base plans only (type === PLAN)
+  useEffect(() => {
+    async function fetchPlans() {
+      try {
+        const response = await fetch("http://localhost:8000/plans");
+        const json = await response.json();
+        const serializedPlans = json.map(serializeToPlan);
+        setPlansData(serializedPlans);
+      } catch (error) {
+        console.error("Failed to fetch plans:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+  
+    fetchPlans();
+  }, []);
+
   const basePlans = plansData.filter((p) => p.type === "PLAN");
 
-  // Apply filters and sorting
   const filteredPlans = basePlans
-    .filter((p) =>
-      !filterYear || p.number.startsWith(filterYear)
-    )
+    .filter((p) => !filterYear || p.number.startsWith(filterYear))
     .filter((p) =>
       p.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
       p.mission.toLowerCase().includes(searchTerm.toLowerCase())
@@ -27,6 +41,10 @@ const PlansPage: React.FC = () => {
       if (sortBy === "published") return a.published.localeCompare(b.published);
       return 0;
     });
+
+  if (loading) {
+    return <div className="p-6 mt-16">Loading plans...</div>;
+  }
 
   return (
     <div className="p-6 mt-16">
@@ -38,7 +56,6 @@ const PlansPage: React.FC = () => {
         />
       ) : (
         <>
-          {/* Button Bar */}
           <div className="top-controls mb-6 flex gap-4 flex-wrap">
             <button className="control-btn" onClick={() => setFilterYear(null)}>All Years</button>
             <button className="control-btn" onClick={() => setFilterYear("25")}>FY25</button>
@@ -54,7 +71,6 @@ const PlansPage: React.FC = () => {
             <button className="control-btn">New Plan ➕</button>
           </div>
 
-          {/* Plans List */}
           <PlansList plans={filteredPlans} selectPlan={setSelectedPlan} hideTypeBadge />
         </>
       )}

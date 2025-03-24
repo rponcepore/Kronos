@@ -2,6 +2,7 @@ import React from "react";
 import PlanCard from "./PlanCard";
 import { Plan } from "../types/planTypes";
 
+
 interface PlansListProps {
   plans: Plan[];
   selectPlan: (plan: Plan) => void;
