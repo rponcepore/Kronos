@@ -2,6 +2,10 @@ import React, { useEffect, useState } from "react";
 import PlansList from "../components/PlansList";
 import PlanDetails from "../components/PlansDetails";
 import { Plan, serializeToPlan } from "../types/planTypes";
+import { KronosRequest } from "../types/KronosRequest";
+import { KronosResponse } from "../types/KronosResponse";
+import { kronosApiCall } from "../helper_methods/ApiCall";
+
 
 const PlansPage: React.FC = () => {
   const [plansData, setPlansData] = useState<Plan[]>([]);
@@ -14,19 +18,22 @@ const PlansPage: React.FC = () => {
   useEffect(() => {
     async function fetchPlans() {
       try {
-        const response = await fetch("http://localhost:8000/plans");
-        const json = await response.json();
-        const serializedPlans = json.map(serializeToPlan);
-        setPlansData(serializedPlans);
+        setLoading(true);
+        setPlansData([]); // Clear existing plans data before fetching new data
+        const req: KronosRequest = { action: "GET_PLANS", unit: "", plan_id: 0, order_id: 0, paragraph_id: 0, task_id: 0 };
+        const res: KronosResponse = await kronosApiCall(req);
+          setPlansData(res.plans_vec); // Update the state with the fetched plans
       } catch (error) {
-        console.error("Failed to fetch plans:", error);
+        console.error("Error fetching plans:", error);
       } finally {
         setLoading(false);
       }
     }
+
   
     fetchPlans();
   }, []);
+  
 
   const basePlans = plansData.filter((p) => p.type === "PLAN");
 
