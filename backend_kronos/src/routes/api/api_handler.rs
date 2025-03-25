@@ -61,17 +61,18 @@ pub async fn api_handler(kronos_request_as_json: Result<web::Json<KronosRequest>
 
     // Deserialization successful
     dprintln!("api_handler called, request body: {:?}", req);
-    let action = match &req.action {
+    /*let action = match &req.action {
         Some(action) => action.as_str(),
         None => return HttpResponse::BadRequest().body(format!("Request action field is null.")),
     };
+    */
 
     match &req.unit {
         Some(unit) => unit,
         None => return HttpResponse::BadRequest().body(format!("Invalid request: No unit provided")),
     };
 
-    let kronos_response: Result<KronosResponse, KronosApiError> = match action {
+    let kronos_response: Result<KronosResponse, KronosApiError> = match req.action {
         "get_plans" => get_plans(req).await,
         "get_orders" => Err(KronosApiError::NotImplemented("get_orders not implemented.".to_string())),
         // Return a BadRequest response if the action was invalid.
