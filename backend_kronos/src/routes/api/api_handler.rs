@@ -16,12 +16,13 @@ use debug_print::debug_println as dprintln;
 use crate::models::entities::{prelude::*, *};
 // Include our database configs
 use crate::configuration::get_configuration;
+use crate::routes::api::api_methods::get_plans::get_plans;
 
 #[derive(serde::Deserialize, Serialize)]
 #[derive(Debug)]
 pub struct KronosRequest {
     //pub request_id: Integer,
-    pub http_method: Option<String>,
+    //pub http_method: Option<String>,
     pub action: Option<String>,
     pub unit: Option<String>,
 }
@@ -54,26 +55,22 @@ pub enum KronosApiError  {
  */
 pub async fn api_handler(kronos_request_as_json: Result<web::Json<KronosRequest>, actix_web::Error>) -> impl Responder {
 
-    let req = match kronos_request_as_json {
-        Ok(req) => req,
+    // Check for a valid request and that unit and action are not null.
+    let valid_req: Json<KronosRequest> = match kronos_request_as_json{
+        Ok(req) => match is_request_valid(req).await{
+            Ok(valid_req) => valid_req,
+            Err(bad_request_http_response) => return bad_request_http_response,
+        },
         Err(msg) => return HttpResponse::BadRequest().body(format!("Invalid JSON: {}\n", msg)),
     };
 
-    // Deserialization successful
-    dprintln!("api_handler called, request body: {:?}", req);
-    /*let action = match &req.action {
-        Some(action) => action.as_str(),
-        None => return HttpResponse::BadRequest().body(format!("Request action field is null.")),
-    };
-    */
+    // a valid_req has no null values for either action or unit, so we can unwrap without worry.
+    // Also, even though unwrap() will panic (and crash the program) if it fails, I want to crash
+    // because it means my is_valid_request function failed.
+    let action = valid_req.action.as_ref().unwrap().as_str();
 
-    match &req.unit {
-        Some(unit) => unit,
-        None => return HttpResponse::BadRequest().body(format!("Invalid request: No unit provided")),
-    };
-
-    let kronos_response: Result<KronosResponse, KronosApiError> = match req.action {
-        "get_plans" => get_plans(req).await,
+    let kronos_response: Result<KronosResponse, KronosApiError> = match action {
+        "get_plans" => get_plans(valid_req).await,
         "get_orders" => Err(KronosApiError::NotImplemented("get_orders not implemented.".to_string())),
         // Return a BadRequest response if the action was invalid.
         _ => return HttpResponse::BadRequest().body(format!("Invalid action: {}\n", action)),
@@ -105,90 +102,29 @@ pub async fn api_handler(kronos_request_as_json: Result<web::Json<KronosRequest>
     }
 }
 
-pub async fn get_plans(req: Json<KronosRequest>) -> Result<KronosResponse, KronosApiError>  {
-    dprintln!("get_plans method called. ");
-
-    // TODO: Delete this bad, very bad, hack, that is used only for development:
-    if req.unit.as_deref().unwrap_or("") == "tstUIC" { // This is a same unwrap because unit was already checked for None
-        let plan_vec = vec![
-            plan::Model {
-                id: 1,
-                unit: "WJH8C0".to_string(),
-                parent_plan: None,
-                fiscal_year: 2025,
-                serial_number: 1,
-                classification: "Top Secret".to_string(),
-                name: "Operation Blackbeard".to_string(),
-            },
-            plan::Model {
-                id: 2,
-                unit: "WJH8C0".to_string(),
-                parent_plan: None,
-                fiscal_year: 2025,
-                serial_number: 2,
-                classification: "CUI".to_string(),
-                name: "Revenge Strategy".to_string(),
-            },
-            plan::Model {
-                id: 3,
-                unit: "WJH8C0".to_string(),
-                parent_plan: None,
-                fiscal_year: 2025,
-                serial_number: 3,
-                classification: "Secret".to_string(),
-                name: "Jack Sparrow's Gambit".to_string(),
-            },
-        ];
-        let kronos_response = KronosResponse {
-            kronos_request: req.into_inner(),
-            plans_vec: Some(plan_vec),
-            orders_vec: None,
-            paragraphs_vec: None,
-            units_vec: None,
-        };
-        return Ok(kronos_response);
-    } //END of teh very bad hack that should be deleted. (I need to install mocking, oof.)
-
-    // NORMAL execution:
-    // Connect to the database
-    let db = match access_kronos_database().await{
-        Ok(db) => db,
-        Err(error) => return Err(KronosApiError::DbErr(error)),
-    };
-
-    let unit_str = match &req.unit {
-        Some(unit) => unit.as_str(),
-        None => return Err(KronosApiError::Unknown("Deserialization error: unit string failure.".to_string())),
-    };
-
-    // Get all the plans for that unit
-    let plan_vec: Vec<plan::Model> = match Plan::find()
-        .filter(plan::Column::Unit.contains(unit_str))
-        .order_by_asc(plan::Column::FiscalYear)
-        .order_by_asc(plan::Column::SerialNumber)
-        .all(&db)
-        .await {
-            Ok(plan_vec) => plan_vec,
-            Err(msg) => return Err(KronosApiError::DbErr(msg)),
-        };
-    // Unwrap json<KronosRequest> into just a KronosRequest to avoid de-re-de-se-re-serialization issues. 
-    let plain_kronos_request = req.into_inner();
-    // Encode them into a KronosResponse Object
-    let kronos_response = KronosResponse {
-        kronos_request: plain_kronos_request,
-        plans_vec: Some(plan_vec),
-        orders_vec: None,
-        paragraphs_vec: None,
-        units_vec: None,
-    };
-    // Send back to the client
-    Ok(kronos_response)
-}
-
 pub async fn access_kronos_database() -> Result<DatabaseConnection, DbErr> {
     let configuration = get_configuration().expect("Failed to read configuration.");
     dprintln!("Configuration read successfully.");
     let connection_string = configuration.database.connection_string();
     dprintln!("Connection string: {}", connection_string);
     Database::connect(connection_string).await 
+}
+
+// Invariant: Valid requests always have, at a minimum, a unit and an action.
+// This method occurs AFTER deserialization is proven successful.
+async fn is_request_valid(req: Json<KronosRequest>) -> Result< Json<KronosRequest>, HttpResponse> {
+    // Deserialization successful
+    dprintln!("api_handler called, request body: {:?}", req);
+
+    // First, check if the action is null
+    if req.action.is_none(){
+        return Err(HttpResponse::BadRequest().body(format!("Request action field is null.")));
+    }
+    
+    if req.unit.is_none(){
+        return Err(HttpResponse::BadRequest().body(format!("Request unit field is null.")));
+    }
+
+    return Ok(req);
+    
 }

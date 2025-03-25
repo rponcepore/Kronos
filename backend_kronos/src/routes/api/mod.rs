@@ -3,3 +3,4 @@
 
 
 pub mod api_handler;
+pub mod api_methods;
