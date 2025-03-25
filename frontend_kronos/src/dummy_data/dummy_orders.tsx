@@ -2,19 +2,19 @@ import { Order } from '../types/Order.tsx'
 import { Plan } from '../types/Plan.tsx';
 import { Paragraph } from '../types/Paragraph.tsx';
 
-const plans: Plan[] = [
+export const plans: Plan[] = [
     {
         id: 1,
         unit: "1st Brigade",
         parent_plan: null,
         fiscal_year: 2025,
-        serial_number: 101,
+        serial_number: 1,
         classification: "SECRET",
         name: "Operation Iron Shield"
     }
 ];
 
-const orders: Order[] = [
+export const orders: Order[] = [
     {
         id: 1,
         parent_plan: 1,
@@ -33,7 +33,7 @@ const orders: Order[] = [
     }
 ];
 
-const paragraphs: Paragraph[] = [
+export const paragraphs: Paragraph[] = [
     {
         id: 1,
         order: 1,
