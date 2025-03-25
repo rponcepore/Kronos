@@ -2,29 +2,26 @@ import React, { useState } from "react";
 import PlansList from "../components/PlansList";
 import PlanDetails from "../components/PlansDetails";
 import { Plan } from "../types/Plan";
-import plansData from "../data/plansData";
+import dummyData from "../dummy_data/dummy_orders"; // ✅ Correct import
 
 const PlansPage: React.FC = () => {
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortBy, setSortBy] = useState<"default" | "alpha" | "published">("default");
-  const [filterYear, setFilterYear] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState<"default" | "alpha" | "year">("default");
+  const [filterYear, setFilterYear] = useState<number | null>(null);
 
-  // Get base plans only (type === PLAN)
-  const basePlans = plansData.filter((p) => p.type === "PLAN");
+  // ✅ Fallback with default values, ensuring TS knows these arrays always exist
+  const plans = dummyData?.plans_vec ?? [];
+  const orders = dummyData?.orders_vec ?? [];
+  const paragraphs = dummyData?.paragraphs_vec ?? [];
 
-  // Apply filters and sorting
-  const filteredPlans = basePlans
-    .filter((p) =>
-      !filterYear || p.number.startsWith(filterYear)
-    )
-    .filter((p) =>
-      p.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.mission.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+  // ✅ Filter and sort logic
+  const filteredPlans = plans
+    .filter((p) => !filterYear || p.fiscal_year === filterYear)
+    .filter((p) => p.name.toLowerCase().includes(searchTerm.toLowerCase()))
     .sort((a, b) => {
-      if (sortBy === "alpha") return a.number.localeCompare(b.number);
-      if (sortBy === "published") return a.published.localeCompare(b.published);
+      if (sortBy === "alpha") return a.name.localeCompare(b.name);
+      if (sortBy === "year") return a.fiscal_year - b.fiscal_year;
       return 0;
     });
 
@@ -33,17 +30,25 @@ const PlansPage: React.FC = () => {
       {selectedPlan ? (
         <PlanDetails
           plan={selectedPlan}
-          allPlans={plansData}
+          allOrders={orders}
+          allParagraphs={paragraphs}
           goBack={() => setSelectedPlan(null)}
         />
       ) : (
         <>
-          {/* Button Bar */}
           <div className="top-controls mb-6 flex gap-4 flex-wrap">
-            <button className="control-btn" onClick={() => setFilterYear(null)}>All Years</button>
-            <button className="control-btn" onClick={() => setFilterYear("25")}>FY25</button>
-            <button className="control-btn" onClick={() => setSortBy("alpha")}>Order A-Z</button>
-            <button className="control-btn" onClick={() => setSortBy("published")}>Order by Published</button>
+            <button className="control-btn" onClick={() => setFilterYear(null)}>
+              All Years
+            </button>
+            <button className="control-btn" onClick={() => setFilterYear(2025)}>
+              FY25
+            </button>
+            <button className="control-btn" onClick={() => setSortBy("alpha")}>
+              Order A–Z
+            </button>
+            <button className="control-btn" onClick={() => setSortBy("year")}>
+              Order by Year
+            </button>
             <input
               type="text"
               className="control-input"
@@ -51,11 +56,9 @@ const PlansPage: React.FC = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <button className="control-btn">New Plan ➕</button>
           </div>
 
-          {/* Plans List */}
-          <PlansList plans={filteredPlans} selectPlan={setSelectedPlan} hideTypeBadge />
+          <PlansList plans={filteredPlans} selectPlan={setSelectedPlan} />
         </>
       )}
     </div>
@@ -63,3 +66,5 @@ const PlansPage: React.FC = () => {
 };
 
 export default PlansPage;
+
+
