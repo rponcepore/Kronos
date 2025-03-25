@@ -9,8 +9,8 @@ export type Unit = {
     component: string,
     state_abbrev: string,
     level: number,
-    service_member_capacity: number,
-    parent_uic: string,
+    service_member_capacity: number | null,
+    parent_uic: string | null,
 }
 
 /*

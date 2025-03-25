@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import PlansList from "./PlansList";
-import { Plan } from "../types/planTypes";
+import { Plan } from "../types/Plan";
 import { useNavigate } from "react-router-dom";
 
 interface PlansOverviewProps {

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import PlansList from "../components/PlansList";
 import PlanDetails from "../components/PlansDetails";
-import { Plan } from "../types/planTypes";
+import { Plan } from "../types/Plan";
 import plansData from "../data/plansData";
 
 const PlansPage: React.FC = () => {

@@ -4,8 +4,8 @@
 export type KronosRequest = {
     action: string;
     unit: string;
-    plan_id: number;
-    order_id: number;
-    paragraph_id: number;
-    task_id: number;
+    plan_id: number | null;
+    order_id: number | null;
+    paragraph_id: number | null;
+    task_id: number | null;
 }

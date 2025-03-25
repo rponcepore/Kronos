@@ -1,4 +1,4 @@
-import { Plan } from "../types/planTypes";
+import { Plan } from "../types/Plan";
 
 const plansData: Plan[] = [
   {

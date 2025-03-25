@@ -1,5 +1,5 @@
 import React from "react";
-import { Plan } from "../types/planTypes";
+import { Plan } from "../types/Plan";
 
 interface PlanDetailsProps {
   plan: Plan;

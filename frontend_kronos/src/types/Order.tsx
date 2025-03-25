@@ -16,5 +16,5 @@ export type Order = {
     order_type: "OPORD" | "FRAGO" | "WARNO";
     serial_number: number;
     is_published: boolean;
-    derived_from: number; // i.e., the order id of the higher echelon order from which this order follows
+    derived_from: number | null; // i.e., the order id of the higher echelon order from which this order follows
 }
