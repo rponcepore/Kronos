@@ -32,7 +32,7 @@ pub struct KronosRequest {
 pub struct KronosResponse {
     pub kronos_request: KronosRequest,
     pub plans_vec: Option< Vec<plan::Model>>,
-    pub orders_vec: Option< Vec<order::Model>>,
+    pub orders_vec: Option< Vec<kronos_order::Model>>,
     pub paragraphs_vec: Option< Vec<paragraph::Model>>,
     pub units_vec: Option< Vec<unit::Model>>,
 }

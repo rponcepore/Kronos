@@ -13,10 +13,10 @@ pub struct Model {
     pub display_name: String,
     pub short_name: String,
     pub component: String,
-    pub state_abbrev: String,
-    pub level: i32,
-    pub service_member_capacity: i32,
-    pub parent_uic: String,
+    pub state_abbrev: Option<String>,
+    pub level: Option<i32>,
+    pub service_member_capacity: Option<i32>,
+    pub parent_uic: Option<String>,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

@@ -89,21 +89,22 @@ pub async fn get_plans(req: Json<KronosRequest>) -> Result<KronosResponse, Krono
             Err(msg) => return Err(KronosApiError::DbErr(msg)),
         };
     
-    let order_vec: Vec<order::Model> = Vec::new();
-
-
+    let mut order_vec: Vec<kronos_order::Model> = Vec::new();
 
     // For each plan returned, get it's associated orders
-    /*for plan in plan_vec {
-        let mut order_vec_single_plan: Vec<order::model> = match Order::find()
-            .filter(order::Column::ParentPlan.eq(plan.id))
-            .order_by_asc(order::Column::SerialNumber)
+    for plan in &plan_vec {
+        let mut order_vec_single_plan = match KronosOrder::find()
+            .filter(kronos_order::Column::ParentPlan.eq(plan.id))
+            .order_by_asc(kronos_order::Column::SerialNumber)
             .all(&db)
             .await {
-                Ok(order_vec_single_plan) => order_vec.append(order_vec_single_plan),
+                Ok(order_vec_single_plan) => order_vec_single_plan,
                 Err(msg) => return Err(KronosApiError::DbErr(msg)),
             };
-    }*/
+        for order in order_vec_single_plan{
+            order_vec.push(order);
+        }
+    }
 
     // Unwrap json<KronosRequest> into just a KronosRequest to avoid de-re-de-se-re-serialization issues. 
     let plain_kronos_request = req.into_inner();
@@ -111,7 +112,7 @@ pub async fn get_plans(req: Json<KronosRequest>) -> Result<KronosResponse, Krono
     let kronos_response = KronosResponse {
         kronos_request: plain_kronos_request,
         plans_vec: Some(plan_vec),
-        orders_vec: None,
+        orders_vec: Some(order_vec),
         paragraphs_vec: None,
         units_vec: None,
     };

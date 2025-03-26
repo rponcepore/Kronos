@@ -18,8 +18,8 @@ pub struct Model {
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
-    #[sea_orm(has_one = "super::order::Entity")]
-    Order,
+    #[sea_orm(has_one = "super::kronos_order::Entity")]
+    KronosOrder,
     #[sea_orm(
         belongs_to = "Entity",
         from = "Column::Id",
@@ -38,9 +38,9 @@ pub enum Relation {
     Unit,
 }
 
-impl Related<super::order::Entity> for Entity {
+impl Related<super::kronos_order::Entity> for Entity {
     fn to() -> RelationDef {
-        Relation::Order.def()
+        Relation::KronosOrder.def()
     }
 }
 

@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i32,
-    pub order: i32,
+    pub kronos_order: i32,
     pub parent_paragraph: i32,
     pub is_major: bool,
     pub ordinal_sequence: i32,
@@ -20,13 +20,13 @@ pub struct Model {
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
     #[sea_orm(
-        belongs_to = "super::order::Entity",
-        from = "Column::Order",
-        to = "super::order::Column::Id",
+        belongs_to = "super::kronos_order::Entity",
+        from = "Column::KronosOrder",
+        to = "super::kronos_order::Column::Id",
         on_update = "Cascade",
         on_delete = "Cascade"
     )]
-    Order,
+    KronosOrder,
     #[sea_orm(
         belongs_to = "Entity",
         from = "Column::ParentParagraph",
@@ -37,9 +37,9 @@ pub enum Relation {
     SelfRef,
 }
 
-impl Related<super::order::Entity> for Entity {
+impl Related<super::kronos_order::Entity> for Entity {
     fn to() -> RelationDef {
-        Relation::Order.def()
+        Relation::KronosOrder.def()
     }
 }
 

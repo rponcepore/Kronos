@@ -2,7 +2,7 @@
 
 pub mod prelude;
 
-pub mod order;
+pub mod kronos_order;
 pub mod paragraph;
 pub mod plan;
 pub mod test_table;

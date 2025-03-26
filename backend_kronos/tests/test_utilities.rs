@@ -11,9 +11,8 @@ const RANDOM_PORT: &str = "127.0.0.1:0"; // This is a special case: says, "use l
 /* Return a dummy JSON for a post request asking for all plans */
 pub fn dummy_plan_request() -> KronosRequest {
     let result = KronosRequest{
-        http_method: "POST".to_string(),
-        action: "get_plans".to_string(),
-        unit: "WHJ8C0".to_string(),
+        action: Some("get_plans".to_string()),
+        unit: Some("WHJ8C0".to_string()),
     };
     result
 }
@@ -31,3 +30,4 @@ pub fn spawn_app() -> String {
     // return the port to the calling function, so the test goes to the correct port!
     format! ("http://127.0.0.1:{}", port)
 }
+

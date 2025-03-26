@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { Plan } from "../types/Plan";
-import { Order } from "../types/Order";
+import { KronosOrder } from "../types/KronosOrder";
 import { Paragraph } from "../types/Paragraph";
 import OrderDetails from "./OrderDetails"; // Import your new component
 
 interface PlanDetailsProps {
   plan: Plan;
-  allOrders: Order[];
+  allOrders: KronosOrder[];
   allParagraphs: Paragraph[];
   goBack: () => void;
 }
@@ -17,7 +17,7 @@ const PlanDetails: React.FC<PlanDetailsProps> = ({
   allParagraphs,
   goBack,
 }) => {
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [selectedOrder, setSelectedOrder] = useState<KronosOrder | null>(null);
 
   const relatedOrders = allOrders.filter(
     (order) => order.parent_plan === plan.id
