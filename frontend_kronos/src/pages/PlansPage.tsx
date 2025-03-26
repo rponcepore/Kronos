@@ -19,17 +19,28 @@ const PlansPage: React.FC = () => {
     async function fetchPlans() {
       try {
         setLoading(true);
-        setPlansData([]); // Clear existing plans data before fetching new data
-        const req: KronosRequest = { action: "get_plans", unit: "WJH8C0", plan_id: 0, order_id: 0, paragraph_id: 0, task_id: 0 };
+        setPlansData([]);
+  
+        const isDev = import.meta.env.DEV;
+        const unit =  isDev ? "tstUIC" : "WJH8C0"; // use fake data only in dev
+  
+        const req: KronosRequest = {
+          action: "get_plans",
+          unit: unit,
+          plan_id: 0,
+          order_id: 0,
+          paragraph_id: 0,
+          task_id: 0
+        };
+  
         const res: KronosResponse = await kronosApiCall(req);
-          setPlansData(res.plans_vec); // Update the state with the fetched plans
+        setPlansData(res.plans_vec ?? []);
       } catch (error) {
         console.error("Error fetching plans:", error);
       } finally {
         setLoading(false);
       }
     }
-
   
     fetchPlans();
   }, []);
