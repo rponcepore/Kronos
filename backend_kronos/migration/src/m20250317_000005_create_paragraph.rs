@@ -1,6 +1,6 @@
 use sea_orm_migration::{prelude::*, schema::*};
 
-use super::m20250317_000004_create_order::Order;
+use super::m20250317_000004_create_order::KronosOrder;
 
 #[derive(DeriveMigrationName)]
 pub struct Migration;
@@ -9,7 +9,7 @@ pub struct Migration;
 pub enum Paragraph {
     Table,
     Id,
-    Order,
+    KronosOrder,
     ParentParagraph,
     IsMajor,
     OrdinalSequence,
@@ -35,15 +35,15 @@ impl MigrationTrait for Migration {
                         .primary_key(),
                     )
                     .col(
-                        ColumnDef::new(Paragraph::Order)
+                        ColumnDef::new(Paragraph::KronosOrder)
                         .integer()
                         .not_null()
                     )
                     .foreign_key( 
                         ForeignKey::create() // bind the paragraph to the owning order
                             .name("fk-paragraph-order-order-id")
-                            .from(Paragraph::Table, Paragraph::Order)
-                            .to(Order::Table, Order::Id)
+                            .from(Paragraph::Table, Paragraph::KronosOrder)
+                            .to(KronosOrder::Table, KronosOrder::Id)
                             .on_delete(ForeignKeyAction::Cascade)
                             .on_update(ForeignKeyAction::Cascade),
                     )
