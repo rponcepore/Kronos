@@ -24,8 +24,9 @@ pub fn run_server(listener: TcpListener) -> Result<Server, std::io::Error> {
                     Cors::default()
                         .allowed_origin("http://localhost:9000") // Only allow this origin (React App)
                         .allowed_origin("http://localhost:5173") // (Other react app)
-                        .allowed_methods(vec!["GET", "POST"]) 
-                        .allowed_headers(vec!["Content-Type"]) // Allow specific headers
+                        .allowed_methods(vec!["GET", "POST", "OPTIONS"]) 
+                        .allowed_headers(vec!["Content-Type", "Accept", "Access-Control-Allow-Origin"])
+                        .max_age(3600)
                 )
                 .route("/healthcheck", web::get().to(health_check))
                 .route("/health_check", web::get().to(health_check))

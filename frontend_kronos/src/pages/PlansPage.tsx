@@ -20,7 +20,7 @@ const PlansPage: React.FC = () => {
       try {
         setLoading(true);
         setPlansData([]); // Clear existing plans data before fetching new data
-        const req: KronosRequest = { action: "GET_PLANS", unit: "", plan_id: 0, order_id: 0, paragraph_id: 0, task_id: 0 };
+        const req: KronosRequest = { action: "get_plans", unit: "WJH8C0", plan_id: 0, order_id: 0, paragraph_id: 0, task_id: 0 };
         const res: KronosResponse = await kronosApiCall(req);
           setPlansData(res.plans_vec); // Update the state with the fetched plans
       } catch (error) {
