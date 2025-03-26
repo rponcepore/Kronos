@@ -10,7 +10,7 @@ pub id: i32,
     pub derived_from: Option<i32>,
 */
 
-export type Order = {
+export type KronosOrder = {
     id: number,
     parent_plan: number;
     order_type: "OPORD" | "FRAGO" | "WARNO";

@@ -1,7 +1,7 @@
 //! KronosResponse.tsx
 import { KronosRequest  } from "./KronosRequest"
 import { Plan } from "./Plan";
-import { Order } from "./Order";
+import { Order } from "./KronosOrder";
 import { Paragraph } from "./Paragraph";
 import { Unit } from "./Unit";
 

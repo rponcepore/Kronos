@@ -1,10 +1,10 @@
 import React from "react";
-import { Order } from "../types/Order";
+import { KronosOrder } from "../types/KronosOrder";
 import { Paragraph } from "../types/Paragraph";
 import { Plan } from "../types/Plan";
 
 interface OrderDetailsProps {
-  order: Order;
+  order: KronosOrder;
   plan: Plan;
   paragraphs: Paragraph[];
   goBack: () => void;

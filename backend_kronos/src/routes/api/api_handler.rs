@@ -32,7 +32,7 @@ pub struct KronosRequest {
 pub struct KronosResponse {
     pub kronos_request: KronosRequest,
     pub plans_vec: Option< Vec<plan::Model>>,
-    pub orders_vec: Option< Vec<order::Model>>,
+    pub orders_vec: Option< Vec<kronos_order::Model>>,
     pub paragraphs_vec: Option< Vec<paragraph::Model>>,
     pub units_vec: Option< Vec<unit::Model>>,
 }
@@ -127,4 +127,27 @@ async fn is_request_valid(req: Json<KronosRequest>) -> Result< Json<KronosReques
 
     return Ok(req);
     
+}
+
+impl KronosRequest {
+    pub fn new() -> Self {
+        Self {
+            action: None,
+            unit: None,
+        }
+    }
+
+    pub fn with_action(mut self, action: String) -> Self {
+        self.action = Some(action);
+        self
+    }
+
+    pub fn with_unit(mut self, unit: String) -> Self {
+        self.unit = Some(unit);
+        self
+    }
+
+    pub fn build(self) -> Self {
+        self
+    }
 }
