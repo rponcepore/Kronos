@@ -34,7 +34,25 @@ const PlansPage: React.FC = () => {
         };
   
         const res: KronosResponse = await kronosApiCall(req);
-        setPlansData(res.plans_vec ?? []);
+
+        //test block for frontend adding features
+        const processedPlans = (res.plans_vec ?? []).map((p) => ({
+          ...p,
+          number: `FY${p.fiscal_year}-${p.serial_number.toString().padStart(3, "3")}`,
+          date: `${p.fiscal_year}-10-01`,
+          published: `20${p.fiscal_year.toString().slice(-2)}-10-01`,
+          expires: `20${(p.fiscal_year + 1).toString().slice(-2)}-10-01`,
+          type: "PLAN",
+          mission: p.name,
+          taskedBy: "Command HQ", // placeholder
+          taskedTo: p.unit       // fallback
+        }));
+
+        //end test block
+        setPlansData(processedPlans);
+
+        
+        //setPlansData(res.plans_vec ?? []);
       } catch (error) {
         console.error("Error fetching plans:", error);
       } finally {
@@ -46,19 +64,20 @@ const PlansPage: React.FC = () => {
   }, []);
   
 
-  const basePlans = plansData.filter((p) => p.type === "PLAN");
-
+  //const basePlans = plansData.filter((p) => p.type === "PLAN");
+  const basePlans = plansData;
   const filteredPlans = basePlans
-    .filter((p) => !filterYear || p.number.startsWith(filterYear))
-    .filter((p) =>
-      p.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.mission.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-    .sort((a, b) => {
-      if (sortBy === "alpha") return a.number.localeCompare(b.number);
-      if (sortBy === "published") return a.published.localeCompare(b.published);
-      return 0;
-    });
+  .filter((p) => !filterYear || String(p.fiscal_year).endsWith(filterYear))
+  .filter((p) => {
+    const name = p.name?.toLowerCase() ?? "";
+    const classification = p.classification?.toLowerCase() ?? "";
+    return name.includes(searchTerm.toLowerCase()) || classification.includes(searchTerm.toLowerCase());
+  })
+  .sort((a, b) => {
+    if (sortBy === "alpha") return a.name.localeCompare(b.name);
+    if (sortBy === "published") return (a as any).published?.localeCompare((b as any).published ?? "") ?? 0;
+    return 0;
+  });
 
   if (loading) {
     return <div className="p-6 mt-16">Loading plans...</div>;

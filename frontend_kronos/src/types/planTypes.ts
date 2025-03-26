@@ -1,12 +1,19 @@
 export interface Plan {
-    id: number;
-    type: "PLAN" | "OPORD" | "FRAGO" | "WARNO";
-    number: string;
-    date: string;
-    published: string;
-    expires: string;
-    taskedBy: string;
-    taskedTo: string;
-    mission: string;
-  }
+  id: number;
+  unit: string;
+  parent_plan: number | null;
+  fiscal_year: number;
+  serial_number: number;
+  classification: string;
+  name: string;
   
+  // Frontend-only derived fields for display
+  number: string;
+  date: string;
+  published: string;
+  expires: string;
+  type: string;
+  mission: string;
+  taskedBy: string;
+  taskedTo: string;
+};
