@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import PlansList from "../components/PlansList";
 import PlanDetails from "../components/PlansDetails";
-import { Plan, serializeToPlan } from "../types/planTypes";
+import { Plan } from "../types/planTypes";
 import { KronosRequest } from "../types/KronosRequest";
 import { KronosResponse } from "../types/KronosResponse";
 import { kronosApiCall } from "../helper_methods/ApiCall";
