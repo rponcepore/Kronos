@@ -128,3 +128,26 @@ async fn is_request_valid(req: Json<KronosRequest>) -> Result< Json<KronosReques
     return Ok(req);
     
 }
+
+impl KronosRequest {
+    pub fn new() -> Self {
+        Self {
+            action: None,
+            unit: None,
+        }
+    }
+
+    pub fn with_action(mut self, action: String) -> Self {
+        self.action = Some(action);
+        self
+    }
+
+    pub fn with_unit(mut self, unit: String) -> Self {
+        self.unit = Some(unit);
+        self
+    }
+
+    pub fn build(self) -> Self {
+        self
+    }
+}

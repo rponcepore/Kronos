@@ -31,3 +31,18 @@ pub fn spawn_app() -> String {
     format! ("http://127.0.0.1:{}", port)
 }
 
+// This method builds a basic KronosRequest for when the database is not connected.
+pub fn no_db_plan_req() -> KronosRequest {
+    KronosRequest { 
+        action: Some("get_plans".to_string()), 
+        unit: Some("tstUIC".to_string()) 
+    }
+}
+
+// This method builds a basic KronosRequest for when the database is connected.
+pub fn with_db_plan_req() -> KronosRequest {
+    KronosRequest { 
+        action: Some("get_plans".to_string()), 
+        unit: Some("WJH8C0".to_string()) 
+    }
+}
