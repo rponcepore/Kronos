@@ -1,6 +1,3 @@
-import { Plan } from "../types/Plan";
-import { Order } from "../types/Order";
-import { Paragraph } from "../types/Paragraph";
 import { KronosResponse } from "../types/KronosResponse";
 
 const dummyData: KronosResponse = {
