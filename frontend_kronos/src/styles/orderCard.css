@@ -1,0 +1,64 @@
+/* ----------------------------- */
+/* Order Card Component Styles  */
+/* ----------------------------- */
+
+/* Base styling for each order card */
+.order-card {
+    background-color: white;              /* White card background */
+    border: 1px solid #ddd;               /* Light gray border */
+    border-radius: 10px;                  /* Rounded corners */
+    padding: 1rem 1.5rem;                 /* Inner spacing */
+    margin-bottom: 1.2rem;                /* Spacing between cards */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05); /* Subtle shadow for depth */
+    transition: transform 0.2s ease;      /* Smooth grow effect on hover */
+    cursor: pointer;                      /* Pointer cursor for interactivity */
+  }
+  
+  /* Hover effect for the order card */
+  .order-card:hover {
+    transform: scale(1.01);               /* Slight zoom-in */
+    background-color: #f9f9f9;            /* Slightly lighter background */
+  }
+  
+  /* Layout for the top row of the card (badge + title) */
+  .order-card-header {
+    display: flex;                        /* Place badge and serial side-by-side */
+    align-items: center;                 /* Vertically align badge and text */
+    gap: 1rem;                            /* Spacing between badge and serial */
+    margin-bottom: 0.75rem;               /* Space below the header */
+  }
+  
+  /* Badge styling for order type (OPORD, WARNO, FRAGO) */
+  .plan-type {
+    padding: 4px 10px;                    /* Inner padding around text */
+    font-size: 0.85rem;                   /* Smaller font size */
+    font-weight: bold;                    /* Bold text */
+    border-radius: 5px;                   /* Rounded badge shape */
+    text-transform: uppercase;            /* Make text all caps */
+    white-space: nowrap;                  /* Prevent badge from breaking lines */
+  }
+  
+  /* Order Type Badge Colors */
+  
+  /* Blue badge for OPORD */
+  .opord {
+    background-color: #007bff;            /* Bootstrap blue */
+    color: white;                         /* White text */
+  }
+  
+  /* Red badge for WARNO */
+  .warno {
+    background-color: #dc3545;            /* Bootstrap danger red */
+    color: white;                         /* White text */
+  }
+  
+  /* Yellow badge for FRAGO */
+  .frago {
+    background-color: #ffc107;            /* Bootstrap warning yellow */
+    color: black;                         /* Black text for contrast */
+  }
+  
+  
+  
+  
+  

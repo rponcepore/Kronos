@@ -1,28 +1,42 @@
 import React from "react";
-import { Plan } from "../types/Plan";
+import { Plan } from "../types/Plan";                                // Import the Plan type
+import { getPlanSerialDisplay } from "../helper_methods/format";     // Utility to format serial numbers
 
+// ------------------------------
+// Props interface for PlanCard
+// ------------------------------
 interface PlanCardProps {
-  plan: Plan;
-  selectPlan: (plan: Plan) => void;
+  plan: Plan;                                     // The plan object to render
+  selectPlan: (plan: Plan) => void;               // Function to call when the card is clicked
 }
 
+// ------------------------------
+// PlanCard Component
+// ------------------------------
 const PlanCard: React.FC<PlanCardProps> = ({ plan, selectPlan }) => {
   return (
+    // When clicked, call selectPlan with this specific plan object
     <div className="plan-card" onClick={() => selectPlan(plan)}>
-      <div className="plan-left">
-        <h2 className="plan-title">{plan.name}</h2>
-        <p className="plan-subtitle">FY {plan.fiscal_year} Base Plan</p>
-      </div>
-      <div className="plan-right">
-        <p className="plan-info"><strong>Unit:</strong> {plan.unit}</p>
-        <p className="plan-info"><strong>Classification:</strong> {plan.classification}</p>
-        <p className="plan-info"><strong>Serial #:</strong> {plan.serial_number}</p>
-      </div>
+      {/* Plan title */}
+      <h2>{plan.name}</h2>
+
+      {/* Subtitle: shows fiscal year */}
+      <p className="plan-subtitle">FY {plan.fiscal_year} Base Plan</p>
+
+      {/* Display key metadata about the plan */}
+      <p><strong>Unit:</strong> {plan.unit}</p>
+      <p><strong>Classification:</strong> {plan.classification}</p>
+
+      {/* Serial number formatted for display */}
+      <p><strong>Serial #:</strong> {getPlanSerialDisplay(plan.fiscal_year, plan.serial_number)}</p>
     </div>
   );
 };
 
 export default PlanCard;
+
+
+
 
 
 
