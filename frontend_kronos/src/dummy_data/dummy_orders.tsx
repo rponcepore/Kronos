@@ -1,7 +1,7 @@
 import { Plan } from "../types/Plan";
 import { KronosOrder } from "../types/KronosOrder";
 import { Paragraph } from "../types/Paragraph";
-import { KronosResponse } from "../types/KronosResponse";
+import { KronosResponse } from "../types/networking_types/KronosResponse";
 import { OrderKind } from "../types/enums/OrderKind";
 
 const dummyData: KronosResponse = {

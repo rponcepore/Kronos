@@ -1,7 +1,7 @@
 //! ApiCall.tsx
 
-import { KronosRequest } from "../types/KronosRequest";
-import { KronosResponse } from "../types/KronosResponse";
+import { KronosRequest } from "../types/networking_types/KronosRequest";
+import { KronosResponse } from "../types/networking_types/KronosResponse";
 
 // This file defines the API calls and responses that we can expect
 
