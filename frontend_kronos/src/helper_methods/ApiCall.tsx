@@ -5,7 +5,7 @@ import { KronosResponse } from "../types/networking_types/KronosResponse";
 
 // This file defines the API calls and responses that we can expect
 
-async function kronosApiCall(request: KronosRequest): Promise<KronosResponse> {
+export async function kronosApiCall(request: KronosRequest): Promise<KronosResponse> {
     try {
         const response = await fetch('http://localhost:8000/api', {
             method: 'POST',
