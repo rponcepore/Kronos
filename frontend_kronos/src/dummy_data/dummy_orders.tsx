@@ -2,6 +2,7 @@ import { Plan } from "../types/Plan";
 import { KronosOrder } from "../types/KronosOrder";
 import { Paragraph } from "../types/Paragraph";
 import { KronosResponse } from "../types/KronosResponse";
+import { OrderKind } from "../types/enums/OrderKind";
 
 const dummyData: KronosResponse = {
   kronos_request: {
@@ -27,7 +28,7 @@ const dummyData: KronosResponse = {
     {
       id: 1,
       parent_plan: 101,
-      order_type: "OPORD",
+      order_type: OrderKind.OPORD,
       serial_number: 1,
       is_published: false,
       derived_from: null
@@ -35,7 +36,7 @@ const dummyData: KronosResponse = {
     {
       id: 2,
       parent_plan: 101,
-      order_type: "WARNO",
+      order_type: OrderKind.WARNORD,
       serial_number: 1,
       is_published: true,
       derived_from: null
@@ -43,7 +44,7 @@ const dummyData: KronosResponse = {
     {
       id: 3,
       parent_plan: 101,
-      order_type: "FRAGO",
+      order_type: OrderKind.FRAGORD,
       serial_number: 2,
       is_published: true,
       derived_from: 1
@@ -51,7 +52,7 @@ const dummyData: KronosResponse = {
     {
       id: 4,
       parent_plan: 101,
-      order_type: "FRAGO",
+      order_type: OrderKind.FRAGORD,
       serial_number: 3,
       is_published: true,
       derived_from: 1

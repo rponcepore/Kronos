@@ -13,6 +13,8 @@ export interface Plan {
 
 */
 
+import { Classification } from "../enums/Classification";
+
 export type Plan = {
 
     id: number,
@@ -20,7 +22,7 @@ export type Plan = {
     parent_plan: number | null, // can be null,
     fiscal_year: number,
     serial_number: number,
-    classification: string,
+    classification: Classification,
     name: string,
 
 }
