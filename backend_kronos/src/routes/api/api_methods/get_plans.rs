@@ -87,7 +87,7 @@ pub async fn get_plans(req: Json<KronosRequest>) -> Result<KronosResponse, Krono
         };
 
     
-    let plan_summary_vec: Vec<PlanSummary> = Vec::new();
+    let mut plan_summary_vec: Vec<PlanSummary> = Vec::new();
     // For each plan returned, get it's associated orders
     for plan in plan_vec {
 
@@ -113,7 +113,7 @@ pub async fn get_plans(req: Json<KronosRequest>) -> Result<KronosResponse, Krono
     Ok(kronos_response)
 }
 
-async fn pack_plan_summary(plan: plan::Model, db: DatabaseConnection) -> Result<PlanSummary, KronosApiError> {
+async fn pack_plan_summary(plan: plan::Model, db: &DatabaseConnection) -> Result<PlanSummary, KronosApiError> {
 
     //let planid:i32 = plan.clone().id;
 
@@ -121,7 +121,7 @@ async fn pack_plan_summary(plan: plan::Model, db: DatabaseConnection) -> Result<
     let order_vec_single_plan: Vec<kronos_order::Model> = match KronosOrder::find()
             .filter(kronos_order::Column::ParentPlan.eq(plan.id))
             .order_by_asc(kronos_order::Column::SerialNumber)
-            .all(&db)
+            .all(db)
             .await {
                 Ok(order_vec_single_plan) => order_vec_single_plan,
                 Err(msg) => return Err(KronosApiError::DbErr(msg)),
@@ -136,7 +136,7 @@ async fn pack_plan_summary(plan: plan::Model, db: DatabaseConnection) -> Result<
         _ => {
             let mut packed_orders= Vec::<KronosOrderSummary>::new();
             for db_order in order_vec_single_plan {
-                let packed_order = match pack_orders_summary(db_order, db).await {
+                let packed_order = match pack_orders_summary(db_order, &db).await {
                     Ok(packed_order) => packed_order,
                     Err(err) => return Err(err),
                 };
@@ -150,7 +150,7 @@ async fn pack_plan_summary(plan: plan::Model, db: DatabaseConnection) -> Result<
     Ok(plan_summary)
 }
 
-async fn pack_orders_summary(order: kronos_order::Model, _db: DatabaseConnection) -> Result<KronosOrderSummary, KronosApiError> {
+async fn pack_orders_summary(order: kronos_order::Model, _db: &DatabaseConnection) -> Result<KronosOrderSummary, KronosApiError> {
     
 
     let paragraph_vec_single_plan: Vec<paragraph::Model> = Vec::<paragraph::Model>::new();
@@ -160,7 +160,7 @@ async fn pack_orders_summary(order: kronos_order::Model, _db: DatabaseConnection
     let orders_summary: KronosOrderSummary = KronosOrderSummary { data:order, paragraphs: None };
 
     if paragraph_vec_single_plan.len() > 0 {
-        //TODO: pack paragraph method
+        // TODO: pack paragraph method
         // Spiral down, start grabbing the lower level data here!
     }
 
