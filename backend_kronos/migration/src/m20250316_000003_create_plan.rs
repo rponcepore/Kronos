@@ -47,7 +47,7 @@ impl MigrationTrait for Migration {
                             .name("fk-plan-unit-unit-uic")
                             .from(Plan::Table, Plan::Unit)
                             .to(Unit::Table, Unit::Uic)
-                            .on_delete(ForeignKeyAction::SetNull) //if the foreign entity is deleted, this entity is deleted.
+                            .on_delete(ForeignKeyAction::SetNull) // if the foreign entity is deleted, this entity is deleted.
                             .on_update(ForeignKeyAction::Cascade),
                     )
                     .col(ColumnDef::new(Plan::ParentPlan).integer())
