@@ -1,16 +1,11 @@
 //! get_plans.rs
-//! 
 
-use actix_web::web;
-use actix_web::{
-    web::Json,
-    http::{header::ContentType, StatusCode}, 
-    HttpRequest, HttpResponse, Responder
-    };
-    
+use actix_web::web::Json;
 use sea_orm::*;
-use serde::{Deserialize, Serialize};
 use debug_print::debug_println as dprintln;
+
+use crate::models::entity_summaries::kronos_order_summary::KronosOrderSummary;
+use crate::models::entity_summaries::plan_summary::PlanSummary;
 use crate::routes::api::api_handler::KronosApiError;
 use crate::routes::api::api_handler::KronosRequest;
 use crate::routes::api::api_handler::KronosResponse;
@@ -18,9 +13,6 @@ use crate::routes::api::api_handler::access_kronos_database;
 
 // Pull in our entities,
 use crate::models::entities::{prelude::*, *};
-// Include our database configs
-use crate::configuration::get_configuration;
-
 
 pub async fn get_plans(req: Json<KronosRequest>) -> Result<KronosResponse, KronosApiError>  {
     dprintln!("get_plans method called. ");
@@ -56,9 +48,14 @@ pub async fn get_plans(req: Json<KronosRequest>) -> Result<KronosResponse, Krono
                 name: "Jack Sparrow's Gambit".to_string(),
             },
         ];
+        let mut sum_vec: Vec<PlanSummary> = Vec::new();
+        for plan in plan_vec {
+            let plan_summary: PlanSummary = PlanSummary { data: plan, orders: None };
+            sum_vec.push(plan_summary);
+        }
         let kronos_response = KronosResponse {
             kronos_request: req.into_inner(),
-            plans_vec: Some(plan_vec),
+            plans_vec: Some(sum_vec),
             orders_vec: None,
             paragraphs_vec: None,
             units_vec: None,
@@ -88,12 +85,40 @@ pub async fn get_plans(req: Json<KronosRequest>) -> Result<KronosResponse, Krono
             Ok(plan_vec) => plan_vec,
             Err(msg) => return Err(KronosApiError::DbErr(msg)),
         };
-    
-    let mut order_vec: Vec<kronos_order::Model> = Vec::new();
 
+    
+    let plan_summary_vec: Vec<PlanSummary> = Vec::new();
     // For each plan returned, get it's associated orders
-    for plan in &plan_vec {
-        let mut order_vec_single_plan = match KronosOrder::find()
+    for plan in plan_vec {
+
+        let packed_plan_summary = match pack_plan_summary(plan, &db).await {
+            Ok(packed_plan_summary) => packed_plan_summary,
+            Err(err) => return Err(err),
+        };
+        plan_summary_vec.push(packed_plan_summary);
+    }
+
+    // Unwrap json<KronosRequest> into just a KronosRequest to avoid de-re-de-se-re-serialization issues. 
+    let plain_kronos_request = req.into_inner();
+    
+    // Encode them into a KronosResponse Object
+    let kronos_response = KronosResponse {
+        kronos_request: plain_kronos_request,
+        plans_vec: Some(plan_summary_vec),
+        orders_vec: None,
+        paragraphs_vec: None,
+        units_vec: None,
+    };
+    // Send back to the client
+    Ok(kronos_response)
+}
+
+async fn pack_plan_summary(plan: plan::Model, db: DatabaseConnection) -> Result<PlanSummary, KronosApiError> {
+
+    //let planid:i32 = plan.clone().id;
+
+    // Check the database for orders
+    let order_vec_single_plan: Vec<kronos_order::Model> = match KronosOrder::find()
             .filter(kronos_order::Column::ParentPlan.eq(plan.id))
             .order_by_asc(kronos_order::Column::SerialNumber)
             .all(&db)
@@ -101,21 +126,43 @@ pub async fn get_plans(req: Json<KronosRequest>) -> Result<KronosResponse, Krono
                 Ok(order_vec_single_plan) => order_vec_single_plan,
                 Err(msg) => return Err(KronosApiError::DbErr(msg)),
             };
-        for order in order_vec_single_plan{
-            order_vec.push(order);
-        }
+
+    // Initialize the summary
+    let mut plan_summary: PlanSummary = PlanSummary { data: plan, orders: None };
+    
+    // If there were orders, convert them to summaries
+    match order_vec_single_plan.len() {
+        0 => {},
+        _ => {
+            let mut packed_orders= Vec::<KronosOrderSummary>::new();
+            for db_order in order_vec_single_plan {
+                let packed_order = match pack_orders_summary(db_order, db).await {
+                    Ok(packed_order) => packed_order,
+                    Err(err) => return Err(err),
+                };
+                packed_orders.push(packed_order);
+            }
+            plan_summary.orders = Some(packed_orders);
+        },
+    };
+    
+    // return the plan summary
+    Ok(plan_summary)
+}
+
+async fn pack_orders_summary(order: kronos_order::Model, _db: DatabaseConnection) -> Result<KronosOrderSummary, KronosApiError> {
+    
+
+    let paragraph_vec_single_plan: Vec<paragraph::Model> = Vec::<paragraph::Model>::new();
+    // Need to make a call to the database to retrieve this!
+    // TODO: go to the database, possibly with a recursve method, oh boy, no way that this will spiral out of control.
+
+    let orders_summary: KronosOrderSummary = KronosOrderSummary { data:order, paragraphs: None };
+
+    if paragraph_vec_single_plan.len() > 0 {
+        //TODO: pack paragraph method
+        // Spiral down, start grabbing the lower level data here!
     }
 
-    // Unwrap json<KronosRequest> into just a KronosRequest to avoid de-re-de-se-re-serialization issues. 
-    let plain_kronos_request = req.into_inner();
-    // Encode them into a KronosResponse Object
-    let kronos_response = KronosResponse {
-        kronos_request: plain_kronos_request,
-        plans_vec: Some(plan_vec),
-        orders_vec: Some(order_vec),
-        paragraphs_vec: None,
-        units_vec: None,
-    };
-    // Send back to the client
-    Ok(kronos_response)
+    Ok(orders_summary)
 }

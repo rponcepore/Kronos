@@ -3,8 +3,9 @@
 use crate::models::entities::unit::Model as Unit;
 
 use super::plan_summary::PlanSummary;
-
+use serde::{Deserialize, Serialize};
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct UnitSummary {
-    data: Unit,
-    plans: Option<vec<PlanSummary>>,
+    pub data: Unit,
+    pub plans: Option<Vec<PlanSummary>>,
 }
