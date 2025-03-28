@@ -17,19 +17,9 @@ fi
 
 #First, make sure that we are in the correct directory:
 
-EXPECTED_DIR="/home/$USER/Kronos/backend_kronos"
-CURRENT_DIR="$(pwd)"
+EXPECTED_DIR="/home/$USER/Kronos/database_kronos"
+cd ${EXPECTED_DIR}
 
-if [ "$CURRENT_DIR" == "$EXPECTED_DIR" ]; then
-    echo "You are in the correct directory: $CURRENT_DIR"
-else
-    echo "Warning: You are in the wrong directory!"
-    echo "Current directory: $CURRENT_DIR"
-    echo "Expected directory: $EXPECTED_DIR"
-    echo ""
-    echo "Moving to correct directory."
-    cd $EXPECTED_DIR
-fi
 
 # Make sure that sea-orm-cli is installed
 
@@ -64,8 +54,8 @@ fi
 # Check if custom parameter has been set, otherwise use default postgres values
 # These need to be read in from backend_configuration.yaml
 
-CONFIG_FILE="configs/backend_configuration.yaml"
-
+CONFIG_FILE="../configs/backend_configuration.yaml"
+pwd
 echo "Reading from config file: ${CONFIG_FILE}"
 
 # Function to read YAML values with fallback to default

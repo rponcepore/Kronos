@@ -96,9 +96,7 @@ impl MigrationTrait for Migration {
             }
         };
 
-
-        
-        // Now create the order "WARNORD_TEMPLATE"
+        // Now create the templates
 
         /*
         pub enum KronosOrder {
@@ -113,7 +111,9 @@ impl MigrationTrait for Migration {
         */
 
         let mut order_vec: Vec<(i32, &str, i32, bool)> = Vec::new();
-        order_vec.push((plan_id, "OPORD", 0, true)); //
+        order_vec.push((plan_id, "OPORD", 0, true)); 
+        order_vec.push((plan_id, "FRAGORD", 1, true)); 
+        order_vec.push((plan_id, "WARNORD", 1, true)); 
         
 
         for fragord in order_vec{
