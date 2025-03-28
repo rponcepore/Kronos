@@ -2,4 +2,4 @@
 //! 
 
 pub mod entities;
-pub mod entity_implementations;
+pub mod entity_summaries;

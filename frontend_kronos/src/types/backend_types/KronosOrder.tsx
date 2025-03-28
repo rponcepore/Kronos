@@ -1,5 +1,7 @@
 //! Order.tsx
 
+import { OrderKind } from "../enums/OrderKind";
+
 // This file defines the order type
 /*
 pub id: i32,
@@ -13,8 +15,8 @@ pub id: i32,
 export type KronosOrder = {
     id: number,
     parent_plan: number;
-    order_type: "OPORD" | "FRAGO" | "WARNO";
-    serial_number: number | null; // orders should not be numbered, though FRAGORDS and WARNORDS should be. 
+    order_type: OrderKind;
+    serial_number: number;
     is_published: boolean;
     derived_from: number | null; // i.e., the order id of the higher echelon order from which this order follows
 }

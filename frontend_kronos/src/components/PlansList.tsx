@@ -1,22 +1,38 @@
+// Importing React for JSX usage
 import React from "react";
-import PlanCard from "./PlanCard";
+
+// Importing the Plan type definition
 import { Plan } from "../types/Plan";
 
+// Importing the reusable PlanCard component
+import PlanCard from "./PlanCard";
+
+// Defining the props expected by the PlansList component
 interface PlansListProps {
-  plans: Plan[];
-  selectPlan: (plan: Plan) => void;
+  plans: Plan[];                       // Array of Plan objects to display
+  selectPlan: (plan: Plan) => void;   // Callback to handle clicking a plan
 }
 
+// Functional component to display a list/grid of PlanCard components
 const PlansList: React.FC<PlansListProps> = ({ plans, selectPlan }) => {
   return (
-    <div className="plans-container">
-      {plans.map((plan) => (
-        <div key={plan.id} className="mb-6">
-          <PlanCard plan={plan} selectPlan={selectPlan} />
-        </div>
-      ))}
+    // Top-level wrapper with layout/padding styles
+    <div className="plans-overview">
+      {/* Flex or grid container for laying out individual plan cards */}
+      <div className="plans-grid">
+        {/* Map through each plan and render a PlanCard component */}
+        {plans.map((plan) => (
+          <PlanCard 
+            key={plan.id}             // Unique key for React's rendering
+            plan={plan}               // Passing down the plan data
+            selectPlan={selectPlan}   // Passing down the click handler
+          />
+        ))}
+      </div>
     </div>
   );
 };
 
+// Exporting the component so it can be used in other files
 export default PlansList;
+

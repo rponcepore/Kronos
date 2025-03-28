@@ -4,16 +4,21 @@
 use actix_web::web;
 use actix_web::{
     web::Json,
-    http::{header::ContentType, StatusCode}, 
-    HttpRequest, HttpResponse, Responder
+    HttpResponse, 
+    Responder
     };
     
 use sea_orm::*;
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use debug_print::debug_println as dprintln;
 
-// Pull in our entities,
-use crate::models::entities::{prelude::*, *};
+// Pull in our entity Summaries
+
+use crate::models::entity_summaries::plan_summary::PlanSummary;
+use crate::models::entity_summaries::kronos_order_summary::KronosOrderSummary;
+use crate::models::entity_summaries::paragraph_summary::ParagraphSummary;
+use crate::models::entity_summaries::unit_summary::UnitSummary;
+
 // Include our database configs
 use crate::configuration::get_configuration;
 use crate::routes::api::api_methods::get_plans::get_plans;
@@ -31,10 +36,10 @@ pub struct KronosRequest {
 #[derive(Debug)]
 pub struct KronosResponse {
     pub kronos_request: KronosRequest,
-    pub plans_vec: Option< Vec<plan::Model>>,
-    pub orders_vec: Option< Vec<kronos_order::Model>>,
-    pub paragraphs_vec: Option< Vec<paragraph::Model>>,
-    pub units_vec: Option< Vec<unit::Model>>,
+    pub plans_vec: Option< Vec<PlanSummary>>,
+    pub orders_vec: Option< Vec<KronosOrderSummary>>,
+    pub paragraphs_vec: Option< Vec<ParagraphSummary>>,
+    pub units_vec: Option< Vec<UnitSummary>>,
 }
 
 pub enum KronosApiError  {
@@ -42,7 +47,6 @@ pub enum KronosApiError  {
     ActixError(actix_web::Error),
     NotImplemented(String),
     Unknown(String),
-
 }
 
 /*

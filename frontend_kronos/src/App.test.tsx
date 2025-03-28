@@ -1,6 +1,46 @@
 import { expect, test } from 'vitest'
-import { sum } from './App.tsx'
+import { KronosRequest } from './types/KronosRequest.tsx'
+import { Plan } from './types/backend_types/Plan.tsx'
+import { PlanSummary } from './types/frontend_types/PlanSummary.tsx'
+import { kronosApiCall } from './helper_methods/ApiCall.tsx'
+import { KronosResponse } from './types/networking_types/KronosResponse.tsx'
 
-test('Example test: adds 1 + 2 to equal 3', () => {
-  expect(sum(1, 2)).toBe(3)
+
+
+test('Network test: Attempt to connect to backend via "tstUIC":', async () => {
+  const req: KronosRequest = {
+    action: "get_plans",
+    unit: "tstUIC",
+    plan_id: null,
+    order_id: null,
+    paragraph_id: null,
+    task_id: null,
+  };
+  let response: KronosResponse = await kronosApiCall(req);
+  expect(response.plans_vec).not.toBeNull();
+})
+
+test('Verbose network test: Verify structure of KronosResponse', async () => {
+  const req: KronosRequest = {
+    action: "get_plans",
+    unit: "tstUIC",
+    plan_id: null,
+    order_id: null,
+    paragraph_id: null,
+    task_id: null,
+  };
+  let response: KronosResponse = await kronosApiCall(req);
+
+  expect(response.plans_vec).not.toBeNull();
+
+  // If plans_vec is not null, assert each plan is of type PlanSummary and print its data
+  if (response.plans_vec) {
+    response.plans_vec.forEach((plan: PlanSummary) => {
+      // Assert that each element is a PlanSummary
+      expect(plan).toBeInstanceOf(Object); // This checks that the plan is an object (you can refine the check if needed)
+
+      // Print the contents of PlanSummary.data
+      console.log("PlanSummary data:", plan.data);
+    });
+  }
 })
