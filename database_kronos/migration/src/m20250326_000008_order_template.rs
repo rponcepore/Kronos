@@ -1,4 +1,4 @@
-use sea_orm::{prelude::*, ExecResult, DatabaseBackend};
+use sea_orm::prelude::*;
 use sea_orm::{Statement};
 use sea_orm_migration::{prelude::*};
 
@@ -6,7 +6,7 @@ use sea_orm_migration::DbErr;
 
 // Bring plans table into scope
 use super::m20250316_000003_create_plan::Plan;
-use super::m20250317_000004_create_order::KronosOrder;
+use super::m20250317_000004_create_kronosorder::KronosOrder;
 
 // Be able to connect to the database, this is awful.
 // use backend_kronos::routes::api::api_handler::access_kronos_database;
@@ -27,7 +27,7 @@ impl MigrationTrait for Migration {
         
         
         //First create the overall plan "00-00 Orders Template"
-        let plan: (&str, i32, i32, &str, &str) = ("TEMPLT", 00, 0, "Orders Templates", "CUI");
+        let plan: (&str, i32, i32, &str, &str) = ("TEMPLT", 00, 0, "Orders Template Plan", "CUI");
 
         let insert = Query::insert()
             .into_table(Plan::Table)

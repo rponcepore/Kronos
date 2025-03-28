@@ -1,6 +1,6 @@
 use sea_orm_migration::{prelude::*, schema::*};
 
-use super::m20250317_000004_create_order::KronosOrder;
+use super::m20250317_000004_create_kronosorder::KronosOrder;
 
 #[derive(DeriveMigrationName)]
 pub struct Migration;
