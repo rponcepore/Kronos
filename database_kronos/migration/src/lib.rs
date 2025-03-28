@@ -9,6 +9,7 @@ mod m20250317_000005_create_paragraph;
 mod m20250319_000006_seed_unit_data;
 mod m20250319_000007_seed_plans_data;
 mod m20250326_000008_order_template;
+mod m20250328_000009_create_template_paragraphs;
 
 
 
@@ -27,6 +28,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20250319_000006_seed_unit_data::Migration),
             Box::new(m20250319_000007_seed_plans_data::Migration),
             Box::new(m20250326_000008_order_template::Migration),
+            Box::new(m20250328_000009_create_template_paragraphs::Migration),
         ]
     }
 }

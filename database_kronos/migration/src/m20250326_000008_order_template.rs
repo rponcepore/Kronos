@@ -1,6 +1,6 @@
 use sea_orm::{prelude::*, ExecResult, DatabaseBackend};
-use sea_orm::{QueryResult, Statement};
-use sea_orm_migration::{prelude::*, schema::*};
+use sea_orm::{Statement};
+use sea_orm_migration::{prelude::*};
 
 use sea_orm_migration::DbErr;
 
