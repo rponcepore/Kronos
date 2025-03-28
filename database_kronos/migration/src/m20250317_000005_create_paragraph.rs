@@ -11,7 +11,6 @@ pub enum Paragraph {
     Id,
     KronosOrder,
     ParentParagraph,
-    IsMajor,
     OrdinalSequence,
     Title,
     Text,
@@ -47,7 +46,11 @@ impl MigrationTrait for Migration {
                             .on_delete(ForeignKeyAction::Cascade)
                             .on_update(ForeignKeyAction::Cascade),
                     )
-                    .col(integer(Paragraph::ParentParagraph))
+                    .col(
+                        ColumnDef::new(Paragraph::ParentParagraph) // Allow NULL values
+                            .integer()
+                            .null(),
+                    )
                     .foreign_key(
                         ForeignKey::create() //bind the paragraph to its owning paragraph
                             .name("fk-paragraph-parentParagraph-paragraph-id")
@@ -56,7 +59,6 @@ impl MigrationTrait for Migration {
                             .on_delete(ForeignKeyAction::Cascade) // Save us some business logic, nice.
                             .on_update(ForeignKeyAction::Cascade),
                     )
-                    .col(boolean(Paragraph::IsMajor).not_null())
                     .col(integer(Paragraph::OrdinalSequence).not_null())
                     .col(string(Paragraph::Title).not_null())
                     .col(string(Paragraph::Text).not_null())

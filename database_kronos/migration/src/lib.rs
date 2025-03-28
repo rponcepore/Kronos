@@ -11,7 +11,8 @@ mod m20250319_000007_seed_plans_data;
 mod m20250326_000008_order_template;
 mod m20250328_000009_create_template_paragraphs;
 
-
+// Import the modules with our synthetic data
+mod preloaded_data;
 
 pub struct Migrator;
 
