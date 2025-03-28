@@ -1,3 +1,5 @@
+use sea_orm::prelude::*;
+use sea_orm::{QueryResult, Statement};
 use sea_orm_migration::{prelude::*, schema::*};
 
 // Bring plans table into scope
@@ -37,17 +39,39 @@ impl MigrationTrait for Migration {
             .to_owned();
 
         manager.exec_stmt(insert).await?;
+        
+        /*
+            This is a somewhat bad hack. SeaORM does not allow you to get the id of the last inserted query in the 
+            SeaORM migrator framework, which is a separate crate from SeaORM. So I have to import some of the SeaORM
+            shit, and it's dependencies, and the types, from my src directory, in order to run a query on the database,
+            which will in turn allow me to find the primary key of the thing that I JUST INSERTED so that I can now make 
+            some related records. The alternative would be to make synthetic, natural primary keys, so that I could logically
+            call for a primary key from the database, at least for plans, but it would bloat the field. i.e., "WJH8A0202501" would
+            be the key for UIC WJH8A0 FY 2025 SN 1, which should never be duplicated.
+
+            Insult to injury, we have to use raw SQL anyway, because to use teh Sea_ROM functionality we woul dneed to point 
+            back to our entities, which would introduce circular dependencies at build time or require custom bash scripting
+            to start the app up correctly. 
+
+            I considered changing everything to natural keys, but then I would need to go change all our frontend types. 
+            I could put a checking method into startup, i.e., if the database is available, check if the basic templates 
+            were loaded, and if they weren't, then load them direectly from the application. But given that the application 
+            doesn't have any data built into at the moment, it would start to un-separate concerns, which I don't want to do. 
+            So raw sql it is.
+         */
 
         // Now get that plan ID
-        let plan: Option<i32> = Plan::find()
-            .filter(plan::Column::Unit.eq("TEMPLT"))
-            .filter(plan::Column::FiscalYear.eq(0))
-            .filter(plan::Column::SerialNumber.eq(0))
-            .one(manager.get_connection())
-            .await?;
-        
-        let plan_id = plan.unwrap().id;
-        
+        // Query the last inserted row (assuming `id` is the primary key)
+        let query = Statement::from_string(
+            manager.get_database_backend(),
+            format!(
+                "SELECT id FROM {} WHERE unit = '{}' AND fiscal_year = {} AND serial_number = {}",
+                Plan::Table.to_string(),
+                plan.0,
+                plan.1,
+                plan.2
+            ),
+        );
         
         // Now create the order "WARNORD_TEMPLATE"
 
