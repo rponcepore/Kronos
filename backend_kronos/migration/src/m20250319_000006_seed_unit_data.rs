@@ -24,6 +24,29 @@ pub enum Unit {
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
 
+        //Step 0: Create a unit for this plan to live in. We'll call that unit "TEMPLT" and it will house orders templates.
+        // Hacky but deal with it.
+        let template_unit = ("TEMPLT", "UNK", "TEMPLATES", "ORDERS TEMPLATS", "TEMPLATES", "Active");
+        let insert_template = Query::insert()
+            .into_table(Unit::Table)
+            .columns([  Unit::Uic, 
+                Unit::Echelon, 
+                Unit::Nickname, 
+                Unit::DisplayName, 
+                Unit::ShortName,
+                Unit::Component])
+            .values_panic([
+                template_unit.0.into(),
+                template_unit.1.into(),
+                template_unit.2.into(),
+                template_unit.3.into(),
+                template_unit.4.into(),
+                template_unit.5.into(),
+            ]) 
+            .to_owned();
+
+        manager.exec_stmt(insert_template).await?;
+
         // First insert the squadron
         let rattlesnake_sqdn = ("WJH8AA", "BN", "Rattlesnake", "2-14 Cavalry Regiment", "2-14 CAV", "Active");
         let insert_sqdn = Query::insert()

@@ -1,10 +1,15 @@
-use sea_orm::prelude::*;
+use sea_orm::{prelude::*, ExecResult, DatabaseBackend};
 use sea_orm::{QueryResult, Statement};
 use sea_orm_migration::{prelude::*, schema::*};
+
+use sea_orm_migration::DbErr;
 
 // Bring plans table into scope
 use super::m20250316_000003_create_plan::Plan;
 use super::m20250317_000004_create_order::KronosOrder;
+
+// Be able to connect to the database, this is awful.
+// use backend_kronos::routes::api::api_handler::access_kronos_database;
 
 
 /* This migration conducts a series of insert queries to seed the database with some basic templates. */
@@ -18,13 +23,16 @@ impl MigrationTrait for Migration {
         // Replace the sample below with your own migration scripts
         // This stores a template for an order. This is a very bad hack at this time,
         // As we're just calling all orders under the UIC "TEMPLT" and moving on
+
+        
         
         //First create the overall plan "00-00 Orders Template"
         let plan: (&str, i32, i32, &str, &str) = ("TEMPLT", 00, 0, "Orders Templates", "CUI");
 
         let insert = Query::insert()
             .into_table(Plan::Table)
-            .columns([  Plan::Unit, 
+            .columns([  
+                Plan::Unit, 
                 Plan::FiscalYear, 
                 Plan::SerialNumber, 
                 Plan::Name, 
@@ -60,18 +68,35 @@ impl MigrationTrait for Migration {
             So raw sql it is.
          */
 
-        // Now get that plan ID
+        // Now get that plan ID. First we have to connect to the database.
+
+        let db = manager.get_connection();
+        
         // Query the last inserted row (assuming `id` is the primary key)
         let query = Statement::from_string(
             manager.get_database_backend(),
             format!(
                 "SELECT id FROM {} WHERE unit = '{}' AND fiscal_year = {} AND serial_number = {}",
                 Plan::Table.to_string(),
-                plan.0,
-                plan.1,
-                plan.2
+                plan.0, // "TEMPLT"
+                plan.1, // 0
+                plan.2 // 0 
             ),
         );
+
+        let plan_id= match db.query_one(query).await? {
+            Some(row) => {
+                let id: i32 = row.try_get("", "id")?;
+                println!("Found ID: {}", id);
+                id
+            }
+            None => {
+                println!("No matching record found.");
+                return Err(sea_orm_migration::DbErr::RecordNotFound("No matching record found.".to_string()));
+            }
+        };
+
+
         
         // Now create the order "WARNORD_TEMPLATE"
 
