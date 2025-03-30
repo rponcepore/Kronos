@@ -14,30 +14,30 @@ else
     # Start your PostgreSQL container or run the rest of your script
 fi
 
+# Get the project root directory (parent of database_kronos directory)
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+DATABASE_DIR="${PROJECT_ROOT}/database_kronos"
 
-#First, make sure that we are in the correct directory:
-
-EXPECTED_DIR="/home/$USER/Kronos/database_kronos"
-cd ${EXPECTED_DIR}
-
+cd "${DATABASE_DIR}"
 
 # Make sure that sea-orm-cli is installed
-
 if ! [ -x "$(command -v sea-orm-cli)" ]; then
   echo >&2 "Error: sea-orm-cli is not installed."
   echo >&2 "Use:"
-  echo >&2 "    cargo install sea-orm-cli \
-  --features sqlx-postgres, runtime-tokio-rustls"
+  echo >&2 "    cargo install sea-orm-cli"
   echo >&2 "to install it."
   exit 1
 fi
-
 
 # Make sure that the postgres-sql client is installed.
 if ! [ -x "$(command -v psql)" ]; then
   echo >&2 "Error: psql is not installed."
   echo >&2 "Use:"
-  echo >&2 "    sudo apt-get install postgresql-client   "
+  if [[ "$OSTYPE" == "darwin"* ]]; then
+    echo >&2 "    brew install postgresql@14"
+  else
+    echo >&2 "    sudo apt-get install postgresql-client"
+  fi
   echo >&2 "to install it."
   exit 1
 fi
@@ -47,7 +47,11 @@ set -eo pipefail
 
 # Ensure `yq` is installed
 if ! command -v yq &>/dev/null; then
-    echo "Error: yq is not installed. Install it with 'sudo snap install yq' or 'brew install yq'."
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        echo "Error: yq is not installed. Install it with 'brew install yq'"
+    else
+        echo "Error: yq is not installed. Install it with 'sudo snap install yq'"
+    fi
     exit 1
 fi
 
