@@ -1,114 +1,72 @@
 import React, { useState } from "react";
-
-// Types for props
-import { Plan } from "../types/Plan";
-import { KronosOrder } from "../types/KronosOrder";
-import { Paragraph } from "../types/Paragraph";
+import { PlanSummary } from "../types/frontend_types/PlanSummary";
+import { KronosOrderSummary } from "../types/frontend_types/KronosOrderSummary";
+import { ParagraphSummary } from "../types/frontend_types/ParagraphSummary";
+import { getPlanSerialDisplay } from "../helper_methods/format";
 
 // Subcomponents for rendering orders and order details
 import OrderDetails from "./OrderDetails";
 import OrderCard from "./OrderCard";
 
-// Utility functions to format serial numbers
-import { getPlanSerialDisplay, getOrderSerialDisplay } from "../helper_methods/format";
-
-
 // Props that PlanDetails expects to receive
 interface PlanDetailsProps {
-  plan: Plan;                            // The selected base plan
-  allOrders: KronosOrder[];             // All orders from the database/dummy data
-  allParagraphs: Paragraph[];           // All paragraphs for every order
-  goBack: () => void;                   // Callback to return to the previous view
+  plan: PlanSummary;
+  allOrders: KronosOrderSummary[] | null;
+  allParagraphs: ParagraphSummary[] | null;
+  goBack: () => void;
 }
 
+// Main component to display detailed information about a selected plan
 const PlanDetails: React.FC<PlanDetailsProps> = ({
   plan,
-  allOrders,
-  allParagraphs,
+  allOrders = [], // Default to empty array if null
+  allParagraphs = [], // Default to empty array if null
   goBack,
 }) => {
+  // Local state to track which order is selected
+  const [selectedOrder, setSelectedOrder] = useState<KronosOrderSummary | null>(null);
 
-  // State to track if an individual order (OPORD, FRAGO, WARNO) has been selected
-  const [selectedOrder, setSelectedOrder] = useState<KronosOrder | null>(null);
+  // Filter orders to only show those associated with this plan
+  const planOrders = (allOrders || []).filter(
+    (order) => order.data.parent_plan === plan.data.id
+  );
 
-  // Filter allOrders to just the ones related to this specific base plan
-  const relatedOrders = allOrders.filter(
-    (order) => order.parent_plan === plan.id
+  // Filter paragraphs to only show those associated with this plan's orders
+  const planParagraphs = (allParagraphs || []).filter((paragraph) =>
+    planOrders.some((order) => order.data.id === paragraph.data.order)
   );
 
   return (
     <div className="plan-details">
-      {/* Top-left back button to exit plan detail view */}
-      <div className="back-button-wrapper">
-        <button className="back-button" onClick={goBack}>
-          ← Back
-        </button>
+      {/* Header section with plan info and back button */}
+      <div className="plan-header">
+        <h1>{plan.data.name}</h1>
+        <p>Unit: {plan.data.unit}</p>
+        <p>Fiscal Year: {plan.data.fiscal_year}</p>
+        <button onClick={goBack}>Back to Plans</button>
       </div>
 
-      {/* If an order has been selected, show the OrderDetails view */}
-      {selectedOrder ? (
+      {/* Orders section */}
+      <div className="orders-section">
+        <h2>Orders</h2>
+        <div className="orders-grid">
+          {planOrders.map((order) => (
+            <OrderCard
+              key={order.data.id}
+              order={order}
+              selectOrder={setSelectedOrder}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Order details modal */}
+      {selectedOrder && (
         <OrderDetails
           order={selectedOrder}
-          parentPlan={plan}
-          // Filter paragraphs to just the ones belonging to the selected order
-          paragraphs={allParagraphs.filter(
-            (p) => p.order === selectedOrder.id
-          )}
-          goBack={() => setSelectedOrder(null)}  // Clicking "Back" in OrderDetails resets selectedOrder
+          allParagraphs={planParagraphs}
+          goBack={() => setSelectedOrder(null)}
         />
-      ) : (
-        <>
-          {/* Base Plan Metadata */}
-          <h1>{plan.name}</h1>
-          <p>
-            <strong>Unit:</strong> {plan.unit}
-          </p>
-          <p>
-            <strong>Fiscal Year:</strong> {plan.fiscal_year}
-          </p>
-          <p>
-            <strong>Serial Number:</strong>{" "}
-            {getPlanSerialDisplay(plan.fiscal_year, plan.serial_number)}
-          </p>
-          <p>
-            <strong>Classification:</strong> {plan.classification}
-          </p>
-
-          {/* Related orders (OPORDs, WARNOs, FRAGOs) for this plan */}
-          {relatedOrders.length > 0 && (
-            <div className="related-orders">
-              <h2>Orders</h2>
-
-              {/* Container for all OrderCard components */}
-              <div className="related-orders-container">
-                {relatedOrders.map((order) => {
-                  
-                  // If this order is a FRAGO (i.e., derived from another order), build its derived serial number
-                  const derivedSerial =
-                    order.derived_from !== null
-                      ? getOrderSerialDisplay(
-                          plan.fiscal_year,
-                          plan.serial_number,
-                          allOrders.find((o) => o.id === order.derived_from)
-                            ?.serial_number ?? null
-                        )
-                      : undefined;
-
-                  return (
-                    <OrderCard
-                      key={order.id}
-                      order={order}
-                      fiscalYear={plan.fiscal_year}
-                      planSerial={plan.serial_number}
-                      derivedSerial={derivedSerial}
-                      onClick={() => setSelectedOrder(order)} // Clicking an OrderCard sets the selected order
-                    />
-                  );
-                })}
-              </div>
-            </div>
-          )}
-        </>
       )}
     </div>
   );
