@@ -1,12 +1,8 @@
-use sea_orm_migration::{prelude::*, schema::*};
-use sea_orm::{Statement};
+use sea_orm_migration::prelude::*;
 
-use crate::m20250316_000003_create_plan::Plan;
 use crate::m20250317_000004_create_kronosorder::KronosOrder;
-use crate::m20250317_000005_create_paragraph::Paragraph;
 use crate::m20250316_000002_create_unit::Unit;
 
-use crate::preloaded_data::fragord_data::*;
 use crate::helper_methods::order_insertion::*;
 
 #[derive(DeriveMigrationName)]
@@ -23,7 +19,7 @@ impl MigrationTrait for Migration {
 
         // Create an order associated with this plan.
         let mut order_vec: Vec<(&i32, &str, i32, bool)> = Vec::new();
-        order_vec.push((&plan_id, "OPORD", 0, true)); 
+        //order_vec.push((&plan_id, "OPORD", 0, true)); 
         order_vec.push((&plan_id, "FRAGORD", 1, true)); 
         order_vec.push((&plan_id, "WARNORD", 1, true)); 
         
@@ -40,8 +36,11 @@ impl MigrationTrait for Migration {
             ).await?;
 
             // For each order, add the first five paragraphs
-            insert_header_paragraphs(order_id, manager);
+            insert_header_paragraphs(order_id, manager).await?;
         }
+
+        // Now build the full OPORD
+        let opord_id = build_standard_order(&plan_id, db, manager);
 
         Ok(())
 
@@ -52,7 +51,7 @@ impl MigrationTrait for Migration {
         manager.exec_stmt(
             Query::delete()
                 .from_table(KronosOrder::Table)
-                .cond_where(Expr::col(Unit::Uic).is_in(["WJH8AA"]))
+                .cond_where(Expr::col(Unit::Uic).is_in(["WJH8AA"])) // The nuclear option.
                 .to_owned()
         ).await?;
 

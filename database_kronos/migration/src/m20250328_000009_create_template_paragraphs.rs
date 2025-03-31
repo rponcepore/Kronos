@@ -1,11 +1,9 @@
-use sea_orm_migration::{prelude::*, schema::*};
+use sea_orm_migration::prelude::*;
 use sea_orm::{Statement};
 
 use super::m20250316_000003_create_plan::Plan;
-use super::m20250317_000004_create_kronosorder::KronosOrder;
 use super::m20250317_000005_create_paragraph::Paragraph;
 
-use super::preloaded_data::fragord_data::*;
 use super::helper_methods::order_insertion::*;
 
 #[derive(DeriveMigrationName)]
@@ -47,8 +45,8 @@ impl MigrationTrait for Migration {
 
         // There are three combination: 
 
-        let warnord_id = get_order_id(&plan_id, "WARNORD", None::<i32>, db, manager).await?;
-        let opord_id = get_order_id(&plan_id, "OPORD", None::<i32>, db, manager).await?;
+        let _warnord_id = get_order_id(&plan_id, "WARNORD", None::<i32>, db, manager).await?;
+        let _opord_id = get_order_id(&plan_id, "OPORD", None::<i32>, db, manager).await?;
         let fragord_id = get_order_id(&plan_id, "FRAGORD", None::<i32>, db, manager).await?;
         
         // Insert warnord's paragraphs

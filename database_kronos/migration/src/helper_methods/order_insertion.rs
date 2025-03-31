@@ -1,12 +1,12 @@
 //! order_insertion.rs
-use sea_orm_migration::{prelude::*, schema::*};
+use sea_orm_migration::prelude::*;
 use sea_orm::{Statement};
 
 use crate::m20250316_000003_create_plan::Plan;
 use crate::m20250317_000004_create_kronosorder::KronosOrder;
 use crate::m20250317_000005_create_paragraph::Paragraph;
 
-use crate::preloaded_data::fragord_data::*;
+use crate::preloaded_data::order_templates::*;
 
 // This file defines convenience methdos for accessing the database to do basic data entry on the migration side
 
@@ -139,4 +139,59 @@ pub async fn insert_header_paragraphs(order_id: i32, manager: &SchemaManager<'_>
         manager.exec_stmt(insert).await?;
     }
     Ok(())
+}
+
+/*
+ * This method builds the standard template order. It builds from boilerplate to help the user fo complete coverage
+ * of the subject matter.
+ */
+pub async fn build_standard_order(plan_id: &i32, db: &SchemaManagerConnection<'_>, manager: &SchemaManager<'_>) -> Result<i32, DbErr> {
+    let serial_number = 0;
+    let order_type = "OPORD";
+    let insert = Query::insert()
+        .into_table(KronosOrder::Table)
+        .columns([  KronosOrder::ParentPlan, 
+                    KronosOrder::OrderType, 
+                    KronosOrder::SerialNumber, 
+                    KronosOrder::IsPublished])
+        .values_panic([
+            plan_id.clone().into(),
+            order_type.into(),
+            serial_number.into(),
+            false.into(),
+            ]) 
+        .to_owned();
+
+    manager.exec_stmt(insert).await?;
+
+    let order_id = get_order_id(&plan_id, order_type, Some(serial_number), db, manager).await?;
+
+    let order_template: OrderTemplate = default_order_template();
+
+    for major_paragraph in order_template.paragraphs{
+        // insert major paragraph, returning pargraph id
+        match major_paragraph.subparagraphs {
+            Some(subparagraphs) => {
+                for subpara in subparagraphs {
+                    // insert subparagraphs recursively
+                }
+            },
+            None => {}, //Do nothing
+        };
+    }
+
+
+}
+
+// Non recursive method, that calls a recursive method, to insert subparagraphs into the database.
+pub async fn insert_major_paragraph(order_id: i32, 
+    major_paragraph: MigrationParagraph, 
+    db: &SchemaManagerConnection<'_>, 
+    manager: &SchemaManager<'_> ) -> Result<i32, DbErr> {
+        
+    }
+
+// Recursive method for inserting a subparagraph
+pub async fn insert_subparagraph(subparagraph: MigrationParagraph, parent_paragraph_id: i32) -> Result<i32, DbErr> {
+
 }
