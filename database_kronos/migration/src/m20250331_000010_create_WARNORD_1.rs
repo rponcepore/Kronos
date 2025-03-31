@@ -37,7 +37,7 @@ impl MigrationTrait for Migration {
                 ord.1,
                 ord.2,
                 ord.3,
-                manager
+                manager 
             );
         }
 
