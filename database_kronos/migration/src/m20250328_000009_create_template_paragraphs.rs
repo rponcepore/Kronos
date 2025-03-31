@@ -57,9 +57,8 @@ impl MigrationTrait for Migration {
         // OPORD
 
         // FRAGORD
-        let fragord_paragraphs = get_fragord_vec();
-        insert_paragraphs_to_order_shallow(fragord_id, fragord_paragraphs, manager).await?;
-
+        
+        insert_header_paragraphs(fragord_id, manager).await?;
 
         Ok(())
     }

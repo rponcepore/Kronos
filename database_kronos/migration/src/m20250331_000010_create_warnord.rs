@@ -30,7 +30,7 @@ impl MigrationTrait for Migration {
 
         for ord in order_vec{
         
-            insert_shallow_order(
+            let order_id = insert_shallow_order(
                 ord.0, // plan_id
                 ord.1, // opord_type
                 ord.2, // serial_number
@@ -38,6 +38,9 @@ impl MigrationTrait for Migration {
                 db,
                 manager
             ).await?;
+
+            // For each order, add the first five paragraphs
+            insert_header_paragraphs(order_id, manager);
         }
 
         Ok(())

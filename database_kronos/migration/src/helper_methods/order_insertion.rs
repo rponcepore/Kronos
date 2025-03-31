@@ -112,24 +112,9 @@ pub async fn insert_shallow_order(plan_id: &i32, order_type: &str, serial_number
     Ok(order_id)
 }
 
-pub async fn insert_paragraphs_to_order_shallow(order_id: i32, 
-                                            paragraphs: Vec<(i32, i32, &'static str, &'static str)>, 
-                                            manager: &SchemaManager<'_>
-                                            ) -> Result<(), DbErr> {
-    
-    /*
-    pub enum Paragraph {
-        Table,
-        Id,
-        KronosOrder,
-        ParentParagraph,
-        IsMajor,
-        OrdinalSequence,
-        Title,
-        Text,
-        IndentLevel, // 0 is base for paragraphs 1-5.
-    }
-     */
+pub async fn insert_header_paragraphs(order_id: i32, manager: &SchemaManager<'_>) -> Result<(), DbErr> {
+
+    let paragraphs = get_header_paragraph_vec();
     
     // Paragraph: (i32, i32, &str, &str)
     for paragraph in paragraphs {
