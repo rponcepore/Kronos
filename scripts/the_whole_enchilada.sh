@@ -9,12 +9,13 @@ echo ""
 echo "This script assumes that you have installed Rust, npm, react, etc."
 echo "This script also assumes that your docker daemon is running. Most commonly this is done by running Docker Desktop if on Windows."
 
+# Get the project root directory (parent of scripts directory)
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
 # Important directories:
-EXPECTED_DIR="/home/$USER/Kronos/scripts"
-MIGRATION_DIR="/home/$USER/Kronos/backend_kronos/migration"
-BACKEND_DIR="/home/$USER/Kronos/backend_kronos"
-FRONTEND_DIR="/home/$USER/Kronos/frontend_kronos"
-cd ${EXPECTED_DIR}
+DATABASE_DIR="${PROJECT_ROOT}/database_kronos"
+BACKEND_DIR="${PROJECT_ROOT}/backend_kronos"
+FRONTEND_DIR="${PROJECT_ROOT}/frontend_kronos"
 
 echo ""
 echo "First, we will confirm that your docker daemon has started."
@@ -31,22 +32,23 @@ fi
 
 # Now, check for necessary libraries.
 # Make sure that sea-orm-cli is installed
-
 if ! [ -x "$(command -v sea-orm-cli)" ]; then
   echo >&2 "Error: sea-orm-cli is not installed."
   echo >&2 "Use:"
-  echo >&2 "    cargo install sea-orm-cli \
-  --features sqlx-postgres, runtime-tokio-rustls"
+  echo >&2 "    cargo install sea-orm-cli"
   echo >&2 "to install it."
   exit 1
 fi
-
 
 # Make sure that the postgres-sql client is installed.
 if ! [ -x "$(command -v psql)" ]; then
   echo >&2 "Error: psql is not installed."
   echo >&2 "Use:"
-  echo >&2 "    sudo apt-get install postgresql-client   "
+  if [[ "$OSTYPE" == "darwin"* ]]; then
+    echo >&2 "    brew install postgresql@14"
+  else
+    echo >&2 "    sudo apt-get install postgresql-client"
+  fi
   echo >&2 "to install it."
   exit 1
 fi
@@ -55,16 +57,11 @@ fi
 set -eo pipefail 
 
 # Now we need to run our initdb script.
-cd ${BACKEND_DIR}
+cd "${DATABASE_DIR}"
 source "./scripts/init_db.sh"
 
-# Now we need to run database migrations to populate the database
-cd ${MIGRATION_DIR}
-
-cargo run
-
 # Database should be ready to go. 
-cd ${BACKEND_DIR}
+cd "${BACKEND_DIR}"
 
 cargo test
 
