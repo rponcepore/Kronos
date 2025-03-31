@@ -22,10 +22,10 @@ impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
 
         let mut plan_vec: Vec<(&str, i32, i32, &str, &str)> = Vec::new();
-        plan_vec.push(("WJH8C0", 25, 1, "Blackbeard", "CUI"));
-        plan_vec.push(("WJH8C0", 25, 2, "Revenge", "CUI"));
-        plan_vec.push(("WJH8C0", 25, 3, "Jack Sparrow", "CUI"));
-        plan_vec.push(("WJH8C0", 25, 3, "Pirate's Life", "CUI"));
+        plan_vec.push(("WJH8AA", 25, 1, "Blackbeard", "CUI"));
+        plan_vec.push(("WJH8AA", 25, 2, "Revenge", "CUI"));
+        plan_vec.push(("WJH8AA", 25, 3, "Jack Sparrow", "CUI"));
+        plan_vec.push(("WJH8AA", 25, 3, "Pirate's Life", "CUI"));
 
         for plan in plan_vec{
             let insert = Query::insert()

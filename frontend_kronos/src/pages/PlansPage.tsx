@@ -31,7 +31,7 @@ const PlansPage: React.FC = () => {
         setError(null);
         const req: KronosRequest = {
           action: "get_plans",
-          unit: "TEMPLT",
+          unit: "WJH8AA",
           plan_id: null,
           order_id: null,
           paragraph_id: null,
