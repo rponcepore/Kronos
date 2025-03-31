@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { PlanSummary } from "../types/frontend_types/PlanSummary";
-import { KronosOrderSummary } from "../types/frontend_types/KronosOrderSummary";
-import { ParagraphSummary } from "../types/frontend_types/ParagraphSummary";
-import { getPlanSerialDisplay } from "../helper_methods/format";
+import { PlanSummary } from "../../types/frontend_types/PlanSummary";
+import { KronosOrderSummary } from "../../types/frontend_types/KronosOrderSummary";
+import { ParagraphSummary } from "../../types/frontend_types/ParagraphSummary";
+import { getPlanSerialDisplay } from "../../helper_methods/format";
 
 // Subcomponents for rendering orders and order details
-import OrderDetails from "./OrderDetails";
-import OrderCard from "./OrderCard";
+import OrderDetails from "../orders/OrderDetails";
+import OrderCard from "../orders/OrderCard";
 
 // Props that PlanDetails expects to receive
 interface PlanDetailsProps {
@@ -54,6 +54,7 @@ const PlanDetails: React.FC<PlanDetailsProps> = ({
             <OrderCard
               key={order.data.id}
               order={order}
+              parentPlanFiscalYear={plan.data.fiscal_year}
               selectOrder={setSelectedOrder}
             />
           ))}

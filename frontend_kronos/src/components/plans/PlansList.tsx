@@ -2,7 +2,7 @@
 import React from "react";
 
 // Importing the PlanSummary type definition
-import { PlanSummary } from "../types/frontend_types/PlanSummary";
+import { PlanSummary } from "../../types/frontend_types/PlanSummary";
 
 // Importing the reusable PlanCard component
 import PlanCard from "./PlanCard";

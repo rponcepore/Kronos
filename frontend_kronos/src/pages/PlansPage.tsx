@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
-import PlansList from "../components/PlansList";           // Component to render the list of plans
-import PlanDetails from "../components/PlansDetails";       // Component to show plan details when selected
-import { Plan } from "../types/backend_types/Plan";         // Plan type definition
+import { PlansList, PlansDetails } from "../components";
+import { Plan } from "../types/backend_types/Plan";
 import { PlanSummary } from "../types/frontend_types/PlanSummary";
+import { KronosOrderSummary } from "../types/frontend_types/KronosOrderSummary";
+import { ParagraphSummary } from "../types/frontend_types/ParagraphSummary";
 import { kronosApiCall } from "../helper_methods/ApiCall";
 import { KronosRequest } from "../types/networking_types/KronosRequest";
+import "../styles/plans.css";
 
 // Main container component for the Plans page
 const PlansPage: React.FC = () => {
@@ -17,6 +19,8 @@ const PlansPage: React.FC = () => {
   const [sortBy, setSortBy] = useState<"default" | "alpha" | "year">("default"); // Sorting mode (alphabetical, year, or default)
   const [filterYear, setFilterYear] = useState<number | null>(null);           // Optional filter by fiscal year
   const [plans, setPlans] = useState<PlanSummary[]>([]);
+  const [allOrders, setAllOrders] = useState<KronosOrderSummary[] | null>(null);
+  const [allParagraphs, setAllParagraphs] = useState<ParagraphSummary[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -29,7 +33,9 @@ const PlansPage: React.FC = () => {
       try {
         setLoading(true);
         setError(null);
-        const req: KronosRequest = {
+
+        // Fetch plans
+        const plansReq: KronosRequest = {
           action: "get_plans",
           unit: "TEMPLT",
           plan_id: null,
@@ -37,20 +43,17 @@ const PlansPage: React.FC = () => {
           paragraph_id: null,
           task_id: null
         };
-        const response = await kronosApiCall(req);
-        console.log('Response:', response);
-        
-        if (response.plans_vec) {
-          console.log('Plans received:', response.plans_vec);
-          setPlans(response.plans_vec);
-        } else {
-          console.log('No plans received from API');
-          setError('No plans were returned from the server');
+        const plansResponse = await kronosApiCall(plansReq);
+        if (plansResponse.plans_vec) {
+          setPlans(plansResponse.plans_vec);
         }
+
+        // For now, set empty arrays for orders and paragraphs since they're not implemented
+        setAllOrders([]);
+        setAllParagraphs([]);
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Failed to fetch plans';
-        console.error('Error fetching plans:', err);
-        setError(errorMessage);
+        console.error('Error fetching data:', err);
+        setError('Failed to fetch data from the server');
       } finally {
         setLoading(false);
       }
@@ -60,67 +63,85 @@ const PlansPage: React.FC = () => {
   }, []);
 
   // ----------------------------
-  // Filter and sort logic
+  // Filter and sort functions
   // ----------------------------
 
-  const filteredPlans = plans
-    .filter((p) => !filterYear || p.data.fiscal_year === filterYear)                     // Filter by fiscal year if applied
-    .filter((p) => p.data.name.toLowerCase().includes(searchTerm.toLowerCase()))        // Match search input to plan name
-    .sort((a, b) => {
-      if (sortBy === "alpha") return a.data.name.localeCompare(b.data.name);                 // Sort alphabetically
-      if (sortBy === "year") return a.data.fiscal_year - b.data.fiscal_year;                // Sort by year
-      return 0;                                                                    // Default (no sort)
-    });
+  const filteredPlans = plans.filter(plan => {
+    const matchesSearch = plan.data.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesYear = !filterYear || plan.data.fiscal_year === filterYear;
+    return matchesSearch && matchesYear;
+  });
+
+  const sortedPlans = [...filteredPlans].sort((a, b) => {
+    switch (sortBy) {
+      case "alpha":
+        return a.data.name.localeCompare(b.data.name);
+      case "year":
+        return b.data.fiscal_year - a.data.fiscal_year;
+      default:
+        return 0;
+    }
+  });
+
+  // ----------------------------
+  // Render functions
+  // ----------------------------
 
   if (loading) {
-    return <div className="p-6">Loading plans...</div>;
+    return <div className="loading">Loading plans...</div>;
   }
 
   if (error) {
-    return <div className="p-6 text-red-500">Error: {error}</div>;
+    return <div className="error">Error: {error}</div>;
   }
 
   return (
     <div className="plans-page-wrapper">
-      {selectedPlan ? (
-        // If a plan is selected, render PlanDetails with related orders and paragraphs
-        <PlanDetails
-          plan={selectedPlan}
-          allOrders={selectedPlan.orders} // Use the orders from the selected plan
-          allParagraphs={[]} // We'll need to fetch paragraphs separately
-          goBack={() => setSelectedPlan(null)} // Return to plans list view
+      <div className="top-controls">
+        <input
+          type="text"
+          placeholder="Search plans..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="control-input"
         />
-      ) : (
-        <>
-          {/* Top controls for filter, sort, and search */}
-          <div className="top-controls mb-6 flex gap-4 flex-wrap">
-            <button className="control-btn" onClick={() => setFilterYear(null)}>
-              All Years
-            </button>
-            <button className="control-btn" onClick={() => setFilterYear(2025)}>
-              FY25
-            </button>
-            <button className="control-btn" onClick={() => setSortBy("alpha")}>
-              Order A–Z
-            </button>
-            <button className="control-btn" onClick={() => setSortBy("year")}>
-              Order by Year
-            </button>
-
-            {/* Search input for plan name */}
-            <input
-              type="text"
-              className="control-input"
-              placeholder="Search plans..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-
-          {/* Render list of plans after filtering/sorting */}
-          <PlansList plans={filteredPlans} selectPlan={setSelectedPlan} />
-        </>
-      )}
+        <button 
+          className="control-btn"
+          onClick={() => setSortBy("alpha")}
+        >
+          Sort Alphabetically
+        </button>
+        <button 
+          className="control-btn"
+          onClick={() => setSortBy("year")}
+        >
+          Sort by Year
+        </button>
+        <select
+          value={filterYear || ""}
+          onChange={(e) => setFilterYear(e.target.value ? parseInt(e.target.value) : null)}
+          className="control-input"
+        >
+          <option value="">All Years</option>
+          {Array.from(new Set(plans.map(plan => plan.data.fiscal_year))).sort((a, b) => b - a).map(year => (
+            <option key={year} value={year}>{year}</option>
+          ))}
+        </select>
+      </div>
+      <div className="plans-overview">
+        <PlansList
+          plans={sortedPlans}
+          selectPlan={setSelectedPlan}
+        />
+        {selectedPlan && (
+          <PlansDetails
+            plan={selectedPlan}
+            allOrders={allOrders}
+            allParagraphs={allParagraphs}
+            goBack={() => setSelectedPlan(null)}
+          />
+        )}
+      </div>
     </div>
   );
 };

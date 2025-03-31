@@ -1,10 +1,10 @@
 import React from "react";
-import Navbar from "./Navbar";
+import Navbar from "../layout/Navbar";
 import Notifications from "./Notifications";
 import HighPriorityTasks from "./HighPriorityTasks";
 import MissionReadinessChart from "./MissionReadinessChart";
 import WeeklyActivityChart from "./WeeklyActivityChart";
-import BackgroundOverlay from "./BackgroundOverlay"; // Import background component
+import BackgroundOverlay from "../layout/BackgroundOverlay"; // Import background component
 
 const Dashboard = () => (
   <div className="p-4 bg-gray-900 text-white min-h-screen relative">

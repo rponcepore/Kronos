@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import "../styles/NavBar.css";
-import logo from "../assets/KronosLogo.png";
+import "../../styles/NavBar.css";
+import logo from "../../assets/KronosLogo.png";
 
 const NavBar = () => {
   const location = useLocation();
