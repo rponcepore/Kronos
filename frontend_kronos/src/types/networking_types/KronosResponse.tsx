@@ -1,5 +1,5 @@
 //! KronosResponse.tsx
-import { KronosRequest  } from "../KronosRequest"
+import { KronosRequest  } from "../networking_types/KronosRequest"
 import { Plan } from "../backend_types/Plan";
 import { KronosOrder } from "../backend_types/KronosOrder";
 import { Paragraph } from "../backend_types/Paragraph";
