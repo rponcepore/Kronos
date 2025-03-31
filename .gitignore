@@ -1,2 +1,23 @@
-dev_notes.txt
-.vscode
+# macOS system files
+.DS_Store
+**/.DS_Store
+
+# Node modules
+node_modules/
+
+# Rust build artifacts
+target/
+**/target/
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
