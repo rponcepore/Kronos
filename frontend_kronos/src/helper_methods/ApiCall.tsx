@@ -16,7 +16,8 @@ export async function kronosApiCall(request: KronosRequest): Promise<KronosRespo
         });
 
         if (!response.ok) {
-            throw new Error('Network response was not ok');
+            const errorMessage = await response.text(); // or response.json() if expecting JSON
+            throw new Error(errorMessage);
         }
 
         const kronosResponse: KronosResponse = await response.json(); 

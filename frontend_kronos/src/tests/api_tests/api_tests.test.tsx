@@ -71,7 +71,7 @@ test('Network test: Attempt to connect to backend via "tstUIC":', async () => {
   test('Look at a FRAGORD', async () => {
     const req: KronosRequest = {
       action: "get_plans",
-      unit: "TEMPLT",
+      unit: "WJH8AA",
       plan_id: 0,
       order_id: null,
       paragraph_id: null,
@@ -91,4 +91,18 @@ test('Network test: Attempt to connect to backend via "tstUIC":', async () => {
         console.log("PlanSummary data:", plan.data);
       });
     }
+  })
+
+  test('get_orders endpoint test', async () => {
+    const req: KronosRequest = {
+      action: "get_orders",
+      unit: "WJH8AA",
+      plan_id: 1, // this is bad, hardcoded data. I just happen to know that plan 1 is a WJH8AA plan.
+      order_id: null,
+      paragraph_id: null,
+      task_id: null,
+    };
+    let response: KronosResponse = await kronosApiCall(req);
+    expect(response.orders_vec); // This should not be null
+    
   })
