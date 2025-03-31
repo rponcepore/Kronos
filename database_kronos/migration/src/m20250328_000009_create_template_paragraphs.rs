@@ -46,13 +46,10 @@ impl MigrationTrait for Migration {
         
 
         // There are three combination: 
-        let warnord_params = (&plan_id, "WARNORD", None);
-        let opord_params = (&plan_id, "OPORD", None);
-        let fragord_params = (&plan_id, "FRAGORD", None);
 
-        let warnord_id = get_order_id(warnord_params, db, manager).await?;
-        let opord_id = get_order_id(opord_params, db, manager).await?;
-        let fragord_id = get_order_id(fragord_params, db, manager).await?;
+        let warnord_id = get_order_id(&plan_id, "WARNORD", None::<i32>, db, manager).await?;
+        let opord_id = get_order_id(&plan_id, "OPORD", None::<i32>, db, manager).await?;
+        let fragord_id = get_order_id(&plan_id, "FRAGORD", None::<i32>, db, manager).await?;
         
         // Insert warnord's paragraphs
         //insert_paragraphs_to_order_shallow(warnord_id, wa)
@@ -68,17 +65,25 @@ impl MigrationTrait for Migration {
     }
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
+        let db: &SchemaManagerConnection = manager.get_connection();
+
+        let plan_id = get_plan_id(("TEMPLT", 0,0), db, manager).await?;
+
+        
         // Replace the sample below with your own migration scripts
-        todo!();
+        let warnord_id = get_order_id(&plan_id, "WARNORD", None::<i32>, db, manager).await?;
+        let opord_id = get_order_id(&plan_id, "OPORD", None::<i32>, db, manager).await?;
+        let fragord_id = get_order_id(&plan_id, "FRAGORD", None::<i32>, db, manager).await?;
+
+        manager.exec_stmt(
+            Query::delete()
+                .from_table(Paragraph::Table)
+                .cond_where(Expr::col(Paragraph::KronosOrder).is_in([warnord_id, opord_id, fragord_id]))
+                .to_owned()
+        ).await?;
+
+        Ok(())
 
     }
-}
-
-#[derive(DeriveIden)]
-enum Post {
-    Table,
-    Id,
-    Title,
-    Text,
 }
 

@@ -43,19 +43,19 @@ pub async fn get_plan_id(params: (&str, i32, i32), db: &SchemaManagerConnection<
 }
 
 // This function gets an order form the database with the plan id and order type, and possibly the order serial number.
-pub async fn get_order_id(params: (&i32, &str, Option<i32>), db: &SchemaManagerConnection<'_>, manager: &SchemaManager<'_>) -> Result<i32, DbErr> {
+pub async fn get_order_id(plan_id: &i32, order_type: &str, serial_number: Option<i32>, db: &SchemaManagerConnection<'_>, manager: &SchemaManager<'_>) -> Result<i32, DbErr> {
     // Now get the fragord
     // Get the plan_id that we need
 
     //Case where we have an order serial number.
-    let query = match params.2 {
+    let query = match serial_number {
         Some(serial_number) => Statement::from_string(
             manager.get_database_backend(),
             format!(
                 "SELECT id FROM {} WHERE parent_plan = {} AND order_type = '{}' AND serial_number = {}",
                 KronosOrder::Table.to_string(),
-                params.0,
-                params.1,
+                plan_id,
+                order_type,
                 serial_number
             ),
         ),
@@ -64,8 +64,8 @@ pub async fn get_order_id(params: (&i32, &str, Option<i32>), db: &SchemaManagerC
             format!(
                 "SELECT id FROM {} WHERE parent_plan = {} AND order_type = '{}'",
                 KronosOrder::Table.to_string(),
-                params.0,
-                params.1
+                plan_id,
+                order_type
             ),
         ),
     };
@@ -85,8 +85,28 @@ pub async fn get_order_id(params: (&i32, &str, Option<i32>), db: &SchemaManagerC
     Ok(ord_id)
 }
 
-pub async fn insert_shallow_order() -> Result<i32, DbErr> {
+// This function takes a plan ID and inserts an order into the plan. 
+// It returns the order ID that was just inserted.
+pub async fn insert_shallow_order(plan_id: i32, order_type: &str, serial_number: i32, is_published: bool, db: &SchemaManagerConnection<'_>, manager: &SchemaManager<'_>) -> Result<i32, DbErr> {
+    println!("Attempting to insert orders into table.");
+    let insert = Query::insert()
+                .into_table(KronosOrder::Table)
+                .columns([  KronosOrder::ParentPlan, 
+                            KronosOrder::OrderType, 
+                            KronosOrder::SerialNumber, 
+                            KronosOrder::IsPublished])
+                .values_panic([
+                    plan_id.into(),
+                    order_type.into(),
+                    serial_number.into(),
+                    is_published.into(),
+                    ]) 
+                .to_owned();
 
+    manager.exec_stmt(insert).await?;
+
+    let order_id = get_order_id(&plan_id, order_type, Some(serial_number), db, manager).await?;
+    Ok(order_id)
 }
 
 pub async fn insert_paragraphs_to_order_shallow(order_id: i32, 
