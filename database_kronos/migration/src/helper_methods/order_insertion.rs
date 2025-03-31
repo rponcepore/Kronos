@@ -11,9 +11,8 @@ use crate::preloaded_data::fragord_data::*;
 // This file defines convenience methdos for accessing the database to do basic data entry on the migration side
 
 // This function gets a plan id from teh databse given a unit, fiscal year, and serial number.
-pub async fn get_plan_id(params: (&str, i32, i32), db: &SchemaManagerConnection<'_>, manager: &SchemaManager<'_>) -> Result<i32, DbErr> {
+pub async fn get_plan_id(unit: &str, fiscal_year: i32, serial_number: i32, db: &SchemaManagerConnection<'_>, manager: &SchemaManager<'_>) -> Result<i32, DbErr> {
     //First find the overall plan
-    let plan = params;
 
     // Query the last inserted row (assuming `id` is the primary key)
     let query = Statement::from_string(
@@ -21,9 +20,9 @@ pub async fn get_plan_id(params: (&str, i32, i32), db: &SchemaManagerConnection<
         format!(
             "SELECT id FROM {} WHERE unit = '{}' AND fiscal_year = {} AND serial_number = {}",
             Plan::Table.to_string(),
-            plan.0, // "WJH8AA"
-            plan.1, // 25
-            plan.2 // 1
+            unit, // "WJH8AA"
+            fiscal_year, // 25
+            serial_number // 1
         ),
     );
 
@@ -87,8 +86,11 @@ pub async fn get_order_id(plan_id: &i32, order_type: &str, serial_number: Option
 
 // This function takes a plan ID and inserts an order into the plan. 
 // It returns the order ID that was just inserted.
-pub async fn insert_shallow_order(plan_id: i32, order_type: &str, serial_number: i32, is_published: bool, db: &SchemaManagerConnection<'_>, manager: &SchemaManager<'_>) -> Result<i32, DbErr> {
-    println!("Attempting to insert orders into table.");
+pub async fn insert_shallow_order(plan_id: &i32, order_type: &str, serial_number: i32, is_published: bool, db: &SchemaManagerConnection<'_>, manager: &SchemaManager<'_>) -> Result<i32, DbErr> {
+    println!("Attempting to insert orders into table for plan id #{}, order_type: {}, serno: {}.", plan_id, order_type, serial_number);
+
+    let plan_id_clone = plan_id.clone();
+
     let insert = Query::insert()
                 .into_table(KronosOrder::Table)
                 .columns([  KronosOrder::ParentPlan, 
@@ -96,7 +98,7 @@ pub async fn insert_shallow_order(plan_id: i32, order_type: &str, serial_number:
                             KronosOrder::SerialNumber, 
                             KronosOrder::IsPublished])
                 .values_panic([
-                    plan_id.into(),
+                    plan_id_clone.into(),
                     order_type.into(),
                     serial_number.into(),
                     is_published.into(),
@@ -106,6 +108,7 @@ pub async fn insert_shallow_order(plan_id: i32, order_type: &str, serial_number:
     manager.exec_stmt(insert).await?;
 
     let order_id = get_order_id(&plan_id, order_type, Some(serial_number), db, manager).await?;
+    println!("Successfully inserted order pk = {}", order_id);
     Ok(order_id)
 }
 

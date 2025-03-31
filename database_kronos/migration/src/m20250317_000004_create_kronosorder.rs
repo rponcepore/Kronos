@@ -34,9 +34,9 @@ impl MigrationTrait for Migration {
                     )
                     .col(ColumnDef::new(KronosOrder::ParentPlan).integer().not_null())
                     .foreign_key( // order foreign key pointing to plan pk for which plan it belongs to
-                        ForeignKey::create() //bind the plan to the authoring unit
+                        ForeignKey::create() //bind the order to the owning plan
                             .name("fk-order-id-plan-planid")
-                            .from(KronosOrder::Table, KronosOrder::Id)
+                            .from(KronosOrder::Table, KronosOrder::ParentPlan)
                             .to(Plan::Table, Plan::Id)
                             .on_delete(ForeignKeyAction::Cascade) // delete this item if the plan is deleted
                             .on_update(ForeignKeyAction::Cascade),

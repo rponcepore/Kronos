@@ -67,7 +67,7 @@ impl MigrationTrait for Migration {
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         let db: &SchemaManagerConnection = manager.get_connection();
 
-        let plan_id = get_plan_id(("TEMPLT", 0,0), db, manager).await?;
+        let plan_id = get_plan_id("TEMPLT", 0,0, db, manager).await?;
 
         
         // Replace the sample below with your own migration scripts
