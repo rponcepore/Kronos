@@ -7,6 +7,7 @@ import { ParagraphSummary } from "../types/frontend_types/ParagraphSummary";
 import { kronosApiCall } from "../helper_methods/ApiCall";
 import { KronosRequest } from "../types/networking_types/KronosRequest";
 import "../styles/plans.css";
+import PlansOverview from "../components/plans/PlansOverview";
 
 // Main container component for the Plans page
 const PlansPage: React.FC = () => {
@@ -18,7 +19,7 @@ const PlansPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");                            // Tracks search input value
   const [sortBy, setSortBy] = useState<"default" | "alpha" | "year">("default"); // Sorting mode (alphabetical, year, or default)
   const [filterYear, setFilterYear] = useState<number | null>(null);           // Optional filter by fiscal year
-  const [plans, setPlans] = useState<PlanSummary[]>([]);
+  const [plans, setPlans] = useState<Plan[]>([]);
   const [allOrders, setAllOrders] = useState<KronosOrderSummary[] | null>(null);
   const [allParagraphs, setAllParagraphs] = useState<ParagraphSummary[] | null>(null);
   const [loading, setLoading] = useState(true);
@@ -29,13 +30,13 @@ const PlansPage: React.FC = () => {
   // ----------------------------
 
   useEffect(() => {
-    async function fetchPlans() {
+    const fetchData = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        // Fetch plans
-        const plansReq: KronosRequest = {
+        // Set up the request for plans
+        const plansRequest: KronosRequest = {
           action: "get_plans",
           unit: "WJH8AA",
           plan_id: null,
@@ -43,23 +44,30 @@ const PlansPage: React.FC = () => {
           paragraph_id: null,
           task_id: null
         };
-        const plansResponse = await kronosApiCall(plansReq);
-        if (plansResponse.plans_vec) {
-          setPlans(plansResponse.plans_vec);
-        }
 
-        // For now, set empty arrays for orders and paragraphs since they're not implemented
-        setAllOrders([]);
-        setAllParagraphs([]);
+        // Make the API call
+        const response = await kronosApiCall(plansRequest);
+
+        // Check if the response is valid
+        if (response && response.plans_vec) {
+          // Extract just the Plan objects from the PlanSummary array
+          const planObjects = response.plans_vec.map((summary: PlanSummary) => summary.data);
+          setPlans(planObjects);
+          
+          // Collect all orders from all plans
+          const allOrdersFromPlans = response.plans_vec.flatMap((summary: PlanSummary) => summary.orders);
+          setAllOrders(allOrdersFromPlans);
+        } else {
+          setError("Invalid response format from server");
+        }
       } catch (err) {
-        console.error('Error fetching data:', err);
-        setError('Failed to fetch data from the server');
+        setError(err instanceof Error ? err.message : "An error occurred");
       } finally {
         setLoading(false);
       }
-    }
+    };
 
-    fetchPlans();
+    fetchData();
   }, []);
 
   // ----------------------------
@@ -67,17 +75,17 @@ const PlansPage: React.FC = () => {
   // ----------------------------
 
   const filteredPlans = plans.filter(plan => {
-    const matchesSearch = plan.data.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesYear = !filterYear || plan.data.fiscal_year === filterYear;
+    const matchesSearch = plan.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesYear = !filterYear || plan.fiscal_year === filterYear;
     return matchesSearch && matchesYear;
   });
 
   const sortedPlans = [...filteredPlans].sort((a, b) => {
     switch (sortBy) {
       case "alpha":
-        return a.data.name.localeCompare(b.data.name);
+        return a.name.localeCompare(b.name);
       case "year":
-        return b.data.fiscal_year - a.data.fiscal_year;
+        return b.fiscal_year - a.fiscal_year;
       default:
         return 0;
     }
@@ -123,15 +131,16 @@ const PlansPage: React.FC = () => {
           className="control-input"
         >
           <option value="">All Years</option>
-          {Array.from(new Set(plans.map(plan => plan.data.fiscal_year))).sort((a, b) => b - a).map(year => (
+          {Array.from(new Set(plans.map(plan => plan.fiscal_year))).sort((a, b) => b - a).map(year => (
             <option key={year} value={year}>{year}</option>
           ))}
         </select>
       </div>
       <div className="plans-overview">
-        <PlansList
-          plans={sortedPlans}
-          selectPlan={setSelectedPlan}
+        <PlansOverview 
+          plans={sortedPlans} 
+          allOrders={allOrders}
+          allParagraphs={allParagraphs}
         />
         {selectedPlan && (
           <PlansDetails

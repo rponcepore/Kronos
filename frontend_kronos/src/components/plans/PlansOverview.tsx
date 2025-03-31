@@ -1,30 +1,61 @@
 import React, { useState } from "react";
 import PlansList from "./PlansList";
+import PlansDetails from "./PlansDetails";
 import { Plan } from "../../types/backend_types/Plan";
 import { PlanSummary } from "../../types/frontend_types/PlanSummary";
-import { useNavigate } from "react-router-dom";
+import { KronosOrderSummary } from "../../types/frontend_types/KronosOrderSummary";
+import { ParagraphSummary } from "../../types/frontend_types/ParagraphSummary";
 
 interface PlansOverviewProps {
   plans: Plan[];
+  allOrders: KronosOrderSummary[] | null;
+  allParagraphs: ParagraphSummary[] | null;
 }
 
-const PlansOverview: React.FC<PlansOverviewProps> = ({ plans }) => {
-  const navigate = useNavigate();
+const PlansOverview: React.FC<PlansOverviewProps> = ({ 
+  plans, 
+  allOrders = [], 
+  allParagraphs = [] 
+}) => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedPlan, setSelectedPlan] = useState<PlanSummary | null>(null);
 
   const filteredPlans = plans.filter((plan) =>
     plan.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Transform Plan[] into PlanSummary[]
+  const planSummaries: PlanSummary[] = filteredPlans.map(plan => {
+    // Find orders that belong to this plan
+    const planOrders = (allOrders || []).filter(order => {
+      if (!order?.data) return false;
+      return order.data.parent_plan === plan.id;
+    });
+
+    return {
+      data: plan,
+      orders: planOrders
+    };
+  });
+
   const selectPlan = (plan: PlanSummary) => {
-    navigate(`/plans/${plan.data.id}`);
+    setSelectedPlan(plan);
   };
 
-  // Transform Plan[] into PlanSummary[]
-  const planSummaries: PlanSummary[] = filteredPlans.map(plan => ({
-    data: plan,
-    orders: []
-  }));
+  const goBack = () => {
+    setSelectedPlan(null);
+  };
+
+  if (selectedPlan) {
+    return (
+      <PlansDetails
+        plan={selectedPlan}
+        allOrders={allOrders}
+        allParagraphs={allParagraphs}
+        goBack={goBack}
+      />
+    );
+  }
 
   return (
     <div className="p-6">

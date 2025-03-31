@@ -29,28 +29,25 @@ const OrderCard: React.FC<OrderCardProps> = ({
 
   return (
     <div 
-      className="bg-white rounded-lg shadow-md p-4 cursor-pointer hover:shadow-lg transition-shadow duration-200"
+      className="bg-white rounded-lg shadow-sm p-6 cursor-pointer hover:shadow-md transition-shadow duration-200 flex flex-col items-center text-center"
       onClick={() => selectOrder(order)}
     >
-      <div className="flex items-center justify-between mb-2">
-        <span className={`px-2 py-1 rounded text-sm font-semibold ${
-          order.data.order_type.toLowerCase() === 'opord' ? 'bg-blue-100 text-blue-800' :
-          order.data.order_type.toLowerCase() === 'warnord' ? 'bg-yellow-100 text-yellow-800' :
-          'bg-green-100 text-green-800'
-        }`}>
-          {order.data.order_type}
-        </span>
-        <h3 className="text-lg font-bold">{serial}</h3>
+      <div className="text-xl font-medium mb-4">
+        {order.data.order_type}
       </div>
 
-      <p className="text-sm text-gray-600">
-        <span className="font-medium">Published:</span> {order.data.is_published ? "Yes" : "No"}
-      </p>
+      <div className="text-3xl font-bold mb-4">
+        {serial}
+      </div>
+
+      <div className="text-gray-600">
+        Published: {order.data.is_published ? "Yes" : "No"}
+      </div>
 
       {order.data.derived_from && (
-        <p className="text-sm text-gray-600 mt-1">
-          <span className="font-medium">Derived From:</span> {order.data.derived_from}
-        </p>
+        <div className="text-gray-600 mt-2">
+          Derived From: {order.data.derived_from}
+        </div>
       )}
     </div>
   );
