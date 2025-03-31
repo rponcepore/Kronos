@@ -37,7 +37,7 @@ const PlansPage: React.FC = () => {
         // Fetch plans
         const plansReq: KronosRequest = {
           action: "get_plans",
-          unit: "TEMPLT",
+          unit: "WJH8AA",
           plan_id: null,
           order_id: null,
           paragraph_id: null,
