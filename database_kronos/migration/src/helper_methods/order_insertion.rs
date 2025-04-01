@@ -170,61 +170,81 @@ pub async fn build_standard_order(plan_id: &i32, manager: &SchemaManager<'_>) ->
     manager.exec_stmt(insert).await?;
     
     // OPORD entry created. Retrieve the ID
-
     let order_id = get_order_id(&plan_id, order_type, Some(serial_number), manager).await?;
 
     // ID retrieved. Now build out its paragraphs. 
-
     let order_template: OrderTemplate = default_order_template();
-
-    let mut paragraph_number: i32 = 1;
-
+    let mut ordinal_sequence: i32 = 1;
+    let indent_level: i32 = 0;
     for major_paragraph in order_template.paragraphs{
         // insert major paragraph, returning paragraph id
         let _para_id = insert_paragraph(
             &order_id, 
-            &paragraph_number,
-            major_paragraph,
+            &ordinal_sequence, //1-5 for major paragraphs
+            &indent_level,
+            &major_paragraph,
+            None,
             manager
             ).await?;
         
         // increment as necessary:
-        paragraph_number++;
+        ordinal_sequence +=1;
     }
 
     Ok(order_id)
 
 }
 
-// Recursive method that insets a paragraph and all it's subpargraphs into the database.
+// Recursive method that inserts a paragraph and all it's subpargraphs into the database.
+// It is called at the top level by the major paragraphs
 pub async fn insert_paragraph(
     order_id: &i32, 
-    paragraph_number: &i32,
-    major_paragraph: MigrationParagraph, 
+    ordinal_sequence: &i32,
+    indent_level: &i32,
+    paragraph: &MigrationParagraph, 
+    parent_paragraph_id: Option<&i32>,
     manager: &SchemaManager<'_> ) -> Result<i32, DbErr> {
 
         // Insert the paragraph into the db, returning the id for subparagraph reference
-        let para_id = insert_paragraph_into_db(
-
+        let paragraph_id = insert_paragraph_into_db(
+            order_id,
+            ordinal_sequence,
+            indent_level,
+            paragraph,
+            parent_paragraph_id, // Parent paragraph id
+            manager,
         ).await?;
 
-        match major_paragraph.subparagraphs {
+        // Recursively add the subparagraphs
+        match &paragraph.subparagraphs {
             Some(subparagraphs) => {
+                let sub_indent_level = indent_level + 1; // indent at start of loop, once
+                let mut sub_ordinal_sequence = 1; //always start numbering at 1
                 for subpara in subparagraphs {
                     // insert subparagraphs recursively, using the paragraph ID provided above for the first entry.
+                    let _new_para_id = insert_paragraph(
+                        order_id,
+                        &sub_ordinal_sequence,
+                        &sub_indent_level,
+                        &subpara,
+                        Some(&paragraph_id),
+                        manager,
+                    ).await?;
+                    sub_ordinal_sequence += 1;
                 }
             },
             None => {}, //Do nothing
         };
 
+        Ok(paragraph_id)
     }
 
 // Utility method for putting one and only one paragraph into the database
 pub async fn insert_paragraph_into_db(
-    subparagraph: MigrationParagraph, 
     order_id: &i32, 
     ordinal_sequence: &i32,
     indent_level: &i32,
+    paragraph: &MigrationParagraph, 
     parent_paragraph_id: Option<&i32>, 
     manager: &SchemaManager<'_> ) -> Result<i32, DbErr> {
     
@@ -242,11 +262,11 @@ pub async fn insert_paragraph_into_db(
                 order_id.clone().into(),
                 ordinal_sequence.clone().into(),
                 indent_level.clone().into(),
-                subparagraph.title.into(),
-                subparagraph.text.into(),
+                paragraph.title.clone().into(),
+                paragraph.text.clone().into(),
                 parent_paragraph_id.clone().into()
                 ]) 
-            .to_owned();
+            .to_owned()
         },
         None => {
             Query::insert()
@@ -260,10 +280,10 @@ pub async fn insert_paragraph_into_db(
                 order_id.clone().into(),
                 ordinal_sequence.clone().into(),
                 indent_level.clone().into(),
-                subparagraph.title.into(),
-                subparagraph.text.into(),
+                paragraph.title.into(),
+                paragraph.text.into(),
                 ]) 
-            .to_owned();
+            .to_owned()
         },
     };
     
@@ -272,42 +292,47 @@ pub async fn insert_paragraph_into_db(
     let db = manager.get_connection();
 
     /*
-     * This query is a pain in the hoohah. We have to asume certain things about our paragraph--namely that there are no duplicate paragraph titles, etc. 
+     * This query is a pain in the hoohah. We have to assume certain things about our paragraph--namely that there are no duplicate paragraph titles, etc. 
      */
-    let query = Statement::from_string(
-            manager.get_database_backend(),
-            format!(
-                "SELECT id FROM {} WHERE kronos_order = {} AND order_type = '{}' AND serial_number = {}",
-                Paragraph::Table.to_string(),
-                plan_id,
-                order_type,
-                serial_number
-            ),
-        );
+    let query = match parent_paragraph_id {
+        Some(parent_paragraph_id) => {
+            Statement::from_string(
+                manager.get_database_backend(),
+                format!(
+                    "SELECT id FROM {} WHERE kronos_order = {} AND ordinal_sequence = {} AND indent_level = {} AND parent_paragraph = {}",
+                    Paragraph::Table.to_string(),
+                    order_id,
+                    ordinal_sequence,
+                    indent_level,
+                    parent_paragraph_id,
+                ),
+            )
+        },
+        None => {
+            Statement::from_string(
+                manager.get_database_backend(),
+                format!(
+                    "SELECT id FROM {} WHERE kronos_order = {} AND ordinal_sequence = {} AND indent_level = {}",
+                    Paragraph::Table.to_string(),
+                    order_id,
+                    ordinal_sequence,
+                    indent_level,
+                ),
+            )
+        },
+    };
 
-    let para_id_vec = db.query_all(query).await? 
+    let para_id_vec = db.query_all(query).await?;
     
-    let para_id = match para_id_vec.len() {
+    let para_id:i32 = match para_id_vec.len() {
         0 => {
             return Err(sea_orm_migration::DbErr::RecordNotFound("No matching record found.".to_string()));
             },
-        1 => { // Correct case 
-            let para_id = para_id_vec[0];
-            },
+        1 => para_id_vec[0]
+            .try_get::<i32>("id", "id")? // Extract the ID and propagate any error
+            .to_owned(),
         _ => {
             return Err(sea_orm_migration::DbErr::Custom("Multiple records found for what should be a unique query".to_string()));
-        }
-    };
-    
-    {
-        Some(row) => {
-            let id: i32 = row.try_get("", "id")?;
-            println!("Found ID: {}", id);
-            id
-        }
-        None => {
-            println!("No matching record found.");
-            return Err(sea_orm_migration::DbErr::RecordNotFound("No matching record found.".to_string()));
         }
     };
     
