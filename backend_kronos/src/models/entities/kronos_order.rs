@@ -29,7 +29,7 @@ pub enum Relation {
     Paragraph,
     #[sea_orm(
         belongs_to = "super::plan::Entity",
-        from = "Column::Id",
+        from = "Column::ParentPlan",
         to = "super::plan::Column::Id",
         on_update = "Cascade",
         on_delete = "Cascade"

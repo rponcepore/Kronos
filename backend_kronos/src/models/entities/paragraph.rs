@@ -9,8 +9,7 @@ pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i32,
     pub kronos_order: i32,
-    pub parent_paragraph: i32,
-    pub is_major: bool,
+    pub parent_paragraph: Option<i32>,
     pub ordinal_sequence: i32,
     pub title: String,
     pub text: String,
