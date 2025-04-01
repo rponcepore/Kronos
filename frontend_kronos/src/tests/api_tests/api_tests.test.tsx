@@ -100,7 +100,7 @@ test('Network test: Attempt to connect to backend via "tstUIC":', async () => {
       action: "get_order",
       unit: "WJH8AA",
       plan_id: null, 
-      order_id: 6, // this is bad, hardcoded data. I just happen to know that plan 1 is a WJH8AA plan.
+      order_id: 6, // this is bad, hardcoded data. I just happen to know that plan 6 is a WJH8AA plan.
       paragraph_id: null,
       task_id: null,
     };
