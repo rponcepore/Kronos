@@ -45,9 +45,9 @@ impl MigrationTrait for Migration {
 
         // There are three combination: 
 
-        let _warnord_id = get_order_id(&plan_id, "WARNORD", None::<i32>, db, manager).await?;
-        let _opord_id = get_order_id(&plan_id, "OPORD", None::<i32>, db, manager).await?;
-        let fragord_id = get_order_id(&plan_id, "FRAGORD", None::<i32>, db, manager).await?;
+        let _warnord_id = get_order_id(&plan_id, "WARNORD", None::<i32>, manager).await?;
+        let _opord_id = get_order_id(&plan_id, "OPORD", None::<i32>, manager).await?;
+        let fragord_id = get_order_id(&plan_id, "FRAGORD", None::<i32>, manager).await?;
         
         // Insert warnord's paragraphs
         //insert_paragraphs_to_order_shallow(warnord_id, wa)
@@ -62,15 +62,13 @@ impl MigrationTrait for Migration {
     }
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-        let db: &SchemaManagerConnection = manager.get_connection();
 
-        let plan_id = get_plan_id("TEMPLT", 0,0, db, manager).await?;
+        let plan_id = get_plan_id("TEMPLT", 0,0, manager).await?;
 
-        
         // Replace the sample below with your own migration scripts
-        let warnord_id = get_order_id(&plan_id, "WARNORD", None::<i32>, db, manager).await?;
-        let opord_id = get_order_id(&plan_id, "OPORD", None::<i32>, db, manager).await?;
-        let fragord_id = get_order_id(&plan_id, "FRAGORD", None::<i32>, db, manager).await?;
+        let warnord_id = get_order_id(&plan_id, "WARNORD", None::<i32>, manager).await?;
+        let opord_id = get_order_id(&plan_id, "OPORD", None::<i32>, manager).await?;
+        let fragord_id = get_order_id(&plan_id, "FRAGORD", None::<i32>, manager).await?;
 
         manager.exec_stmt(
             Query::delete()

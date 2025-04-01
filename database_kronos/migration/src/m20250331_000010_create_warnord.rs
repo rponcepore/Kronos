@@ -11,11 +11,9 @@ pub struct Migration;
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-        // Replace the sample below with your own migration scripts
-        let db = manager.get_connection();
 
         //First find the overall plan
-        let plan_id = get_plan_id("WJH8AA", 25, 1, db, manager).await?;
+        let plan_id = get_plan_id("WJH8AA", 25, 1, manager).await?;
 
         // Create an order associated with this plan.
         let mut order_vec: Vec<(&i32, &str, i32, bool)> = Vec::new();
@@ -31,7 +29,6 @@ impl MigrationTrait for Migration {
                 ord.1, // opord_type
                 ord.2, // serial_number
                 ord.3,
-                db,
                 manager
             ).await?;
 
@@ -40,7 +37,7 @@ impl MigrationTrait for Migration {
         }
 
         // Now build the full OPORD
-        let opord_id = build_standard_order(&plan_id, db, manager);
+        let opord_id = build_standard_order(&plan_id, manager);
 
         Ok(())
 

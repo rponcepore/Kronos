@@ -70,7 +70,7 @@ impl MigrationTrait for Migration {
 
         // Now get that plan ID. First we have to connect to the database.
 
-        let db = manager.get_connection();
+        
         
         // Query the last inserted row (assuming `id` is the primary key)
         let query = Statement::from_string(
@@ -83,6 +83,8 @@ impl MigrationTrait for Migration {
                 plan.2 // 0 
             ),
         );
+
+        let db = manager.get_connection();
 
         let plan_id= match db.query_one(query).await? {
             Some(row) => {

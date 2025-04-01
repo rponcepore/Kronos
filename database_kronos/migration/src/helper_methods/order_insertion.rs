@@ -11,7 +11,7 @@ use crate::preloaded_data::order_templates::*;
 // This file defines convenience methdos for accessing the database to do basic data entry on the migration side
 
 // This function gets a plan id from teh databse given a unit, fiscal year, and serial number.
-pub async fn get_plan_id(unit: &str, fiscal_year: i32, serial_number: i32, db: &SchemaManagerConnection<'_>, manager: &SchemaManager<'_>) -> Result<i32, DbErr> {
+pub async fn get_plan_id(unit: &str, fiscal_year: i32, serial_number: i32, manager: &SchemaManager<'_>) -> Result<i32, DbErr> {
     //First find the overall plan
 
     // Query the last inserted row (assuming `id` is the primary key)
@@ -25,6 +25,8 @@ pub async fn get_plan_id(unit: &str, fiscal_year: i32, serial_number: i32, db: &
             serial_number // 1
         ),
     );
+
+    let db = manager.get_connection();
 
     let plan_id = match db.query_one(query).await? {
         Some(row) => {
@@ -42,7 +44,7 @@ pub async fn get_plan_id(unit: &str, fiscal_year: i32, serial_number: i32, db: &
 }
 
 // This function gets an order form the database with the plan id and order type, and possibly the order serial number.
-pub async fn get_order_id(plan_id: &i32, order_type: &str, serial_number: Option<i32>, db: &SchemaManagerConnection<'_>, manager: &SchemaManager<'_>) -> Result<i32, DbErr> {
+pub async fn get_order_id(plan_id: &i32, order_type: &str, serial_number: Option<i32>, manager: &SchemaManager<'_>) -> Result<i32, DbErr> {
     // Now get the fragord
     // Get the plan_id that we need
 
@@ -69,6 +71,8 @@ pub async fn get_order_id(plan_id: &i32, order_type: &str, serial_number: Option
         ),
     };
 
+    let db = manager.get_connection();
+
     let ord_id = match db.query_one(query).await? {
         Some(row) => {
             let id: i32 = row.try_get("", "id")?;
@@ -86,7 +90,7 @@ pub async fn get_order_id(plan_id: &i32, order_type: &str, serial_number: Option
 
 // This function takes a plan ID and inserts an order into the plan. 
 // It returns the order ID that was just inserted.
-pub async fn insert_shallow_order(plan_id: &i32, order_type: &str, serial_number: i32, is_published: bool, db: &SchemaManagerConnection<'_>, manager: &SchemaManager<'_>) -> Result<i32, DbErr> {
+pub async fn insert_shallow_order(plan_id: &i32, order_type: &str, serial_number: i32, is_published: bool, manager: &SchemaManager<'_>) -> Result<i32, DbErr> {
     println!("Attempting to insert orders into table for plan id #{}, order_type: {}, serno: {}.", plan_id, order_type, serial_number);
 
     let plan_id_clone = plan_id.clone();
@@ -107,7 +111,7 @@ pub async fn insert_shallow_order(plan_id: &i32, order_type: &str, serial_number
 
     manager.exec_stmt(insert).await?;
 
-    let order_id = get_order_id(&plan_id, order_type, Some(serial_number), db, manager).await?;
+    let order_id = get_order_id(&plan_id, order_type, Some(serial_number), manager).await?;
     println!("Successfully inserted order pk = {}", order_id);
     Ok(order_id)
 }
@@ -145,7 +149,8 @@ pub async fn insert_header_paragraphs(order_id: i32, manager: &SchemaManager<'_>
  * This method builds the standard template order. It builds from boilerplate to help the user fo complete coverage
  * of the subject matter.
  */
-pub async fn build_standard_order(plan_id: &i32, db: &SchemaManagerConnection<'_>, manager: &SchemaManager<'_>) -> Result<i32, DbErr> {
+pub async fn build_standard_order(plan_id: &i32, manager: &SchemaManager<'_>) -> Result<i32, DbErr> {
+    // Create an OPORD.
     let serial_number = 0;
     let order_type = "OPORD";
     let insert = Query::insert()
@@ -163,35 +168,149 @@ pub async fn build_standard_order(plan_id: &i32, db: &SchemaManagerConnection<'_
         .to_owned();
 
     manager.exec_stmt(insert).await?;
+    
+    // OPORD entry created. Retrieve the ID
 
-    let order_id = get_order_id(&plan_id, order_type, Some(serial_number), db, manager).await?;
+    let order_id = get_order_id(&plan_id, order_type, Some(serial_number), manager).await?;
+
+    // ID retrieved. Now build out its paragraphs. 
 
     let order_template: OrderTemplate = default_order_template();
 
+    let mut paragraph_number: i32 = 1;
+
     for major_paragraph in order_template.paragraphs{
-        // insert major paragraph, returning pargraph id
+        // insert major paragraph, returning paragraph id
+        let _para_id = insert_paragraph(
+            &order_id, 
+            &paragraph_number,
+            major_paragraph,
+            manager
+            ).await?;
+        
+        // increment as necessary:
+        paragraph_number++;
+    }
+
+    Ok(order_id)
+
+}
+
+// Recursive method that insets a paragraph and all it's subpargraphs into the database.
+pub async fn insert_paragraph(
+    order_id: &i32, 
+    paragraph_number: &i32,
+    major_paragraph: MigrationParagraph, 
+    manager: &SchemaManager<'_> ) -> Result<i32, DbErr> {
+
+        // Insert the paragraph into the db, returning the id for subparagraph reference
+        let para_id = insert_paragraph_into_db(
+
+        ).await?;
+
         match major_paragraph.subparagraphs {
             Some(subparagraphs) => {
                 for subpara in subparagraphs {
-                    // insert subparagraphs recursively
+                    // insert subparagraphs recursively, using the paragraph ID provided above for the first entry.
                 }
             },
             None => {}, //Do nothing
         };
+
     }
 
-
-}
-
-// Non recursive method, that calls a recursive method, to insert subparagraphs into the database.
-pub async fn insert_major_paragraph(order_id: i32, 
-    major_paragraph: MigrationParagraph, 
-    db: &SchemaManagerConnection<'_>, 
+// Utility method for putting one and only one paragraph into the database
+pub async fn insert_paragraph_into_db(
+    subparagraph: MigrationParagraph, 
+    order_id: &i32, 
+    ordinal_sequence: &i32,
+    indent_level: &i32,
+    parent_paragraph_id: Option<&i32>, 
     manager: &SchemaManager<'_> ) -> Result<i32, DbErr> {
-        
-    }
+    
+    let insert = match parent_paragraph_id {
+        Some(parent_paragraph_id) => {
+            Query::insert()
+            .into_table(Paragraph::Table)
+            .columns([  Paragraph::KronosOrder, 
+                        Paragraph::OrdinalSequence, 
+                        Paragraph::IndentLevel,
+                        Paragraph::Title, 
+                        Paragraph::Text,
+                        Paragraph::ParentParagraph])
+            .values_panic([
+                order_id.clone().into(),
+                ordinal_sequence.clone().into(),
+                indent_level.clone().into(),
+                subparagraph.title.into(),
+                subparagraph.text.into(),
+                parent_paragraph_id.clone().into()
+                ]) 
+            .to_owned();
+        },
+        None => {
+            Query::insert()
+            .into_table(Paragraph::Table)
+            .columns([  Paragraph::KronosOrder, 
+                        Paragraph::OrdinalSequence, 
+                        Paragraph::IndentLevel,
+                        Paragraph::Title, 
+                        Paragraph::Text,])
+            .values_panic([
+                order_id.clone().into(),
+                ordinal_sequence.clone().into(),
+                indent_level.clone().into(),
+                subparagraph.title.into(),
+                subparagraph.text.into(),
+                ]) 
+            .to_owned();
+        },
+    };
+    
+    manager.exec_stmt(insert).await?;
 
-// Recursive method for inserting a subparagraph
-pub async fn insert_subparagraph(subparagraph: MigrationParagraph, parent_paragraph_id: i32) -> Result<i32, DbErr> {
+    let db = manager.get_connection();
 
+    /*
+     * This query is a pain in the hoohah. We have to asume certain things about our paragraph--namely that there are no duplicate paragraph titles, etc. 
+     */
+    let query = Statement::from_string(
+            manager.get_database_backend(),
+            format!(
+                "SELECT id FROM {} WHERE kronos_order = {} AND order_type = '{}' AND serial_number = {}",
+                Paragraph::Table.to_string(),
+                plan_id,
+                order_type,
+                serial_number
+            ),
+        );
+
+    let para_id_vec = db.query_all(query).await? 
+    
+    let para_id = match para_id_vec.len() {
+        0 => {
+            return Err(sea_orm_migration::DbErr::RecordNotFound("No matching record found.".to_string()));
+            },
+        1 => { // Correct case 
+            let para_id = para_id_vec[0];
+            },
+        _ => {
+            return Err(sea_orm_migration::DbErr::Custom("Multiple records found for what should be a unique query".to_string()));
+        }
+    };
+    
+    {
+        Some(row) => {
+            let id: i32 = row.try_get("", "id")?;
+            println!("Found ID: {}", id);
+            id
+        }
+        None => {
+            println!("No matching record found.");
+            return Err(sea_orm_migration::DbErr::RecordNotFound("No matching record found.".to_string()));
+        }
+    };
+    
+    Ok(para_id)
+    
 }

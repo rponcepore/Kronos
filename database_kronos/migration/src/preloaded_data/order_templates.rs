@@ -29,13 +29,13 @@ pub fn get_header_paragraph_vec() -> Vec<(i32, i32, &'static str, &'static str)>
 }
 
 pub struct MigrationParagraph {
-    title: &'static str,
-    text: &'static str,
-    subparagraphs: Option<Vec<MigrationParagraph>>,
+    pub title: &'static str,
+    pub text: &'static str,
+    pub subparagraphs: Option<Vec<MigrationParagraph>>,
 }
 
 pub struct OrderTemplate {
-    paragraphs: Vec<MigrationParagraph>,
+    pub paragraphs: Vec<MigrationParagraph>,
 }
 
 pub fn default_order_template() -> OrderTemplate {
