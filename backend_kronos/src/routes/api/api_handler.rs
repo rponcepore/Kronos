@@ -22,6 +22,7 @@ use crate::models::entity_summaries::unit_summary::UnitSummary;
 // Include our database configs
 use crate::configuration::get_configuration;
 use crate::routes::api::api_methods::get_plans::get_plans;
+use crate::routes::api::api_methods::get_orders::get_orders;
 
 #[derive(serde::Deserialize, Serialize)]
 #[derive(Debug)]
@@ -75,7 +76,8 @@ pub async fn api_handler(kronos_request_as_json: Result<web::Json<KronosRequest>
 
     let kronos_response: Result<KronosResponse, KronosApiError> = match action {
         "get_plans" => get_plans(valid_req).await,
-        "get_orders" => Err(KronosApiError::NotImplemented("get_orders not implemented.".to_string())),
+        "get_orders" => get_orders(valid_req).await,
+        "update_paragraph" => Err(KronosApiError::NotImplemented("update_paragraph not implemented.".to_string())),
         // Return a BadRequest response if the action was invalid.
         _ => return HttpResponse::BadRequest().body(format!("Invalid action: {}\n", action)),
     };
