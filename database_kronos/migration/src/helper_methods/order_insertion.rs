@@ -176,8 +176,10 @@ pub async fn build_standard_order(plan_id: &i32, manager: &SchemaManager<'_>) ->
     let order_template: OrderTemplate = default_order_template();
     let mut ordinal_sequence: i32 = 1;
     let indent_level: i32 = 0;
+    println!("Inserting major paragraphs:");
     for major_paragraph in order_template.paragraphs{
         // insert major paragraph, returning paragraph id
+        
         let _para_id = insert_paragraph(
             &order_id, 
             &ordinal_sequence, //1-5 for major paragraphs
@@ -205,6 +207,14 @@ pub async fn insert_paragraph(
     parent_paragraph_id: Option<&i32>,
     manager: &SchemaManager<'_> ) -> Result<i32, DbErr> {
 
+        println!(
+            "{}{}. {}. {}", 
+            " ".repeat(*indent_level as usize), // Generate spaces based on indent_level
+            ordinal_sequence, 
+            paragraph.title, 
+            paragraph.text
+        );
+
         // Insert the paragraph into the db, returning the id for subparagraph reference
         let paragraph_id = insert_paragraph_into_db(
             order_id,
@@ -222,14 +232,16 @@ pub async fn insert_paragraph(
                 let mut sub_ordinal_sequence = 1; //always start numbering at 1
                 for subpara in subparagraphs {
                     // insert subparagraphs recursively, using the paragraph ID provided above for the first entry.
-                    let _new_para_id = insert_paragraph(
-                        order_id,
-                        &sub_ordinal_sequence,
-                        &sub_indent_level,
-                        &subpara,
-                        Some(&paragraph_id),
-                        manager,
-                    ).await?;
+                    let _new_para_id = Box::pin(async move {
+                        insert_paragraph(
+                            order_id,
+                            &sub_ordinal_sequence,
+                            &sub_indent_level,
+                            &subpara,
+                            Some(&paragraph_id),
+                            manager,
+                        ).await
+                    }).await?;
                     sub_ordinal_sequence += 1;
                 }
             },
@@ -329,7 +341,7 @@ pub async fn insert_paragraph_into_db(
             return Err(sea_orm_migration::DbErr::RecordNotFound("No matching record found.".to_string()));
             },
         1 => para_id_vec[0]
-            .try_get::<i32>("id", "id")? // Extract the ID and propagate any error
+            .try_get::<i32>("", "id")? // Extract the ID and propagate any error
             .to_owned(),
         _ => {
             return Err(sea_orm_migration::DbErr::Custom("Multiple records found for what should be a unique query".to_string()));

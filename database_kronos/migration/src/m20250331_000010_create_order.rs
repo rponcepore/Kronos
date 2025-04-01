@@ -36,9 +36,11 @@ impl MigrationTrait for Migration {
             insert_header_paragraphs(order_id, manager).await?;
         }
 
-        // Now build the full OPORD
-        let opord_id = build_standard_order(&plan_id, manager);
+        println!("WARNORD and FRAGORD inserted.");
 
+        // Now build the full OPORD
+        let _opord_id = build_standard_order(&plan_id, manager).await?;
+        println!("OPORD inserted.");
         Ok(())
 
     }
