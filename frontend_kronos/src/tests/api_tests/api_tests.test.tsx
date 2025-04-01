@@ -103,6 +103,6 @@ test('Network test: Attempt to connect to backend via "tstUIC":', async () => {
       task_id: null,
     };
     let response: KronosResponse = await kronosApiCall(req);
-    expect(response.orders_vec); // This should not be null
+    expect(response.orders_vec); // This should not be null, and ~should~ print to the console.
     
   })

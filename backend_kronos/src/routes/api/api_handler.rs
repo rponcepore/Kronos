@@ -22,7 +22,7 @@ use crate::models::entity_summaries::unit_summary::UnitSummary;
 // Include our database configs
 use crate::configuration::get_configuration;
 use crate::routes::api::api_methods::get_plans::get_plans;
-use crate::routes::api::api_methods::get_orders::get_orders;
+use crate::routes::api::api_methods::get_order::get_order;
 
 #[derive(serde::Deserialize, Serialize)]
 #[derive(Debug)]
@@ -31,6 +31,9 @@ pub struct KronosRequest {
     //pub http_method: Option<String>,
     pub action: Option<String>,
     pub unit: Option<String>,
+    pub order_id: Option<i32>,
+    pub paragraph_id: Option<i32>,
+    pub task_id: Option<i32>,
 }
 
 #[derive(serde::Deserialize, Serialize)]
@@ -47,6 +50,7 @@ pub enum KronosApiError  {
     DbErr(sea_orm::DbErr),
     ActixError(actix_web::Error),
     NotImplemented(String),
+    BadRequest(String),
     Unknown(String),
 }
 
@@ -89,19 +93,18 @@ pub async fn api_handler(kronos_request_as_json: Result<web::Json<KronosRequest>
         },
         Err(kronos_api_error) => match kronos_api_error{
             KronosApiError::DbErr(err) => {
-                // Handle database errors
                 HttpResponse::InternalServerError().body(format!("Database failure: {}\n", err))
             }
             KronosApiError::ActixError(err) => {
-                // Handle Actix errors
                 HttpResponse::InternalServerError().body(format!("Internal server error: {}\n", err))
             }
             KronosApiError::NotImplemented(msg) => {
-                // Handle unimplemented features
                 HttpResponse::NotImplemented().body(format!("Not implemented: {}\n", msg))
             }
+            KronosApiError::BadRequest(msg) => {
+                HttpResponse::BadRequest().body(format!("Bad request to API: {}\n", msg))
+            }
             KronosApiError::Unknown(msg) => {
-                // Handle unknown errors
                 HttpResponse::BadRequest().body(format!("Unknown error: {}\n", msg))
             }
         }
@@ -140,6 +143,9 @@ impl KronosRequest {
         Self {
             action: None,
             unit: None,
+            order_id: None,
+            paragraph_id: None,
+            task_id: None,
         }
     }
 

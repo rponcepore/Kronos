@@ -14,8 +14,8 @@ use crate::routes::api::api_handler::access_kronos_database;
 // Pull in our entities,
 use crate::models::entities::{prelude::*, *};
 
-pub async fn get_orders(req: Json<KronosRequest>) -> Result<KronosResponse, KronosApiError>  {
-    dprintln!("get_plans method called. ");
+pub async fn get_order(req: Json<KronosRequest>) -> Result<KronosResponse, KronosApiError>  {
+    dprintln!("get_orders method called. ");
 
     // Connect to the database
     let db = match access_kronos_database().await{
@@ -28,9 +28,17 @@ pub async fn get_orders(req: Json<KronosRequest>) -> Result<KronosResponse, Kron
         None => return Err(KronosApiError::Unknown("Deserialization error: unit string failure.".to_string())),
     };
 
+    let order_id: i32 = match &req.order_id {
+        Some(order_id) => order_id,
+        None => return Err(KronosApiError::BadRequest("No order_id field provided with get_order request.".to_string())),
+    };
+
+    // We are being asked for the data within an order.
+    // Get an order, serialize into an OrderSummary, and send back to the client.
+
     // Get all the plans for that unit
-    let plan_vec: Vec<plan::Model> = match Plan::find()
-        .filter(plan::Column::Unit.contains(unit_str))
+    let order: kronos_order::Model = match KronosOrder::find()
+        .filter(kronos_order::Column::Id.contains(unit_str))
         .order_by_asc(plan::Column::FiscalYear)
         .order_by_asc(plan::Column::SerialNumber)
         .all(&db)
