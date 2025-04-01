@@ -51,6 +51,7 @@ pub enum KronosApiError  {
     ActixError(actix_web::Error),
     NotImplemented(String),
     BadRequest(String),
+    ExpectedDataNotPresent(String),
     Unknown(String),
 }
 
@@ -80,7 +81,7 @@ pub async fn api_handler(kronos_request_as_json: Result<web::Json<KronosRequest>
 
     let kronos_response: Result<KronosResponse, KronosApiError> = match action {
         "get_plans" => get_plans(valid_req).await,
-        "get_orders" => get_orders(valid_req).await,
+        "get_order" => get_order(valid_req).await,
         "update_paragraph" => Err(KronosApiError::NotImplemented("update_paragraph not implemented.".to_string())),
         // Return a BadRequest response if the action was invalid.
         _ => return HttpResponse::BadRequest().body(format!("Invalid action: {}\n", action)),
@@ -103,6 +104,9 @@ pub async fn api_handler(kronos_request_as_json: Result<web::Json<KronosRequest>
             }
             KronosApiError::BadRequest(msg) => {
                 HttpResponse::BadRequest().body(format!("Bad request to API: {}\n", msg))
+            }
+            KronosApiError::ExpectedDataNotPresent(msg) => {
+                HttpResponse::InternalServerError().body(format!("Expected data not found in database: {}\n", msg))
             }
             KronosApiError::Unknown(msg) => {
                 HttpResponse::BadRequest().body(format!("Unknown error: {}\n", msg))

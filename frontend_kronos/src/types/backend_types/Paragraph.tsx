@@ -10,16 +10,3 @@ export type Paragraph = {
     text: string;
     indent_level: number;
 }
-
-/*
-
-    pub id: i32,
-    pub order: i32,
-    pub parent_paragraph: i32,
-    pub is_major: bool,
-    pub ordinal_sequence: i32,
-    pub title: String,
-    pub text: String,
-    pub indent_level: i32,
-
-*/

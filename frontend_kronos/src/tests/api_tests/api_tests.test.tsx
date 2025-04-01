@@ -3,6 +3,8 @@ import { KronosRequest } from '../../types/networking_types/KronosRequest.tsx'
 import { PlanSummary } from '../../types/frontend_types/PlanSummary.tsx'
 import { kronosApiCall } from '../../helper_methods/ApiCall.tsx'
 import { KronosResponse } from '../../types/networking_types/KronosResponse.tsx'
+import { KronosOrderSummary } from '../../types/frontend_types/KronosOrderSummary.tsx'
+import { ParagraphSummary } from '../../types/frontend_types/ParagraphSummary.tsx'
 
 
 test('Network test: Attempt to connect to backend via "tstUIC":', async () => {
@@ -95,14 +97,22 @@ test('Network test: Attempt to connect to backend via "tstUIC":', async () => {
 
   test('get_orders endpoint test', async () => {
     const req: KronosRequest = {
-      action: "get_orders",
+      action: "get_order",
       unit: "WJH8AA",
-      plan_id: 1, // this is bad, hardcoded data. I just happen to know that plan 1 is a WJH8AA plan.
-      order_id: null,
+      plan_id: null, 
+      order_id: 6, // this is bad, hardcoded data. I just happen to know that plan 1 is a WJH8AA plan.
       paragraph_id: null,
       task_id: null,
     };
     let response: KronosResponse = await kronosApiCall(req);
     expect(response.orders_vec); // This should not be null, and ~should~ print to the console.
-    
+    expect(response.orders_vec).not.toBeNull();
+    expect(response.orders_vec?.length).toBeGreaterThan(0); // Ensure it contains at least one order
+
+    const order: KronosOrderSummary = response.orders_vec![0]; // Use '!' since we've checked it above
+    console.dir(order, { depth: null });
+    //for (const paragraph of order.paragraphs) {
+    //  console.log(`${paragraph.data.ordinal_sequence}. ${paragraph.data.title} ${paragraph.data.text}`);
+    //}
+
   })
