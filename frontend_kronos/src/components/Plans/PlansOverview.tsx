@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import PlansList from "./PlansList";
-import { Plan } from "../types/Plan";
+import { PlanSummary } from "../../types/frontend_types/PlanSummary";
+import { Plan } from "../../types/backend_types/Plan";
 import { useNavigate } from "react-router-dom";
 
 interface PlansOverviewProps {
@@ -15,9 +16,15 @@ const PlansOverview: React.FC<PlansOverviewProps> = ({ plans }) => {
     plan.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const selectPlan = (plan: Plan) => {
-    navigate(`/plans/${plan.id}`);
+  const selectPlan = (plan: PlanSummary) => {
+    navigate(`/plans/${plan.data.id}`);
   };
+
+  // Transform Plan[] to PlanSummary[]
+  const planSummaries: PlanSummary[] = filteredPlans.map(plan => ({
+    data: plan,
+    orders: []
+  }));
 
   return (
     <div className="plans-overview">
@@ -34,7 +41,7 @@ const PlansOverview: React.FC<PlansOverviewProps> = ({ plans }) => {
         <button className="control-btn">New Plan ➕</button>
       </div>
 
-      <PlansList plans={filteredPlans} selectPlan={selectPlan} />
+      <PlansList plans={planSummaries} selectPlan={selectPlan} />
     </div>
   );
 };

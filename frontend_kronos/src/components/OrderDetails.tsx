@@ -37,7 +37,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
 
   // Filter for top-level paragraphs belonging to this order and sort by sequence
   const relevantParagraphs = allParagraphs
-    .filter(p => p.data.order_id === order.data.id && p.data.parent_paragraph === null)
+    .filter(p => p.data.order === order.data.id && p.data.parent_paragraph === null)
     .sort((a, b) => a.data.ordinal_sequence - b.data.ordinal_sequence);
 
   // Called when a paragraph is clicked (editable only in draft)

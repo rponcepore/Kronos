@@ -4,6 +4,7 @@ import { assert } from 'vitest';
 import { Plan } from '../backend_types/Plan';
 import { OrderKind } from '../enums/OrderKind';
 import { KronosOrderSummary } from './KronosOrderSummary';
+import { ParagraphSummary } from './ParagraphSummary';
 
 /*
  * This type represents the easy-access frontend type. It is meant to naturally work with the 
@@ -15,6 +16,7 @@ import { KronosOrderSummary } from './KronosOrderSummary';
 export type PlanSummary = {
     data: Plan; // The original record
     orders: KronosOrderSummary[]; // The orders associated with this paragraph
+    paragraphs: ParagraphSummary[];
 }
 
 export function getMostRecentOrder(plan: PlanSummary): KronosOrderSummary | null {

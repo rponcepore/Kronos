@@ -18,12 +18,30 @@ body {
 
 /* Container for the full plan details view */
 .plan-details {
-  max-width: 900px;                     /* Restrict width for readability */
-  margin: 2rem auto;                    /* Center horizontally with top/bottom spacing */
-  padding: 2rem;                        /* Inner padding */
-  background: white;                    /* White card background */
-  border-radius: 15px;                  /* Rounded corners */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);  /* Soft shadow */
+  background-color: white;
+  border-radius: 10px;
+  padding: 2rem;
+  margin: 2rem auto;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 1800px;
+}
+
+.plan-header {
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+.orders-section {
+  width: 100%;
+}
+
+.orders-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
 }
 
 /* Wrapper for the back button */

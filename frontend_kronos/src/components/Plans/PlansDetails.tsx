@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { PlanSummary } from "../types/frontend_types/PlanSummary";
-import { KronosOrderSummary } from "../types/frontend_types/KronosOrderSummary";
-import { ParagraphSummary } from "../types/frontend_types/ParagraphSummary";
-import { getPlanSerialDisplay } from "../helper_methods/format";
+import { PlanSummary } from "../../types/frontend_types/PlanSummary";
+import { KronosOrderSummary } from "../../types/frontend_types/KronosOrderSummary";
+import { ParagraphSummary } from "../../types/frontend_types/ParagraphSummary";
+import { getPlanSerialDisplay } from "../../helper_methods/format";
 
 // Subcomponents for rendering orders and order details
-import OrderDetails from "./OrderDetails";
-import OrderCard from "./OrderCard";
+import OrderDetails from "../OrderDetails";
+import OrderCard from "../OrderCard";
 
 // Props that PlanDetails expects to receive
 interface PlanDetailsProps {
@@ -25,6 +25,8 @@ const PlanDetails: React.FC<PlanDetailsProps> = ({
 }) => {
   // Local state to track which order is selected
   const [selectedOrder, setSelectedOrder] = useState<KronosOrderSummary | null>(null);
+  const [viewingRelatedOrders, setViewingRelatedOrders] = useState(false);
+  const [relatedOrders, setRelatedOrders] = useState<KronosOrderSummary[]>([]);
 
   // Filter orders to only show those associated with this plan
   const planOrders = (allOrders || []).filter(
@@ -35,6 +37,27 @@ const PlanDetails: React.FC<PlanDetailsProps> = ({
   const planParagraphs = (allParagraphs || []).filter((paragraph) =>
     planOrders.some((order) => order.data.id === paragraph.data.order)
   );
+
+  // Function to find related orders when an order is clicked
+  const findRelatedOrders = (order: KronosOrderSummary) => {
+    const related = (allOrders || []).filter((o) => 
+      o.data.derived_from === order.data.id || 
+      o.data.id === order.data.derived_from
+    );
+    setRelatedOrders(related);
+    setViewingRelatedOrders(true);
+  };
+
+  // Handle order selection
+  const handleOrderSelect = (order: KronosOrderSummary) => {
+    setSelectedOrder(order);
+    findRelatedOrders(order);
+  };
+
+  // Get paragraphs for a specific order
+  const getOrderParagraphs = (order: KronosOrderSummary) => {
+    return (allParagraphs || []).filter(p => p.data.order === order.data.id);
+  };
 
   return (
     <div className="plan-details">
@@ -49,12 +72,22 @@ const PlanDetails: React.FC<PlanDetailsProps> = ({
       {/* Orders section */}
       <div className="orders-section">
         <h2>Orders</h2>
+        {viewingRelatedOrders && (
+          <button 
+            onClick={() => setViewingRelatedOrders(false)}
+            className="back-button"
+          >
+            Back to All Orders
+          </button>
+        )}
         <div className="orders-grid">
-          {planOrders.map((order) => (
+          {(viewingRelatedOrders ? relatedOrders : planOrders).map((order) => (
             <OrderCard
               key={order.data.id}
               order={order}
-              selectOrder={setSelectedOrder}
+              parentPlanFiscalYear={plan.data.fiscal_year}
+              selectOrder={handleOrderSelect}
+              paragraphs={getOrderParagraphs(order)}
             />
           ))}
         </div>
