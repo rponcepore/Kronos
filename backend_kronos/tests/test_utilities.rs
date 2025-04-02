@@ -8,14 +8,7 @@ use std::net::TcpListener;
 const RANDOM_PORT: &str = "127.0.0.1:0"; // This is a special case: says, "use local host, but bind port 0--any random port."
 
 
-/* Return a dummy JSON for a post request asking for all plans */
-pub fn dummy_plan_request() -> KronosRequest {
-    let result = KronosRequest{
-        action: Some("get_plans".to_string()),
-        unit: Some("WHJ8C0".to_string()),
-    };
-    result
-}
+
 
 /* Spawn application in the background as a helper function */
 pub fn spawn_app() -> String {
@@ -35,7 +28,10 @@ pub fn spawn_app() -> String {
 pub fn no_db_plan_req() -> KronosRequest {
     KronosRequest { 
         action: Some("get_plans".to_string()), 
-        unit: Some("tstUIC".to_string()) 
+        unit: Some("tstUIC".to_string()),
+        order_id: None,
+        paragraph_id: None,
+        task_id: None
     }
 }
 
@@ -43,6 +39,21 @@ pub fn no_db_plan_req() -> KronosRequest {
 pub fn with_db_plan_req() -> KronosRequest {
     KronosRequest { 
         action: Some("get_plans".to_string()), 
-        unit: Some("WJH8C0".to_string()) 
+        unit: Some("WJH8C0".to_string()),
+        order_id: None,
+        paragraph_id: None,
+        task_id: None
     }
+}
+
+/* Return a dummy JSON for a post request asking for all plans */
+pub fn dummy_plan_request() -> KronosRequest {
+    let result = KronosRequest{
+        action: Some("get_plans".to_string()),
+        unit: Some("WHJ8C0".to_string()),
+        order_id: None,
+        paragraph_id: None,
+        task_id: None
+    };
+    result
 }
