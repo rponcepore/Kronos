@@ -12,7 +12,6 @@ pub async fn access_kronos_database() -> Result<DatabaseConnection, DbErr> {
      */
 
     let configuration = get_configuration().expect("Failed to read configuration.");
-    dprintln!("Configuration read successfully.");
     let connection_string = configuration.database.connection_string();
     dprintln!("Connection string: {}", connection_string);
     Database::connect(connection_string).await
