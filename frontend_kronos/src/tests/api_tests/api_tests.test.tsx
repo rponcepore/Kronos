@@ -3,13 +3,16 @@ import { KronosRequest } from '../../types/networking_types/KronosRequest.tsx'
 import { PlanSummary } from '../../types/frontend_types/PlanSummary.tsx'
 import { kronosApiCall } from '../../helper_methods/ApiCall.tsx'
 import { KronosResponse } from '../../types/networking_types/KronosResponse.tsx'
+import { KronosAction } from '../../types/networking_types/NetworkEnums.tsx'
 import { KronosOrderSummary } from '../../types/frontend_types/KronosOrderSummary.tsx'
+
+
 import { ParagraphSummary } from '../../types/frontend_types/ParagraphSummary.tsx'
 
 
 test('Network test: Attempt to connect to backend via "tstUIC":', async () => {
     const req: KronosRequest = {
-      action: "get_plans",
+      action: KronosAction.get_plans,
       unit: "tstUIC",
       plan_id: null,
       order_id: null,
@@ -97,7 +100,7 @@ test('Network test: Attempt to connect to backend via "tstUIC":', async () => {
 
   test('get_orders endpoint test', async () => {
     const req: KronosRequest = {
-      action: "get_order",
+      action: KronosAction.get_order,
       unit: "WJH8AA",
       plan_id: null, 
       order_id: 6, // this is bad, hardcoded data. I just happen to know that plan 6 is a WJH8AA plan.
