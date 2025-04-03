@@ -8,5 +8,5 @@ use serde::{Deserialize, Serialize};
 pub struct PlanSummary {
     pub data: Plan,
     pub orders: Option<Vec<KronosOrderSummary>>,
-    pub most_recent_mission: String,
+    pub most_recent_mission: Option<String>,
 }
