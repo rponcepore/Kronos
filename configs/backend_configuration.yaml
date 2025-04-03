@@ -7,15 +7,15 @@ database:
   host: "127.0.0.1"
   port: 5432
   username: "postgres"
-  password: "password"
-  database_name: "kronos_db"
+  password: "postgres"
+  database_name: "postgres"
   # TODO: CHANGE THE BELOW IN PROD
   superuser: "postgres"
-  superuser_pwd: "password"
-  app_user: "app"
-  app_user_pwd: "password"
-  app_db_name: "kronos_db"
+  superuser_pwd: "postgres"
+  app_user: "postgres"
+  app_user_pwd: "postgres"
+  app_db_name: "postgres"
 
 
 # In dev, this means the connectino string is: 
-# postgres://postgres:password@localhost:5432/kronos_db
+# postgres://postgres:postgres@localhost:5432/postgres

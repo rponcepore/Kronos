@@ -1,6 +1,6 @@
 import React from "react";
-import { PlanSummary } from "../types/frontend_types/PlanSummary";                                // Import the PlanSummary type
-import { getPlanSerialDisplay } from "../helper_methods/format";     // Utility to format serial numbers
+import { PlanSummary } from "../../types/frontend_types/PlanSummary";                                // Import the PlanSummary type
+import { getPlanSerialDisplay } from "../../helper_methods/format";     // Utility to format serial numbers
 
 // ------------------------------
 // Props interface for PlanCard

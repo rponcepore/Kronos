@@ -7,11 +7,15 @@
     background-color: white;              /* White card background */
     border: 1px solid #ddd;               /* Light gray border */
     border-radius: 10px;                  /* Rounded corners */
-    padding: 1rem 1.5rem;                 /* Inner spacing */
-    margin-bottom: 1.2rem;                /* Spacing between cards */
+    padding: 0.75rem 1.5rem;              /* Reduced vertical padding */
+    margin-bottom: 1rem;                  /* Spacing between cards */
     box-shadow: 0 2px 5px rgba(0,0,0,0.05); /* Subtle shadow for depth */
     transition: transform 0.2s ease;      /* Smooth grow effect on hover */
     cursor: pointer;                      /* Pointer cursor for interactivity */
+    width: 100%;                          /* Full width */
+    max-width: 1000px;                    /* Maximum width */
+    margin-left: auto;                    /* Center the card */
+    margin-right: auto;                   /* Center the card */
   }
   
   /* Hover effect for the order card */
@@ -20,12 +24,43 @@
     background-color: #f9f9f9;            /* Slightly lighter background */
   }
   
-  /* Layout for the top row of the card (badge + title) */
+/* Horizontal layout container */
+.order-card-content {
+    display: flex;                        /* Horizontal layout */
+    align-items: center;                  /* Center items vertically */
+    gap: 3rem;                            /* Increased space between columns */
+}
+
+/* Column styling */
+.order-card-column {
+    display: flex;                        /* Flex container for column content */
+    align-items: center;                  /* Center items vertically */
+}
+
+/* First column: Order type and serial */
+.order-card-column:first-child {
+    min-width: 250px;                     /* Increased fixed width for first column */
+    width: 20%;                           /* Percentage-based width */
+}
+
+/* Second column: Publication status */
+.order-card-column:nth-child(2) {
+    min-width: 150px;                     /* Fixed width for publication status */
+    width: 15%;                           /* Percentage-based width */
+}
+
+/* Mission column */
+.mission-column {
+    flex: 1;                              /* Take up remaining space */
+    min-width: 0;                         /* Allow text to wrap */
+    padding-right: 2rem;                  /* Add some padding on the right */
+}
+
+/* Layout for the order type and serial */
   .order-card-header {
     display: flex;                        /* Place badge and serial side-by-side */
-    align-items: center;                 /* Vertically align badge and text */
+    align-items: center;                  /* Vertically align badge and text */
     gap: 1rem;                            /* Spacing between badge and serial */
-    margin-bottom: 0.75rem;               /* Space below the header */
   }
   
   /* Badge styling for order type (OPORD, WARNO, FRAGO) */
@@ -36,26 +71,252 @@
     border-radius: 5px;                   /* Rounded badge shape */
     text-transform: uppercase;            /* Make text all caps */
     white-space: nowrap;                  /* Prevent badge from breaking lines */
+    border: 2px solid;                    /* Add border for all types */
   }
   
   /* Order Type Badge Colors */
-  
-  /* Blue badge for OPORD */
-  .opord {
-    background-color: #007bff;            /* Bootstrap blue */
-    color: white;                         /* White text */
+/* Blue border for OPORD */
+.opord {
+  border-color: #4075ae;                /* Bootstrap blue */
+  color: #4075ae;                       /* Blue text */
+}
+
+/* Red border for WARNORD */
+.warnord {
+  border-color: #f69869;                /* Bootstrap danger red */
+  color: #f69869;                       /* Red text */
+}
+
+/* Yellow border for FRAGORD */
+.fragord {
+  border-color: #ad9347;                /* Bootstrap warning yellow */
+  color: #9f873e;                       /* Yellow text */
+}
+
+/* Mission text styling */
+.mission-text {
+    font-size: 0.9rem;                    /* Slightly smaller font */
+    line-height: 1.4;                     /* Comfortable line height */
+    color: #333;                          /* Dark gray text */
+    overflow: hidden;                     /* Hide overflow */
+    text-overflow: ellipsis;              /* Show ellipsis for overflow */
+    display: -webkit-box;                 /* Enable multi-line ellipsis */
+    -webkit-line-clamp: 2;                /* Show max 2 lines */
+    -webkit-box-orient: vertical;         /* Vertical text flow */
+}
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: left;
+    align-items: left;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: white;
+    border-radius: 10px;
+    width: 95%;
+    max-width: none;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    padding: 2rem 3rem;
+    margin-left: auto;          /* auto margin */
+    margin-right: auto;      /* Keep right margin auto */
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+    text-align: left;        /* Ensure header text is left-aligned */
+}
+
+.close-button {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    line-height: 1;
+    color: #666;
+}
+
+.close-button:hover {
+    color: #333;
+}
+
+.modal-body {
+    padding-right: 2rem;
+    padding-left: 1rem;
+    max-width: 1600px;
+    margin-left: 0;          /* Remove auto margin */
+    margin-right: auto;      /* Keep right margin auto */
+}
+
+.paragraph-item {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+    line-height: 1.6;   
+    text-align: left;
+    margin-left: calc(var(--indent-level) * 48px); /* Half inch (48px) per indent level */
+}
+
+.paragraph-item:last-child {
+    border-bottom: none;
+}
+
+.paragraph-item h3 {
+    color: #333;
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+    text-align: left; 
+}
+
+.paragraph-item p {
+    color: #444;                         /* Slightly darker text for better contrast */
+    line-height: 1.8;                    /* Increased line height for text */
+    margin: 0;
+    white-space: pre-wrap;
+    font-size: 1.1rem;    
+    text-align: left;                /* Slightly larger text */
+}
+
+.context-menu-item {
+    padding: 8px 16px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.context-menu-item:hover {
+    background-color: #f0f0f0;
+}
+
+.paragraph-edit {
+    background-color: #f8f8f8;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 16px;
+    margin: 8px 0;
+}
+
+.edit-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.paragraph-number {
+    font-weight: 600;
+    color: #666;
+    font-size: 1.1rem;
+    min-width: fit-content;
+}
+
+.edit-title {
+    flex: 1;
+    padding: 8px 12px;
+    font-size: 1.1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: white;
+}
+
+.edit-text {
+    width: 100%;
+    min-height: 120px;
+    padding: 12px;
+    font-size: 1rem;
+    line-height: 1.5;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: white;
+    margin-bottom: 12px;
+    resize: vertical;
+}
+
+.edit-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.save-button, .discard-button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.save-button {
+    background-color: #2196F3;
+    color: white;
+}
+
+.save-button:hover {
+    background-color: #1976D2;
+}
+
+.discard-button {
+    background-color: #f44336;
+    color: white;
+}
+
+.discard-button:hover {
+    background-color: #d32f2f;
+}
+
+.paragraph-item {
+    position: relative;
+    cursor: context-menu;
+}
+
+.paragraph-item:hover {
+    background-color: #f8f8f8;
   }
-  
-  /* Red badge for WARNO */
-  .warno {
-    background-color: #dc3545;            /* Bootstrap danger red */
-    color: white;                         /* White text */
-  }
-  
-  /* Yellow badge for FRAGO */
-  .frago {
-    background-color: #ffc107;            /* Bootstrap warning yellow */
-    color: black;                         /* Black text for contrast */
+
+.confirm-dialog {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.confirm-dialog h3 {
+  margin-top: 0;
+  color: #333;
+}
+
+.confirm-dialog p {
+  color: #666;
+  margin: 16px 0;
+}
+
+.confirm-dialog .discard-button:hover {
+  background-color: #d32f2f;
+}
+
+.confirm-dialog .save-button {
+  background-color: #757575;
+}
+
+.confirm-dialog .save-button:hover {
+  background-color: #616161;
   }
   
   

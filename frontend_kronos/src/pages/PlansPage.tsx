@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import PlansList from "../components/PlansList";           // Component to render the list of plans
-import PlanDetails from "../components/PlansDetails";       // Component to show plan details when selected
+import PlansList from "../components/Plans/PlansList";           // Component to render the list of plans
+import PlanDetails from "../components/Plans/PlansDetails";       // Component to show plan details when selected
 import { Plan } from "../types/backend_types/Plan";         // Plan type definition
 import { PlanSummary } from "../types/frontend_types/PlanSummary";
 import { kronosApiCall } from "../helper_methods/ApiCall";
 import { KronosRequest } from "../types/networking_types/KronosRequest";
+import OrderCard from "../components/OrderCard";
 
 // Main container component for the Plans page
 const PlansPage: React.FC = () => {
@@ -19,6 +20,7 @@ const PlansPage: React.FC = () => {
   const [plans, setPlans] = useState<PlanSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedOrder, setSelectedOrder] = useState<number | null>(null);
 
   // ----------------------------
   // Extract data from dummyData
@@ -72,6 +74,37 @@ const PlansPage: React.FC = () => {
       return 0;                                                                    // Default (no sort)
     });
 
+  const handleOrderSelect = async (orderId: number) => {
+    try {
+      const req: KronosRequest = {
+        action: "get_order",
+        unit: "WJH8AA",
+        plan_id: null,
+        order_id: orderId,
+        paragraph_id: null,
+        task_id: null
+      };
+      const response = await kronosApiCall(req);
+      if (response.orders_vec && response.orders_vec[0]) {
+        const order = response.orders_vec[0];
+        // Update the selected plan's orders with the new paragraphs
+        if (selectedPlan) {
+          const updatedOrders = selectedPlan.orders.map(o => 
+            o.data.id === orderId ? order : o
+          );
+          setSelectedPlan({
+            ...selectedPlan,
+            orders: updatedOrders,
+            paragraphs: order.paragraphs || []
+          });
+        }
+        setSelectedOrder(orderId);
+      }
+    } catch (err) {
+      console.error('Error fetching order details:', err);
+    }
+  };
+
   if (loading) {
     return <div className="p-6">Loading plans...</div>;
   }
@@ -83,13 +116,31 @@ const PlansPage: React.FC = () => {
   return (
     <div className="plans-page-wrapper">
       {selectedPlan ? (
-        // If a plan is selected, render PlanDetails with related orders and paragraphs
-        <PlanDetails
-          plan={selectedPlan}
-          allOrders={selectedPlan.orders} // Use the orders from the selected plan
-          allParagraphs={[]} // We'll need to fetch paragraphs separately
-          goBack={() => setSelectedPlan(null)} // Return to plans list view
-        />
+        <div className="plan-details">
+          {/* Header section with plan info and back button */}
+          <div className="plan-header">
+            <h1>{selectedPlan.data.name}</h1>
+            <p>Unit: {selectedPlan.data.unit}</p>
+            <p>Fiscal Year: {selectedPlan.data.fiscal_year}</p>
+            <button onClick={() => setSelectedPlan(null)}>Back to Plans</button>
+          </div>
+
+          {/* Orders section */}
+          <div className="orders-section">
+            <h2>Orders</h2>
+            <div className="orders-grid">
+              {selectedPlan.orders.map((order) => (
+                <OrderCard
+                  key={order.data.id}
+                  order={order}
+                  parentPlanFiscalYear={selectedPlan.data.fiscal_year}
+                  selectOrder={() => handleOrderSelect(order.data.id)}
+                  paragraphs={selectedPlan.paragraphs?.filter((p) => p.data.order === order.data.id) || []}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
       ) : (
         <>
           {/* Top controls for filter, sort, and search */}
