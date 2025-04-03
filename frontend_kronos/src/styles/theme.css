@@ -1,0 +1,92 @@
+/* Global Theme Variables */
+:root {
+  /* Light theme (default) */
+  --background-primary: white;
+  --background-secondary: #f8f8f8;
+  --background-overlay: rgba(0, 0, 0, 0.7);
+  --text-primary: #333;
+  --text-secondary: #666;
+  --border-color: #ddd;
+  --hover-background: #f9f9f9;
+  --shadow-color: rgba(0, 0, 0, 0.05);
+  --modal-shadow: rgba(0, 0, 0, 0.15);
+  --nav-background: #ffffff;
+  --body-background: #f4f4f4;
+  --card-background: white;
+  --input-background: white;
+  --button-background: #2196F3;
+  --button-text: white;
+  --link-color: #2196F3;
+  --divider-color: #eee;
+}
+
+/* Dark theme */
+[data-theme="dark"] {
+  --background-primary: #1a1a1a;
+  --background-secondary: #2d2d2d;
+  --background-overlay: rgba(0, 0, 0, 0.8);
+  --text-primary: #e0e0e0;
+  --text-secondary: #b0b0b0;
+  --border-color: #404040;
+  --hover-background: #2a2a2a;
+  --shadow-color: rgba(0, 0, 0, 0.2);
+  --modal-shadow: rgba(0, 0, 0, 0.3);
+  --nav-background: #1a1a1a;
+  --body-background: #121212;
+  --card-background: #1a1a1a;
+  --input-background: #2d2d2d;
+  --button-background: #1976D2;
+  --button-text: #ffffff;
+  --link-color: #64B5F6;
+  --divider-color: #404040;
+}
+
+/* Apply theme to body */
+body {
+  background-color: var(--body-background);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Basic element theming */
+input, textarea, select {
+  background-color: var(--input-background);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+button {
+  background-color: var(--button-background);
+  color: var(--button-text);
+}
+
+a {
+  color: var(--link-color);
+}
+
+/* Card and container theming */
+.card, .container {
+  background-color: var(--background-primary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+/* Navigation theming */
+nav {
+  background-color: var(--nav-background);
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Table theming */
+table {
+  border-color: var(--border-color);
+}
+
+th, td {
+  border-color: var(--border-color);
+}
+
+/* Divider theming */
+hr {
+  border-color: var(--divider-color);
+} 

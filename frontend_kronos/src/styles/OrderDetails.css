@@ -4,7 +4,8 @@
 
 /* Wrapper for the order details page */
 .order-details-container {
-  max-width: 1200px;
+  max-width: none;
+  width: 98%;
   margin: 1rem auto;
   padding: 2rem;
   background: white;
