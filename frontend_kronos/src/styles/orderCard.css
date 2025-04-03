@@ -16,14 +16,14 @@
     max-width: 1400px;                    /* Maximum width */
     margin-left: auto;                    /* Center the card */
     margin-right: auto;                   /* Center the card */
-}
-
-/* Hover effect for the order card */
-.order-card:hover {
+  }
+  
+  /* Hover effect for the order card */
+  .order-card:hover {
     transform: scale(1.01);               /* Slight zoom-in */
     background-color: #f9f9f9;            /* Slightly lighter background */
-}
-
+  }
+  
 /* Horizontal layout container */
 .order-card-content {
     display: flex;                        /* Horizontal layout */
@@ -57,14 +57,14 @@
 }
 
 /* Layout for the order type and serial */
-.order-card-header {
+  .order-card-header {
     display: flex;                        /* Place badge and serial side-by-side */
     align-items: center;                  /* Vertically align badge and text */
     gap: 1rem;                            /* Spacing between badge and serial */
-}
-
-/* Badge styling for order type (OPORD, WARNO, FRAGO) */
-.plan-type {
+  }
+  
+  /* Badge styling for order type (OPORD, WARNO, FRAGO) */
+  .plan-type {
     padding: 4px 10px;                    /* Inner padding around text */
     font-size: 0.85rem;                   /* Smaller font size */
     font-weight: bold;                    /* Bold text */
@@ -72,23 +72,23 @@
     text-transform: uppercase;            /* Make text all caps */
     white-space: nowrap;                  /* Prevent badge from breaking lines */
     border: 2px solid;                    /* Add border for all types */
-}
-
-/* Order Type Badge Colors */
+  }
+  
+  /* Order Type Badge Colors */
 /* Blue border for OPORD */
-.opord {
+  .opord {
     border-color: #007bff;                /* Bootstrap blue */
     color: #007bff;                       /* Blue text */
-}
-
+  }
+  
 /* Red border for WARNO */
-.warno {
+  .warno {
     border-color: #dc3545;                /* Bootstrap danger red */
     color: #dc3545;                       /* Red text */
-}
-
+  }
+  
 /* Yellow border for FRAGO */
-.frago {
+  .frago {
     border-color: #ffc107;                /* Bootstrap warning yellow */
     color: #ffc107;                       /* Yellow text */
 }
@@ -193,6 +193,102 @@
     font-size: 1.1rem;    
     text-align: left;                /* Slightly larger text */
 }
+
+.context-menu-item {
+    padding: 8px 16px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.context-menu-item:hover {
+    background-color: #f0f0f0;
+}
+
+.paragraph-edit {
+    background-color: #f8f8f8;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 16px;
+    margin: 8px 0;
+}
+
+.edit-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.paragraph-number {
+    font-weight: 600;
+    color: #666;
+    font-size: 1.1rem;
+    min-width: fit-content;
+}
+
+.edit-title {
+    flex: 1;
+    padding: 8px 12px;
+    font-size: 1.1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: white;
+}
+
+.edit-text {
+    width: 100%;
+    min-height: 120px;
+    padding: 12px;
+    font-size: 1rem;
+    line-height: 1.5;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: white;
+    margin-bottom: 12px;
+    resize: vertical;
+}
+
+.edit-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.save-button, .discard-button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.save-button {
+    background-color: #2196F3;
+    color: white;
+}
+
+.save-button:hover {
+    background-color: #1976D2;
+}
+
+.discard-button {
+    background-color: #f44336;
+    color: white;
+}
+
+.discard-button:hover {
+    background-color: #d32f2f;
+}
+
+.paragraph-item {
+    position: relative;
+    cursor: context-menu;
+}
+
+.paragraph-item:hover {
+    background-color: #f8f8f8;
+  }
   
   
   
