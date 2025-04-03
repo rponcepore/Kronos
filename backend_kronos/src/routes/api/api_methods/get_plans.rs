@@ -135,7 +135,8 @@ async fn pack_plan_summary(plan: plan::Model, db: &DatabaseConnection) -> Result
         0 => {},
         _ => {
             let mut packed_orders= Vec::<KronosOrderSummary>::new();
-            for db_order in order_vec_single_plan {
+            for db_order_ref in &order_vec_single_plan {
+                let db_order = db_order_ref.clone();
                 let packed_order = match pack_orders_summary(db_order, &db).await {
                     Ok(packed_order) => packed_order,
                     Err(err) => return Err(err),
@@ -147,7 +148,10 @@ async fn pack_plan_summary(plan: plan::Model, db: &DatabaseConnection) -> Result
     };
 
     // For the sake of the frontend, we need to send the msot recent mission statement. 
-    let most_recent_mission_statement: Option<String> = get_most_recent_mission(order_vec_single_plan, db).await?;
+    let most_recent_mission_statement: Option<String> = match get_most_recent_mission(order_vec_single_plan, db).await {
+        Ok(most_recent_mission_statement) => most_recent_mission_statement,
+        Err(msg) => return Err(KronosApiError::DbErr(msg)),
+    };
     
     plan_summary.most_recent_mission = most_recent_mission_statement;
 
@@ -172,15 +176,15 @@ async fn pack_orders_summary(order: kronos_order::Model, _db: &DatabaseConnectio
     Ok(orders_summary)
 }
 
-async fn get_most_recent_mission(order_vec: Vec<kronos_order::Model>, db: &DatabaseConnection) -> Result<Option<String>, KronosApiError> {
+async fn get_most_recent_mission(order_vec: Vec<kronos_order::Model>, db: &DatabaseConnection) -> Result<Option<String>, DbErr> {
     // Check all orders associated with this plan.
     // If there are any fragords, use the most recent. 
     // Else, check fro an OPORD.
     // Else, check fro a fragord and use the most recent.
     // Else, return NONE
-    let mut champion: Option<kronos_order::Model> = None;
+    let mut champion: Option<&kronos_order::Model> = None;
 
-    for order in order_vec {
+    for order in &order_vec {
         champion = match champion {
             None => Some(order),
             Some(current_champion) => Some(more_recent_order(&current_champion, &order)),
@@ -208,32 +212,41 @@ async fn get_most_recent_mission(order_vec: Vec<kronos_order::Model>, db: &Datab
     
 }    
 
-fn more_recent_order(order_1: &kronos_order::Model, order_2: &kronos_order::Model) -> Option<order::Model> {
+fn more_recent_order<'a>(
+    order_1: &'a kronos_order::Model, 
+    order_2: &'a kronos_order::Model
+) -> &'a kronos_order::Model {
     let order1rank = match order_1.order_type.as_str() {
         "FRAGORD" => 3,
         "OPORD" => 2,
         "WARNORD" => 1,
-        _ => 0, // Default case (optional)
+        _ => panic!("Invariant violated: Order had nonsense type {}", order_1.order_type), // Default case (optional)
     };
-    let order2rank = match order_1.order_type.as_str() {
+    let order2rank = match order_2.order_type.as_str() {
         "FRAGORD" => 3,
         "OPORD" => 2,
         "WARNORD" => 1,
-        _ => 0, // Default case (optional)
+        _ => panic!("Invariant violated: Order had nonsense type {}", order_2.order_type), // Default case (optional)
     };
     
     if order1rank == order2rank {
         // they are the same type of order. check serial numbers.
-        if (order_1.serial_number > order_2.serial_number) {
-            return Some(order_1);
-        }else if (order_1.serial_number < order_2.serial_number) {
-            return Some(order_2); 
+        if order_1.serial_number > order_2.serial_number {
+            return order_1;
+        }else if order_1.serial_number < order_2.serial_number {
+            return order_2; 
         }else { 
             assert!(
                 order_1.parent_plan == order_2.parent_plan, 
                 "Invariant violated: Orders in order_vec not from same parent plan in get_plans return."
             );
             panic!("Invariant violated: Orders of same plan and same type had same serial numbers.");
+        }
+    }else{
+        if order1rank > order2rank {
+            return order_1;
+        }else{
+            return order_2;
         }
     }
 }

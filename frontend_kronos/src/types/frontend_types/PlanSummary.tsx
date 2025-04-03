@@ -16,11 +16,7 @@ import { ParagraphSummary } from './ParagraphSummary';
 export type PlanSummary = {
     data: Plan; // The original record
     orders: KronosOrderSummary[]; // The orders associated with this paragraph
-<<<<<<< HEAD
-    paragraphs: ParagraphSummary[];
-=======
-    most_recent_mission: String;
->>>>>>> luca
+    most_recent_mission: String | null;
 }
 
 export function getMostRecentOrder(plan: PlanSummary): KronosOrderSummary | null {
