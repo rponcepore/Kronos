@@ -1,0 +1,167 @@
+/* Dark mode styles */
+body.dark-mode {
+  background-color: #121212;
+  color: #ffffff;
+}
+
+/* Plan details in dark mode */
+.dark-mode .plan-details {
+  background-color: #1e1e1e;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+/* Modal styles in dark mode */
+.dark-mode .modal-content {
+  background-color: #1e1e1e;
+  color: #ffffff;
+}
+
+.dark-mode .modal-header {
+  border-bottom-color: #333333;
+}
+
+.dark-mode .modal-body {
+  color: #ffffff;
+}
+
+.dark-mode .close-button {
+  color: #ffffff;
+}
+
+/* Order card styles in dark mode */
+.dark-mode .order-card {
+  background-color: #242424;
+  border-color: #333333;
+  color: #ffffff;
+}
+
+.dark-mode .order-card:hover {
+  background-color: #2a2a2a;
+}
+
+/* Paragraph styles in dark mode */
+.dark-mode .paragraph-item {
+  border-bottom-color: #333333;
+  color: #ffffff;
+}
+
+.dark-mode .paragraph-item:hover {
+  background-color: #242424;
+}
+
+.dark-mode h3,
+.dark-mode p {
+  color: #ffffff;
+}
+
+/* Keep edit menu and context menu light for better contrast and usability */
+.dark-mode .paragraph-edit,
+.dark-mode .context-menu,
+.dark-mode .confirm-dialog {
+  background-color: #242424;
+  color: #ffffff;
+  border: 1px solid #333333;
+}
+
+.dark-mode .edit-title,
+.dark-mode .edit-text {
+  background-color: #1a1a1a;
+  color: #ffffff;
+  border-color: #333333;
+}
+
+/* Navigation styles in dark mode */
+.dark-mode .navbar {
+  background-color: #1a1a1a;
+  border-bottom: 1px solid #333333;
+}
+
+.dark-mode .nav-links a {
+  color: #ffffff;
+}
+
+.dark-mode .nav-links a:hover {
+  background-color: #2a2a2a;
+}
+
+/* Dark mode toggle button */
+.dark-mode-toggle-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+.dark-mode-toggle {
+  background-color: #242424;
+  border: 1px solid #333333;
+  color: #ffffff;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  transition: all 0.2s ease;
+}
+
+.dark-mode-toggle:hover {
+  background-color: #2a2a2a;
+  transform: scale(1.1);
+}
+
+/* Button styles in dark mode */
+.dark-mode button:not(.save-button):not(.discard-button):not(.close-button) {
+  background-color: #242424;
+  color: #ffffff;
+  border-color: #333333;
+}
+
+.dark-mode button:not(.save-button):not(.discard-button):not(.close-button):hover {
+  background-color: #2a2a2a;
+}
+
+/* Input styles in dark mode */
+.dark-mode input[type="text"]:not(.edit-title),
+.dark-mode input[type="search"] {
+  background-color: #1a1a1a;
+  color: #ffffff;
+  border-color: #333333;
+}
+
+/* Table styles in dark mode */
+.dark-mode table {
+  background-color: #2d2d2d;
+  color: #e0e0e0;
+}
+
+.dark-mode th,
+.dark-mode td {
+  border-color: #404040;
+}
+
+.dark-mode tr:nth-child(even) {
+  background-color: #363636;
+}
+
+/* Scrollbar styles for dark mode */
+.dark-mode ::-webkit-scrollbar {
+  width: 12px;
+}
+
+.dark-mode ::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+
+.dark-mode ::-webkit-scrollbar-thumb {
+  background-color: #333333;
+  border-radius: 6px;
+  border: 3px solid #1a1a1a;
+}
+
+.dark-mode ::-webkit-scrollbar-thumb:hover {
+  background-color: #404040;
+} 
