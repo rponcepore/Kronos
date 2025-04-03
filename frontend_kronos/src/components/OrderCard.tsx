@@ -85,7 +85,7 @@ const OrderCard: React.FC<OrderCardProps> = ({
                 <div 
                   key={paragraph.data.id} 
                   className="paragraph-item"
-                  style={{ marginLeft: `${paragraph.data.indent_level * 20}px` }}
+                  style={{ "--indent-level": paragraph.data.indent_level } as React.CSSProperties}
                 >
                   <h3>{paragraph.data.ordinal_sequence}. {paragraph.data.title}</h3>
                   <p>{paragraph.data.text}</p>

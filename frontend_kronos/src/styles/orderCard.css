@@ -114,20 +114,22 @@
     bottom: 0;
     background-color: rgba(0, 0, 0, 0.7);
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: left;
+    align-items: left;
     z-index: 1000;
 }
 
 .modal-content {
     background-color: white;
     border-radius: 10px;
-    width: 95%;                          /* Increased from 90% */
-    max-width: 1800px;                   /* Increased from 1200px */
+    width: 95%;
+    max-width: 1800px;
     max-height: 90vh;
     overflow-y: auto;
     position: relative;
-    padding: 2rem 3rem;                  /* Added more horizontal padding */
+    padding: 2rem 3rem;
+    margin-left: 0;          /* Remove auto margin */
+    margin-right: auto;      /* Keep right margin auto */
 }
 
 .modal-header {
@@ -137,6 +139,7 @@
     margin-bottom: 2rem;
     padding-bottom: 1rem;
     border-bottom: 1px solid #eee;
+    text-align: left;        /* Ensure header text is left-aligned */
 }
 
 .close-button {
@@ -156,15 +159,18 @@
 .modal-body {
     padding-right: 2rem;
     padding-left: 1rem;
-    max-width: 1600px;                   /* Added max-width for readability */
-    margin: 0 auto;                      /* Center the content */
+    max-width: 1600px;
+    margin-left: 0;          /* Remove auto margin */
+    margin-right: auto;      /* Keep right margin auto */
 }
 
 .paragraph-item {
     margin-bottom: 2rem;
     padding-bottom: 1rem;
     border-bottom: 1px solid #eee;
-    line-height: 1.6;                    /* Improved line height for readability */
+    line-height: 1.6;   
+    text-align: left;
+    margin-left: calc(var(--indent-level) * 48px); /* Half inch (48px) per indent level */
 }
 
 .paragraph-item:last-child {
@@ -173,9 +179,10 @@
 
 .paragraph-item h3 {
     color: #333;
-    margin-bottom: 1rem;                 /* Increased spacing */
-    font-size: 1.2rem;                   /* Slightly larger headings */
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
     font-weight: 600;
+    text-align: left; 
 }
 
 .paragraph-item p {
@@ -183,7 +190,8 @@
     line-height: 1.8;                    /* Increased line height for text */
     margin: 0;
     white-space: pre-wrap;
-    font-size: 1.1rem;                   /* Slightly larger text */
+    font-size: 1.1rem;    
+    text-align: left;                /* Slightly larger text */
 }
   
   
