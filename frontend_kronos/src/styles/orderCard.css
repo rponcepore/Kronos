@@ -289,6 +289,35 @@
 .paragraph-item:hover {
     background-color: #f8f8f8;
   }
+
+.confirm-dialog {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.confirm-dialog h3 {
+  margin-top: 0;
+  color: #333;
+}
+
+.confirm-dialog p {
+  color: #666;
+  margin: 16px 0;
+}
+
+.confirm-dialog .discard-button:hover {
+  background-color: #d32f2f;
+}
+
+.confirm-dialog .save-button {
+  background-color: #757575;
+}
+
+.confirm-dialog .save-button:hover {
+  background-color: #616161;
+}
   
   
   

@@ -12,6 +12,13 @@ interface ContextMenuState {
   paragraphId: number | null;
 }
 
+interface ConfirmDialogState {
+  show: boolean;
+  paragraphId: number | null;
+  originalText: string;
+  originalTitle: string;
+}
+
 // Props interface for the OrderCard component
 interface OrderCardProps {
   order: KronosOrderSummary;
@@ -46,6 +53,12 @@ const OrderCard: React.FC<OrderCardProps> = ({
   const [editingParagraph, setEditingParagraph] = useState<number | null>(null);
   const [editText, setEditText] = useState("");
   const [editTitle, setEditTitle] = useState("");
+  const [confirmDiscard, setConfirmDiscard] = useState<ConfirmDialogState>({
+    show: false,
+    paragraphId: null,
+    originalText: "",
+    originalTitle: "",
+  });
 
   // Generate the full serial number (e.g., "25-01-02") using plan and order info
   const serial = getOrderSerialDisplay(
@@ -209,9 +222,12 @@ const OrderCard: React.FC<OrderCardProps> = ({
                           <button 
                             className="discard-button"
                             onClick={() => {
-                              setEditingParagraph(null);
-                              setEditText(paragraph.data.text || '');
-                              setEditTitle(paragraph.data.title || '');
+                              setConfirmDiscard({
+                                show: true,
+                                paragraphId: paragraph.data.id,
+                                originalText: paragraph.data.text || '',
+                                originalTitle: paragraph.data.title || ''
+                              });
                             }}
                           >
                             Discard Changes
@@ -282,6 +298,50 @@ const OrderCard: React.FC<OrderCardProps> = ({
             Add Paragraph Below
           </div>
     </div>
+      )}
+
+      {/* Confirmation Dialog */}
+      {confirmDiscard.show && (
+        <div className="modal-overlay" onClick={(e) => e.stopPropagation()}>
+          <div 
+            className="confirm-dialog"
+            style={{
+              position: 'fixed',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              zIndex: 2000,
+              background: 'white',
+              padding: '20px',
+              borderRadius: '8px',
+              boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+              width: '400px',
+              textAlign: 'center'
+            }}
+          >
+            <h3 style={{ marginTop: 0 }}>Discard Changes?</h3>
+            <p>Are you sure you want to discard your changes?</p>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginTop: '20px' }}>
+              <button
+                className="discard-button"
+                onClick={() => {
+                  setEditingParagraph(null);
+                  setEditText(confirmDiscard.originalText);
+                  setEditTitle(confirmDiscard.originalTitle);
+                  setConfirmDiscard({ show: false, paragraphId: null, originalText: '', originalTitle: '' });
+                }}
+              >
+                Discard
+              </button>
+              <button
+                className="save-button"
+                onClick={() => setConfirmDiscard({ show: false, paragraphId: null, originalText: '', originalTitle: '' })}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </>
   );
