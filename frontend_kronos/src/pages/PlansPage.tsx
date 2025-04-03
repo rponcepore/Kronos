@@ -105,6 +105,34 @@ const PlansPage: React.FC = () => {
     }
   };
 
+  const handleAddParagraph = async (beforeId: number, indentLevel: number, ordinalSequence: number, parentParagraph: number | null) => {
+    try {
+      const req: KronosRequest = {
+        action: "add_paragraph",
+        unit: "WJH8AA",
+        plan_id: selectedPlan?.data.id || null,
+        order_id: selectedOrder || null,
+        paragraph_id: beforeId,
+        task_id: null,
+        indent_level: indentLevel,
+        ordinal_sequence: ordinalSequence,
+        parent_paragraph: parentParagraph
+      };
+      const response = await kronosApiCall(req);
+      if (response.paragraphs_vec) {
+        // Update the selected plan's paragraphs with the new paragraph
+        if (selectedPlan) {
+          setSelectedPlan({
+            ...selectedPlan,
+            paragraphs: [...(selectedPlan.paragraphs || []), response.paragraphs_vec[0]]
+          });
+        }
+      }
+    } catch (err) {
+      console.error('Error adding paragraph:', err);
+    }
+  };
+
   if (loading) {
     return <div className="p-6">Loading plans...</div>;
   }
@@ -136,6 +164,7 @@ const PlansPage: React.FC = () => {
                   parentPlanFiscalYear={selectedPlan.data.fiscal_year}
                   selectOrder={() => handleOrderSelect(order.data.id)}
                   paragraphs={selectedPlan.paragraphs?.filter((p) => p.data.order === order.data.id) || []}
+                  onAddParagraph={handleAddParagraph}
                 />
               ))}
             </div>

@@ -34,6 +34,9 @@ pub struct KronosRequest {
     pub order_id: Option<i32>,
     pub paragraph_id: Option<i32>,
     pub task_id: Option<i32>,
+    pub indent_level: Option<i32>,
+    pub ordinal_sequence: Option<i32>,
+    pub parent_paragraph: Option<i32>,
 }
 
 #[derive(serde::Deserialize, Serialize)]
@@ -150,6 +153,9 @@ impl KronosRequest {
             order_id: None,
             paragraph_id: None,
             task_id: None,
+            indent_level: None,
+            ordinal_sequence: None,
+            parent_paragraph: None,
         }
     }
 

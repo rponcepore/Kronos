@@ -27,7 +27,7 @@ interface OrderCardProps {
   paragraphs: ParagraphSummary[] | null;
   onUpdateParagraph?: (paragraphId: number, newText: string, newTitle: string) => void;
   onDeleteParagraph?: (paragraphId: number) => void;
-  onAddParagraph?: (beforeId: number, indentLevel: number) => void;
+  onAddParagraph?: (beforeId: number, indentLevel: number, ordinalSequence: number, parentParagraph: number | null) => void;
 }
 
 // ---------------------------------------
@@ -48,6 +48,13 @@ const OrderCard: React.FC<OrderCardProps> = ({
   const [editingParagraph, setEditingParagraph] = useState<number | null>(null);
   const [editText, setEditText] = useState("");
   const [editTitle, setEditTitle] = useState("");
+  const [newParagraphPosition, setNewParagraphPosition] = useState<{
+    beforeId: number, 
+    indentLevel: number,
+    ordinalSequence: number,
+    parentParagraph: number | null,
+    paragraph: ParagraphSummary
+  } | null>(null);
   const [confirmDiscard, setConfirmDiscard] = useState<ConfirmDialogState>({
     show: false,
     paragraphId: null,
@@ -141,111 +148,249 @@ const OrderCard: React.FC<OrderCardProps> = ({
                 }
                 
                 return (
-                  <div 
-                    key={paragraph.data.id} 
-                    className="paragraph-item"
-                    style={{ "--indent-level": paragraph.data.indent_level } as React.CSSProperties}
-                  >
-                    {editingParagraph === paragraph.data.id ? (
-                      <div className="paragraph-edit">
-                        <div className="edit-header">
-                          <span className="paragraph-number">{prefix}</span>
-                          <input
-                            type="text"
-                            value={editTitle}
-                            onChange={(e) => setEditTitle(e.target.value)}
-                            className="edit-title"
-                            placeholder="Enter title..."
+                  <React.Fragment key={paragraph.data.id}>
+                    <div 
+                      className="paragraph-item"
+                      style={{ "--indent-level": paragraph.data.indent_level } as React.CSSProperties}
+                    >
+                      {editingParagraph === paragraph.data.id ? (
+                        <div className="paragraph-edit">
+                          <div className="edit-header">
+                            <span className="paragraph-number">{prefix}</span>
+                            <input
+                              type="text"
+                              value={editTitle}
+                              onChange={(e) => setEditTitle(e.target.value)}
+                              className="edit-title"
+                              placeholder="Enter title..."
+                            />
+                          </div>
+                          <textarea
+                            value={editText}
+                            onChange={(e) => setEditText(e.target.value)}
+                            className="edit-text"
+                            placeholder="Enter paragraph text..."
                           />
-                        </div>
-                        <textarea
-                          value={editText}
-                          onChange={(e) => setEditText(e.target.value)}
-                          className="edit-text"
-                          placeholder="Enter paragraph text..."
-                        />
-                        <div className="edit-actions">
-                          <button 
-                            className="save-button"
-                            onClick={() => setEditingParagraph(null)}
-                          >
-                            Save
-                          </button>
-                          <button 
-                            className="discard-button"
-                            onClick={() => {
-                              setConfirmDiscard({
-                                show: true,
-                                paragraphId: paragraph.data.id,
-                                originalText: paragraph.data.text || '',
-                                originalTitle: paragraph.data.title || ''
-                              });
-                            }}
-                          >
-                            Discard Changes
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      <>
-                        <div 
-                          className="paragraph-content"
-                          onClick={() => setSelectedParagraphId(selectedParagraphId === paragraph.data.id ? null : paragraph.data.id)}
-                        >
-                          <h3>{prefix}{paragraph.data.title}</h3>
-                          <p>{paragraph.data.text}</p>
-                        </div>
-                        {selectedParagraphId === paragraph.data.id && paragraph.data.indent_level > 0 && (
-                          <div className="paragraph-menu">
-                            <button
-                              className="menu-button"
-                              onClick={() => {
-                                setEditingParagraph(paragraph.data.id);
-                                setEditText(paragraph.data.text || '');
-                                setEditTitle(paragraph.data.title || '');
-                                setSelectedParagraphId(null);
-                              }}
+                          <div className="edit-actions">
+                            <button 
+                              className="save-button"
+                              onClick={() => setEditingParagraph(null)}
                             >
-                              Edit
+                              Save
                             </button>
-                            <button
-                              className="menu-button"
+                            <button 
+                              className="discard-button"
                               onClick={() => {
-                                if (onAddParagraph) {
-                                  onAddParagraph(paragraph.data.id, paragraph.data.indent_level);
-                                }
-                                setSelectedParagraphId(null);
+                                setConfirmDiscard({
+                                  show: true,
+                                  paragraphId: paragraph.data.id,
+                                  originalText: paragraph.data.text || '',
+                                  originalTitle: paragraph.data.title || ''
+                                });
                               }}
                             >
-                              Add Above
-                            </button>
-                            <button
-                              className="menu-button"
-                              onClick={() => {
-                                if (onAddParagraph) {
-                                  onAddParagraph(paragraph.data.id + 1, paragraph.data.indent_level);
-                                }
-                                setSelectedParagraphId(null);
-                              }}
-                            >
-                              Add Below
-                            </button>
-                            <button
-                              className="menu-button delete"
-                              onClick={() => {
-                                if (onDeleteParagraph) {
-                                  onDeleteParagraph(paragraph.data.id);
-                                }
-                                setSelectedParagraphId(null);
-                              }}
-                            >
-                              Delete
+                              Discard Changes
                             </button>
                           </div>
-                        )}
-                      </>
+                        </div>
+                      ) : (
+                        <>
+                          <div 
+                            className="paragraph-content"
+                            onClick={() => setSelectedParagraphId(selectedParagraphId === paragraph.data.id ? null : paragraph.data.id)}
+                          >
+                            <h3>{prefix}{paragraph.data.title}</h3>
+                            <p>{paragraph.data.text}</p>
+                          </div>
+                          {selectedParagraphId === paragraph.data.id && paragraph.data.indent_level > 0 && (
+                            <div className="paragraph-menu">
+                              <button
+                                className="menu-button"
+                                onClick={() => {
+                                  setEditingParagraph(paragraph.data.id);
+                                  setEditText(paragraph.data.text || '');
+                                  setEditTitle(paragraph.data.title || '');
+                                  setSelectedParagraphId(null);
+                                }}
+                              >
+                                Edit
+                              </button>
+                              <button
+                                className="menu-button"
+                                onClick={() => {
+                                  const nextOrdinalSequence = paragraph.data.ordinal_sequence;
+                                  const newParagraph: ParagraphSummary = {
+                                    data: {
+                                      id: paragraph.data.id - 1, // Temporary ID
+                                      order: paragraph.data.order,
+                                      parent_paragraph: paragraph.data.parent_paragraph,
+                                      ordinal_sequence: nextOrdinalSequence,
+                                      indent_level: paragraph.data.indent_level,
+                                      is_major: paragraph.data.is_major,
+                                      title: '',
+                                      text: ''
+                                    },
+                                    subParagraphs: []
+                                  };
+                                  setNewParagraphPosition({
+                                    beforeId: paragraph.data.id,
+                                    indentLevel: paragraph.data.indent_level,
+                                    ordinalSequence: nextOrdinalSequence,
+                                    parentParagraph: paragraph.data.parent_paragraph,
+                                    paragraph: newParagraph
+                                  });
+                                  setEditText('');
+                                  setEditTitle('');
+                                  setSelectedParagraphId(null);
+                                }}
+                              >
+                                Add Above
+                              </button>
+                              <button
+                                className="menu-button"
+                                onClick={() => {
+                                  const nextOrdinalSequence = paragraph.data.ordinal_sequence + 1;
+                                  const newParagraph: ParagraphSummary = {
+                                    data: {
+                                      id: paragraph.data.id + 1, // Temporary ID
+                                      order: paragraph.data.order,
+                                      parent_paragraph: paragraph.data.parent_paragraph,
+                                      ordinal_sequence: nextOrdinalSequence,
+                                      indent_level: paragraph.data.indent_level,
+                                      is_major: paragraph.data.is_major,
+                                      title: '',
+                                      text: ''
+                                    },
+                                    subParagraphs: []
+                                  };
+                                  setNewParagraphPosition({
+                                    beforeId: paragraph.data.id + 1,
+                                    indentLevel: paragraph.data.indent_level,
+                                    ordinalSequence: nextOrdinalSequence,
+                                    parentParagraph: paragraph.data.parent_paragraph,
+                                    paragraph: newParagraph
+                                  });
+                                  setEditText('');
+                                  setEditTitle('');
+                                  setSelectedParagraphId(null);
+                                }}
+                              >
+                                Add Below
+                              </button>
+                              <button
+                                className="menu-button"
+                                onClick={() => {
+                                  const nextOrdinalSequence = 1; // Start with 1 for subparagraphs
+                                  const newParagraph: ParagraphSummary = {
+                                    data: {
+                                      id: paragraph.data.id + 1, // Temporary ID
+                                      order: paragraph.data.order,
+                                      parent_paragraph: paragraph.data.id,
+                                      ordinal_sequence: nextOrdinalSequence,
+                                      indent_level: paragraph.data.indent_level + 1,
+                                      is_major: paragraph.data.is_major,
+                                      title: '',
+                                      text: ''
+                                    },
+                                    subParagraphs: []
+                                  };
+                                  setNewParagraphPosition({
+                                    beforeId: paragraph.data.id + 1,
+                                    indentLevel: paragraph.data.indent_level + 1,
+                                    ordinalSequence: nextOrdinalSequence,
+                                    parentParagraph: paragraph.data.id,
+                                    paragraph: newParagraph
+                                  });
+                                  setEditText('');
+                                  setEditTitle('');
+                                  setSelectedParagraphId(null);
+                                }}
+                              >
+                                Add Subparagraph
+                              </button>
+                              <button
+                                className="menu-button delete"
+                                onClick={() => {
+                                  if (onDeleteParagraph) {
+                                    onDeleteParagraph(paragraph.data.id);
+                                  }
+                                  setSelectedParagraphId(null);
+                                }}
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </div>
+                    {newParagraphPosition && newParagraphPosition.beforeId === paragraph.data.id + 1 && (
+                      <div 
+                        className="paragraph-item"
+                        style={{ "--indent-level": newParagraphPosition.indentLevel } as React.CSSProperties}
+                      >
+                        <div className="paragraph-edit">
+                          <div className="edit-header">
+                            <span className="paragraph-number">
+                              {(() => {
+                                const level = newParagraphPosition.indentLevel % 4;
+                                switch (level) {
+                                  case 0: return `${newParagraphPosition.ordinalSequence}. `;
+                                  case 1: return `${String.fromCharCode(96 + newParagraphPosition.ordinalSequence)}. `;
+                                  case 2: return `(${newParagraphPosition.ordinalSequence}) `;
+                                  case 3: return `(${String.fromCharCode(96 + newParagraphPosition.ordinalSequence)}) `;
+                                  default: return '';
+                                }
+                              })()}
+                            </span>
+                            <input
+                              type="text"
+                              value={editTitle}
+                              onChange={(e) => setEditTitle(e.target.value)}
+                              className="edit-title"
+                              placeholder="Enter title..."
+                            />
+                          </div>
+                          <textarea
+                            value={editText}
+                            onChange={(e) => setEditText(e.target.value)}
+                            className="edit-text"
+                            placeholder="Enter paragraph text..."
+                          />
+                          <div className="edit-actions">
+                            <button 
+                              className="save-button"
+                              onClick={() => {
+                                if (onAddParagraph) {
+                                  onAddParagraph(
+                                    newParagraphPosition.beforeId, 
+                                    newParagraphPosition.indentLevel,
+                                    newParagraphPosition.ordinalSequence,
+                                    newParagraphPosition.parentParagraph
+                                  );
+                                }
+                                setNewParagraphPosition(null);
+                                setEditText('');
+                                setEditTitle('');
+                              }}
+                            >
+                              Save
+                            </button>
+                            <button 
+                              className="discard-button"
+                              onClick={() => {
+                                setNewParagraphPosition(null);
+                                setEditText('');
+                                setEditTitle('');
+                              }}
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      </div>
                     )}
-                  </div>
+                  </React.Fragment>
                 );
               })}
             </div>
