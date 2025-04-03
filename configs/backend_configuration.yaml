@@ -17,5 +17,5 @@ database:
   app_db_name: "kronos_db"
 
 
-# In dev, this means the connectino string is: 
+# In dev, this means the connection string is: 
 # postgres://postgres:postgres@localhost:5432/postgres
