@@ -1,135 +1,108 @@
-/* Theme Variables */
-:root {
-  /* Light theme (default) */
-  --background-primary: white;
-  --background-secondary: #f8f8f8;
-  --background-overlay: rgba(0, 0, 0, 0.7);
-  --text-primary: #333;
-  --text-secondary: #666;
-  --border-color: #ddd;
-  --hover-background: #f9f9f9;
-  --shadow-color: rgba(0, 0, 0, 0.05);
-  --modal-shadow: rgba(0, 0, 0, 0.15);
-}
-
-/* Dark theme */
-[data-theme="dark"] {
-  --background-primary: #1a1a1a;
-  --background-secondary: #2d2d2d;
-  --background-overlay: rgba(0, 0, 0, 0.8);
-  --text-primary: #e0e0e0;
-  --text-secondary: #b0b0b0;
-  --border-color: #404040;
-  --hover-background: #2a2a2a;
-  --shadow-color: rgba(0, 0, 0, 0.2);
-  --modal-shadow: rgba(0, 0, 0, 0.3);
-}
-
 /* ----------------------------- */
 /* Order Card Component Styles  */
 /* ----------------------------- */
 
 /* Base styling for each order card */
 .order-card {
-    background-color: var(--background-primary);
-    border: 1px solid var(--border-color);
-    border-radius: 10px;
-    padding: 0.75rem 1.5rem;
-    margin-bottom: 1rem;
-    box-shadow: 0 2px 5px var(--shadow-color);
-    transition: transform 0.2s ease, background-color 0.2s ease;
-    cursor: pointer;
-    width: 100%;
-    max-width: 1000px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-/* Hover effect for the order card */
-.order-card:hover {
-    transform: scale(1.01);
-    background-color: var(--hover-background);
-}
-
+    background-color: white;              /* White card background */
+    border: 1px solid #ddd;               /* Light gray border */
+    border-radius: 10px;                  /* Rounded corners */
+    padding: 0.75rem 1.5rem;              /* Reduced vertical padding */
+    margin-bottom: 1rem;                  /* Spacing between cards */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05); /* Subtle shadow for depth */
+    transition: transform 0.2s ease;      /* Smooth grow effect on hover */
+    cursor: pointer;                      /* Pointer cursor for interactivity */
+    width: 100%;                          /* Full width */
+    max-width: 1000px;                    /* Maximum width */
+    margin-left: auto;                    /* Center the card */
+    margin-right: auto;                   /* Center the card */
+  }
+  
+  /* Hover effect for the order card */
+  .order-card:hover {
+    transform: scale(1.01);               /* Slight zoom-in */
+    background-color: #f9f9f9;            /* Slightly lighter background */
+  }
+  
 /* Horizontal layout container */
 .order-card-content {
-    display: flex;
-    align-items: center;
-    gap: 3rem;
+    display: flex;                        /* Horizontal layout */
+    align-items: center;                  /* Center items vertically */
+    gap: 3rem;                            /* Increased space between columns */
 }
 
 /* Column styling */
 .order-card-column {
-    display: flex;
-    align-items: center;
+    display: flex;                        /* Flex container for column content */
+    align-items: center;                  /* Center items vertically */
 }
 
 /* First column: Order type and serial */
 .order-card-column:first-child {
-    min-width: 250px;
-    width: 20%;
+    min-width: 250px;                     /* Increased fixed width for first column */
+    width: 20%;                           /* Percentage-based width */
 }
 
 /* Second column: Publication status */
 .order-card-column:nth-child(2) {
-    min-width: 150px;
-    width: 15%;
+    min-width: 150px;                     /* Fixed width for publication status */
+    width: 15%;                           /* Percentage-based width */
 }
 
 /* Mission column */
 .mission-column {
-    flex: 1;
-    min-width: 0;
-    padding-right: 2rem;
+    flex: 1;                              /* Take up remaining space */
+    min-width: 0;                         /* Allow text to wrap */
+    padding-right: 2rem;                  /* Add some padding on the right */
 }
 
 /* Layout for the order type and serial */
-.order-card-header {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-/* Badge styling for order type (OPORD, WARNO, FRAGO) */
-.plan-type {
-    padding: 4px 10px;
-    font-size: 0.85rem;
-    font-weight: bold;
-    border-radius: 5px;
-    text-transform: uppercase;
-    white-space: nowrap;
-    border: 2px solid;
-}
-
-/* Order Type Badge Colors */
+  .order-card-header {
+    display: flex;                        /* Place badge and serial side-by-side */
+    align-items: center;                  /* Vertically align badge and text */
+    gap: 1rem;                            /* Spacing between badge and serial */
+  }
+  
+  /* Badge styling for order type (OPORD, WARNO, FRAGO) */
+  .plan-type {
+    padding: 4px 10px;                    /* Inner padding around text */
+    font-size: 0.85rem;                   /* Smaller font size */
+    font-weight: bold;                    /* Bold text */
+    border-radius: 5px;                   /* Rounded badge shape */
+    text-transform: uppercase;            /* Make text all caps */
+    white-space: nowrap;                  /* Prevent badge from breaking lines */
+    border: 2px solid;                    /* Add border for all types */
+  }
+  
+  /* Order Type Badge Colors */
 /* Blue border for OPORD */
 .opord {
-    border-color: #4075ae;
-    color: #4075ae;
+  border-color: #4075ae;                /* Bootstrap blue */
+  color: #4075ae;                       /* Blue text */
 }
 
 /* Red border for WARNORD */
 .warnord {
-    border-color: #f69869;
-    color: #f69869;
+  border-color: #f69869;                /* Bootstrap danger red */
+  color: #f69869;                       /* Red text */
 }
 
 /* Yellow border for FRAGORD */
 .fragord {
-    border-color: #ad9347;
-    color: #9f873e;
+  border-color: #ad9347;                /* Bootstrap warning yellow */
+  color: #9f873e;                       /* Yellow text */
 }
 
 /* Mission text styling */
 .mission-text {
-    font-size: 0.9rem;
-    line-height: 1.4;
-    color: var(--text-primary);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
+    font-size: 0.9rem;                    /* Slightly smaller font */
+    line-height: 1.4;                     /* Comfortable line height */
+    color: #333;                          /* Dark gray text */
+    overflow: hidden;                     /* Hide overflow */
+    text-overflow: ellipsis;              /* Show ellipsis for overflow */
+    display: -webkit-box;                 /* Enable multi-line ellipsis */
+    -webkit-line-clamp: 2;                /* Show max 2 lines */
+    -webkit-box-orient: vertical;         /* Vertical text flow */
 }
 
 /* Modal Styles */
@@ -139,7 +112,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: var(--background-overlay);
+    background-color: rgba(0, 0, 0, 0.7);
     display: flex;
     justify-content: left;
     align-items: left;
@@ -147,7 +120,7 @@
 }
 
 .modal-content {
-    background-color: var(--background-primary);
+    background-color: white;
     border-radius: 10px;
     width: 95%;
     max-width: none;
@@ -155,10 +128,8 @@
     overflow-y: auto;
     position: relative;
     padding: 2rem 3rem;
-    margin-left: auto;
-    margin-right: auto;
-    color: var(--text-primary);
-    box-shadow: 0 4px 12px var(--modal-shadow);
+    margin-left: auto;          /* auto margin */
+    margin-right: auto;      /* Keep right margin auto */
 }
 
 .modal-header {
@@ -167,8 +138,8 @@
     align-items: center;
     margin-bottom: 2rem;
     padding-bottom: 1rem;
-    border-bottom: 1px solid var(--border-color);
-    text-align: left;
+    border-bottom: 1px solid #eee;
+    text-align: left;        /* Ensure header text is left-aligned */
 }
 
 .close-button {
@@ -189,17 +160,17 @@
     padding-right: 2rem;
     padding-left: 1rem;
     max-width: 1600px;
-    margin-left: 0;
-    margin-right: auto;
+    margin-left: 0;          /* Remove auto margin */
+    margin-right: auto;      /* Keep right margin auto */
 }
 
 .paragraph-item {
     margin-bottom: 2rem;
     padding-bottom: 1rem;
-    border-bottom: 1px solid var(--border-color);
-    line-height: 1.6;
+    border-bottom: 1px solid #eee;
+    line-height: 1.6;   
     text-align: left;
-    margin-left: calc(var(--indent-level) * 48px);
+    margin-left: calc(var(--indent-level) * 48px); /* Half inch (48px) per indent level */
 }
 
 .paragraph-item:last-child {
@@ -207,20 +178,20 @@
 }
 
 .paragraph-item h3 {
-    color: var(--text-primary);
+    color: #333;
     margin-bottom: 1rem;
     font-size: 1.2rem;
     font-weight: 600;
-    text-align: left;
+    text-align: left; 
 }
 
 .paragraph-item p {
-    color: var(--text-secondary);
-    line-height: 1.8;
+    color: #444;                         /* Slightly darker text for better contrast */
+    line-height: 1.8;                    /* Increased line height for text */
     margin: 0;
     white-space: pre-wrap;
-    font-size: 1.1rem;
-    text-align: left;
+    font-size: 1.1rem;    
+    text-align: left;                /* Slightly larger text */
 }
 
 .context-menu-item {
@@ -230,12 +201,12 @@
 }
 
 .context-menu-item:hover {
-    background-color: var(--background-secondary);
+    background-color: #f0f0f0;
 }
 
 .paragraph-edit {
-    background-color: var(--background-secondary);
-    border: 1px solid var(--border-color);
+    background-color: #f8f8f8;
+    border: 1px solid #ddd;
     border-radius: 8px;
     padding: 16px;
     margin: 8px 0;
@@ -259,10 +230,9 @@
     flex: 1;
     padding: 8px 12px;
     font-size: 1.1rem;
-    border: 1px solid var(--border-color);
+    border: 1px solid #ddd;
     border-radius: 4px;
-    background-color: var(--background-primary);
-    color: var(--text-primary);
+    background-color: white;
 }
 
 .edit-text {
@@ -271,12 +241,11 @@
     padding: 12px;
     font-size: 1rem;
     line-height: 1.5;
-    border: 1px solid var(--border-color);
+    border: 1px solid #ddd;
     border-radius: 4px;
-    background-color: var(--background-primary);
+    background-color: white;
     margin-bottom: 12px;
     resize: vertical;
-    color: var(--text-primary);
 }
 
 .edit-actions {
@@ -319,37 +288,36 @@
 
 .paragraph-item:hover {
     background-color: #f8f8f8;
-}
+  }
 
 .confirm-dialog {
-    background-color: var(--background-primary);
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 4px 12px var(--modal-shadow);
-    color: var(--text-primary);
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .confirm-dialog h3 {
-    margin-top: 0;
-    color: var(--text-primary);
+  margin-top: 0;
+  color: #333;
 }
 
 .confirm-dialog p {
-    color: var(--text-secondary);
-    margin: 16px 0;
+  color: #666;
+  margin: 16px 0;
 }
 
 .confirm-dialog .discard-button:hover {
-    background-color: #d32f2f;
+  background-color: #d32f2f;
 }
 
 .confirm-dialog .save-button {
-    background-color: #757575;
+  background-color: #757575;
 }
 
 .confirm-dialog .save-button:hover {
-    background-color: #616161;
-}
+  background-color: #616161;
+  }
   
   
   
