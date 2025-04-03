@@ -44,12 +44,7 @@ const OrderCard: React.FC<OrderCardProps> = ({
   onAddParagraph,
 }) => {
   const [showModal, setShowModal] = useState(false);
-  const [contextMenu, setContextMenu] = useState<ContextMenuState>({
-    show: false,
-    x: 0,
-    y: 0,
-    paragraphId: null,
-  });
+  const [selectedParagraphId, setSelectedParagraphId] = useState<number | null>(null);
   const [editingParagraph, setEditingParagraph] = useState<number | null>(null);
   const [editText, setEditText] = useState("");
   const [editTitle, setEditTitle] = useState("");
@@ -76,50 +71,8 @@ const OrderCard: React.FC<OrderCardProps> = ({
     selectOrder(order);
   };
 
-  const handleContextMenu = (e: React.MouseEvent, paragraphId: number) => {
-    e.preventDefault();
-    setContextMenu({
-      show: true,
-      x: e.clientX,
-      y: e.clientY,
-      paragraphId,
-    });
-  };
-
   const handleClickOutside = () => {
-    setContextMenu({ ...contextMenu, show: false });
-  };
-
-  const startEditing = (paragraph: ParagraphSummary) => {
-    console.log('Starting edit for paragraph:', paragraph);
-    setEditingParagraph(paragraph.data.id);
-    setEditText(paragraph.data.text || '');
-    setEditTitle(paragraph.data.title || '');
-    setContextMenu({ ...contextMenu, show: false });
-  };
-
-  const saveEdit = () => {
-    if (editingParagraph && onUpdateParagraph) {
-      onUpdateParagraph(editingParagraph, editText, editTitle);
-      setEditingParagraph(null);
-    }
-  };
-
-  const handleDelete = (paragraphId: number) => {
-    if (onDeleteParagraph) {
-      onDeleteParagraph(paragraphId);
-    }
-    setContextMenu({ ...contextMenu, show: false });
-  };
-
-  const handleAddParagraph = (beforeId: number, position: 'before' | 'after') => {
-    if (onAddParagraph) {
-      const paragraph = paragraphs?.find(p => p.data.id === beforeId);
-      if (paragraph) {
-        onAddParagraph(beforeId, paragraph.data.indent_level);
-      }
-    }
-    setContextMenu({ ...contextMenu, show: false });
+    setSelectedParagraphId(null);
   };
 
   const getParagraphNumbers = (
@@ -192,7 +145,6 @@ const OrderCard: React.FC<OrderCardProps> = ({
                     key={paragraph.data.id} 
                     className="paragraph-item"
                     style={{ "--indent-level": paragraph.data.indent_level } as React.CSSProperties}
-                    onContextMenu={(e) => handleContextMenu(e, paragraph.data.id)}
                   >
                     {editingParagraph === paragraph.data.id ? (
                       <div className="paragraph-edit">
@@ -236,8 +188,61 @@ const OrderCard: React.FC<OrderCardProps> = ({
                       </div>
                     ) : (
                       <>
-                        <h3>{prefix}{paragraph.data.title}</h3>
-                        <p>{paragraph.data.text}</p>
+                        <div 
+                          className="paragraph-content"
+                          onClick={() => setSelectedParagraphId(selectedParagraphId === paragraph.data.id ? null : paragraph.data.id)}
+                        >
+                          <h3>{prefix}{paragraph.data.title}</h3>
+                          <p>{paragraph.data.text}</p>
+                        </div>
+                        {selectedParagraphId === paragraph.data.id && paragraph.data.indent_level > 0 && (
+                          <div className="paragraph-menu">
+                            <button
+                              className="menu-button"
+                              onClick={() => {
+                                setEditingParagraph(paragraph.data.id);
+                                setEditText(paragraph.data.text || '');
+                                setEditTitle(paragraph.data.title || '');
+                                setSelectedParagraphId(null);
+                              }}
+                            >
+                              Edit
+                            </button>
+                            <button
+                              className="menu-button"
+                              onClick={() => {
+                                if (onAddParagraph) {
+                                  onAddParagraph(paragraph.data.id, paragraph.data.indent_level);
+                                }
+                                setSelectedParagraphId(null);
+                              }}
+                            >
+                              Add Above
+                            </button>
+                            <button
+                              className="menu-button"
+                              onClick={() => {
+                                if (onAddParagraph) {
+                                  onAddParagraph(paragraph.data.id + 1, paragraph.data.indent_level);
+                                }
+                                setSelectedParagraphId(null);
+                              }}
+                            >
+                              Add Below
+                            </button>
+                            <button
+                              className="menu-button delete"
+                              onClick={() => {
+                                if (onDeleteParagraph) {
+                                  onDeleteParagraph(paragraph.data.id);
+                                }
+                                setSelectedParagraphId(null);
+                              }}
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        )}
                       </>
                     )}
                   </div>
@@ -246,58 +251,6 @@ const OrderCard: React.FC<OrderCardProps> = ({
             </div>
           </div>
         </div>
-      )}
-
-      {contextMenu.show && (
-        <div 
-          className="context-menu"
-          style={{ 
-            position: 'fixed',
-            top: contextMenu.y,
-            left: contextMenu.x,
-            zIndex: 1000,
-            background: 'white',
-            border: '1px solid #ccc',
-            borderRadius: '4px',
-            padding: '8px 0',
-            boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
-          }}
-        >
-          <div 
-            className="context-menu-item"
-            onClick={() => {
-              console.log('Edit clicked, paragraph ID:', contextMenu.paragraphId);
-              console.log('Available paragraphs:', order.paragraphs);
-              if (contextMenu.paragraphId && order.paragraphs) {
-                const paragraph = order.paragraphs.find(p => p.data.id === contextMenu.paragraphId);
-                console.log('Found paragraph:', paragraph);
-                if (paragraph) {
-                  startEditing(paragraph);
-                }
-              }
-            }}
-          >
-            Edit
-          </div>
-          <div 
-            className="context-menu-item"
-            onClick={() => contextMenu.paragraphId && handleDelete(contextMenu.paragraphId)}
-          >
-            Delete
-          </div>
-          <div 
-            className="context-menu-item"
-            onClick={() => contextMenu.paragraphId && handleAddParagraph(contextMenu.paragraphId, 'before')}
-          >
-            Add Paragraph Above
-          </div>
-          <div 
-            className="context-menu-item"
-            onClick={() => contextMenu.paragraphId && handleAddParagraph(contextMenu.paragraphId, 'after')}
-          >
-            Add Paragraph Below
-          </div>
-    </div>
       )}
 
       {/* Confirmation Dialog */}
