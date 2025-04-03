@@ -42,6 +42,22 @@ const OrderCard: React.FC<OrderCardProps> = ({
     selectOrder(order);
   };
 
+  const getParagraphNumbers = (
+    paragraphs: ParagraphSummary[]
+  ): Map<number, string> => {
+    const numberingMap = new Map<number, string>();
+
+    for (const paragraph of paragraphs) {
+      const { id, ordinal_sequence } = paragraph.data;
+      numberingMap.set(id, ordinal_sequence.toString());
+    }
+
+    return numberingMap;
+  };
+
+  // Pre-compute paragraph numbers once
+  const paragraphNumbers = getParagraphNumbers(order.paragraphs || []);
+
   return (
     <>
       <div className="order-card" onClick={handleClick}>
@@ -80,17 +96,38 @@ const OrderCard: React.FC<OrderCardProps> = ({
               <button className="close-button" onClick={() => setShowModal(false)}>×</button>
             </div>
             <div className="modal-body">
-              {order.paragraphs?.sort((a, b) => a.data.ordinal_sequence - b.data.ordinal_sequence)
-                .map((paragraph) => (
+              {order.paragraphs?.sort((a, b) => a.data.id - b.data.id)
+                .map((paragraph) => {
+                const level = paragraph.data.indent_level % 4; // Get repeating pattern of 0-3
+                let prefix;
+                switch (level) {
+                  case 0:
+                    prefix = `${paragraph.data.ordinal_sequence}. `;
+                    break;
+                  case 1:
+                    // Convert number to letter (1 -> a, 2 -> b, etc.)
+                    prefix = `${String.fromCharCode(96 + paragraph.data.ordinal_sequence)}. `;
+                    break;
+                  case 2:
+                    prefix = `(${paragraph.data.ordinal_sequence}) `;
+                    break;
+                  case 3:
+                    prefix = `(${String.fromCharCode(96 + paragraph.data.ordinal_sequence)}) `;
+                    break;
+                }
+                return (
                 <div 
                   key={paragraph.data.id} 
                   className="paragraph-item"
                   style={{ "--indent-level": paragraph.data.indent_level } as React.CSSProperties}
                 >
-                  <h3>{paragraph.data.ordinal_sequence}. {paragraph.data.title}</h3>
+                  <h3>
+                    {prefix}
+                    {paragraph.data.title}
+                  </h3>
                   <p>{paragraph.data.text}</p>
                 </div>
-              ))}
+              )})}
             </div>
           </div>
         </div>
