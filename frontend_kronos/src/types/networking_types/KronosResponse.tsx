@@ -18,4 +18,5 @@ export type KronosResponse = {
     orders_vec: KronosOrderSummary[] | null;
     paragraphs_vec: ParagraphSummary[] | null;
     units_vec: UnitSummary[] | null;
+    //
 }

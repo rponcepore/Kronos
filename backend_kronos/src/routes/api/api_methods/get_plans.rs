@@ -9,7 +9,7 @@ use crate::models::entity_summaries::plan_summary::PlanSummary;
 use crate::routes::api::api_handler::KronosApiError;
 use crate::routes::api::api_handler::KronosRequest;
 use crate::routes::api::api_handler::KronosResponse;
-use crate::routes::api::api_handler::access_kronos_database;
+use crate::utilities::database_tools::access_kronos_database;
 
 // Pull in our entities,
 use crate::models::entities::{prelude::*, *};
