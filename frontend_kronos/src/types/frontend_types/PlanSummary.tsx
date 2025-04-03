@@ -15,6 +15,7 @@ import { KronosOrderSummary } from './KronosOrderSummary';
 export type PlanSummary = {
     data: Plan; // The original record
     orders: KronosOrderSummary[]; // The orders associated with this paragraph
+    most_recent_mission: String;
 }
 
 export function getMostRecentOrder(plan: PlanSummary): KronosOrderSummary | null {
