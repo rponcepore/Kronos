@@ -11,4 +11,6 @@ export type KronosRequest = {
     indent_level?: number;
     ordinal_sequence?: number;
     parent_paragraph?: number | null;
+    title?: string;
+    text?: string;
 }

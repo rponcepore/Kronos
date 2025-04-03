@@ -27,7 +27,7 @@ interface OrderCardProps {
   paragraphs: ParagraphSummary[] | null;
   onUpdateParagraph?: (paragraphId: number, newText: string, newTitle: string) => void;
   onDeleteParagraph?: (paragraphId: number) => void;
-  onAddParagraph?: (beforeId: number, indentLevel: number, ordinalSequence: number, parentParagraph: number | null) => void;
+  onAddParagraph?: (beforeId: number, indentLevel: number, ordinalSequence: number, parentParagraph: number | null, title: string, text: string) => void;
 }
 
 // ---------------------------------------
@@ -366,7 +366,9 @@ const OrderCard: React.FC<OrderCardProps> = ({
                                     newParagraphPosition.beforeId, 
                                     newParagraphPosition.indentLevel,
                                     newParagraphPosition.ordinalSequence,
-                                    newParagraphPosition.parentParagraph
+                                    newParagraphPosition.parentParagraph,
+                                    editTitle,
+                                    editText
                                   );
                                 }
                                 setNewParagraphPosition(null);

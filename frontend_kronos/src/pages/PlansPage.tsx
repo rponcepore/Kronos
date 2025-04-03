@@ -6,6 +6,7 @@ import { PlanSummary } from "../types/frontend_types/PlanSummary";
 import { kronosApiCall } from "../helper_methods/ApiCall";
 import { KronosRequest } from "../types/networking_types/KronosRequest";
 import OrderCard from "../components/OrderCard";
+import { KronosOrderSummary } from "../types/frontend_types/KronosOrderSummary";
 
 // Main container component for the Plans page
 const PlansPage: React.FC = () => {
@@ -20,7 +21,8 @@ const PlansPage: React.FC = () => {
   const [plans, setPlans] = useState<PlanSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedOrder, setSelectedOrder] = useState<number | null>(null);
+  const [selectedOrder, setSelectedOrder] = useState<KronosOrderSummary | null>(null);
+  const [selectedUnit, setSelectedUnit] = useState("WJH8AA");
 
   // ----------------------------
   // Extract data from dummyData
@@ -98,38 +100,55 @@ const PlansPage: React.FC = () => {
             paragraphs: order.paragraphs || []
           });
         }
-        setSelectedOrder(orderId);
+        setSelectedOrder(order);
       }
     } catch (err) {
       console.error('Error fetching order details:', err);
     }
   };
 
-  const handleAddParagraph = async (beforeId: number, indentLevel: number, ordinalSequence: number, parentParagraph: number | null) => {
+  const handleAddParagraph = async (
+    beforeId: number,
+    indentLevel: number,
+    ordinalSequence: number,
+    parentParagraph: number | null,
+    title: string,
+    text: string
+  ) => {
     try {
-      const req: KronosRequest = {
+      const request: KronosRequest = {
         action: "add_paragraph",
-        unit: "WJH8AA",
-        plan_id: selectedPlan?.data.id || null,
-        order_id: selectedOrder || null,
+        unit: selectedUnit,
+        plan_id: selectedPlan?.data.id ?? null,
+        order_id: selectedOrder?.data.id ?? null,
         paragraph_id: beforeId,
         task_id: null,
         indent_level: indentLevel,
         ordinal_sequence: ordinalSequence,
-        parent_paragraph: parentParagraph
+        parent_paragraph: parentParagraph,
+        title: title,
+        text: text
       };
-      const response = await kronosApiCall(req);
-      if (response.paragraphs_vec) {
-        // Update the selected plan's paragraphs with the new paragraph
-        if (selectedPlan) {
-          setSelectedPlan({
-            ...selectedPlan,
-            paragraphs: [...(selectedPlan.paragraphs || []), response.paragraphs_vec[0]]
-          });
-        }
+
+      const response = await fetch("/api", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(request),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to add paragraph");
       }
-    } catch (err) {
-      console.error('Error adding paragraph:', err);
+
+      const data = await response.json();
+      // Refresh the paragraphs after adding a new one
+      if (selectedOrder) {
+        handleOrderSelect(selectedOrder.data.id);
+      }
+    } catch (error) {
+      console.error("Error adding paragraph:", error);
     }
   };
 
