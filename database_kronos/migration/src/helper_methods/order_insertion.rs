@@ -18,7 +18,7 @@ pub async fn get_plan_id(unit: &str, fiscal_year: i32, serial_number: i32, manag
     let query = Statement::from_string(
         manager.get_database_backend(),
         format!(
-            "SELECT id FROM {} WHERE unit = '{}' AND fiscal_year = {} AND serial_number = {}",
+            "SELECT id FROM {} WHERE uic = '{}' AND fiscal_year = {} AND serial_number = {}",
             Plan::Table.to_string(),
             unit, // "WJH8AA"
             fiscal_year, // 25
@@ -274,8 +274,8 @@ pub async fn insert_paragraph_into_db(
                 order_id.clone().into(),
                 ordinal_sequence.clone().into(),
                 indent_level.clone().into(),
-                paragraph.title.clone().into(),
-                paragraph.text.clone().into(),
+                paragraph.title.into(),
+                paragraph.text.into(),
                 parent_paragraph_id.clone().into()
                 ]) 
             .to_owned()

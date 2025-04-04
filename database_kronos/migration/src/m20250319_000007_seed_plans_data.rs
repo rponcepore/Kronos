@@ -30,7 +30,7 @@ impl MigrationTrait for Migration {
         for plan in plan_vec{
             let insert = Query::insert()
                 .into_table(Plan::Table)
-                .columns([  Plan::Unit, 
+                .columns([  Plan::Uic, 
                             Plan::FiscalYear, 
                             Plan::SerialNumber, 
                             Plan::Name, 

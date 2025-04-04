@@ -28,11 +28,11 @@ pub fn spawn_app() -> String {
 pub fn no_db_plan_req() -> KronosRequest {
     KronosRequest { 
         api_method: Some("get_plans".to_string()), 
-        unit: Some("tstUIC".to_string()),
-        order_id: None,
-        paragraph_id: None,
-        task_id: None,
+        uic: Some("tstUIC".to_string()),
         plan_request: None,
+        order_request: None,
+        paragraph_request: None,
+        task_request: None,
     }
 }
 
@@ -40,11 +40,12 @@ pub fn no_db_plan_req() -> KronosRequest {
 pub fn with_db_plan_req() -> KronosRequest {
     KronosRequest { 
         api_method: Some("get_plans".to_string()), 
-        unit: Some("WJH8C0".to_string()),
-        order_id: None,
-        paragraph_id: None,
-        task_id: None,
+        uic: Some("WJH8C0".to_string()),
         plan_request: None,
+        order_request: None,
+        paragraph_request: None,
+        task_request: None,
+        
     }
 }
 
@@ -52,11 +53,11 @@ pub fn with_db_plan_req() -> KronosRequest {
 pub fn dummy_plan_request() -> KronosRequest {
     let result = KronosRequest{
         api_method: Some("get_plans".to_string()),
-        unit: Some("WHJ8C0".to_string()),
-        order_id: None,
-        paragraph_id: None,
-        task_id: None,
+        uic: Some("WHJ8C0".to_string()),
         plan_request: None,
+        order_request: None,
+        paragraph_request: None,
+        task_request: None,
     };
     result
 }

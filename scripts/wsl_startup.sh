@@ -67,6 +67,12 @@ source "./scripts/init_db.sh"
 # Database should be ready to go. 
 cd "${BACKEND_DIR}"
 
+# Generate the new entities. 
+sea-orm-cli generate entity \
+        -u postgres://postgres:password@localhost:5432/kronos_db \
+        -o src/models/entities \
+        --with-serde both
+
 cargo test
 
 #If all tests pass, can start up the backend

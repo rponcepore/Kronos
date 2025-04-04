@@ -22,7 +22,7 @@ use crate::routes::api::api_methods::plans_api::plans_api_utilities::*;
 
 pub async fn create_plan(valid_req: Json<KronosRequest>) ->  Result<KronosResponse, KronosApiError>  {
     // Read out unit name. 
-    let uic = match &valid_req.unit {
+    let uic = match &valid_req.uic {
         Some(uic) =>  uic,
         None => return Err(KronosApiError::Unknown("Deserialization error: unit string failure.".to_string())),
     };
@@ -56,7 +56,7 @@ pub async fn create_plan(valid_req: Json<KronosRequest>) ->  Result<KronosRespon
         name: ActiveValue::Set(plan_name.to_owned()),
         fiscal_year: ActiveValue::Set(fiscal_year),
         serial_number: ActiveValue::Set(max_current_plan_number+1),
-        unit: ActiveValue::Set(uic.to_owned()),
+        uic: ActiveValue::Set(uic.to_owned()),
         classification: ActiveValue::Set("CUI".to_owned()),
         parent_plan: ActiveValue::Set(None),
         ..Default::default()

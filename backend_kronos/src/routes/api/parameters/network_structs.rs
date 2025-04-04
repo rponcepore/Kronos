@@ -2,7 +2,10 @@
 
 use serde::{Serialize, Deserialize};
 
+use super::order_request::OrderRequest;
 use super::plan_request::PlanRequest;
+use super::paragraph_request::ParagraphRequest;
+use super::task_request::TaskRequest;
 // For incomign requests.
 use crate::models::entities::*;
 // For outgoing responses.
@@ -19,13 +22,12 @@ use crate::models::entity_summaries::{
 pub struct KronosRequest {
     //pub request_id: Integer,
     pub api_method: Option<String>,
-    pub unit: Option<String>,
-    pub order_id: Option<i32>,
-    pub paragraph_id: Option<i32>,
-    pub task_id: Option<i32>,
+    pub uic: Option<String>,
     // Basic fields for easy access
     pub plan_request: Option<PlanRequest>,
-    
+    pub order_request: Option<OrderRequest>,
+    pub paragraph_request: Option<ParagraphRequest>,
+    pub task_request: Option<TaskRequest>,
 }
 
 #[derive(serde::Deserialize, Serialize)]

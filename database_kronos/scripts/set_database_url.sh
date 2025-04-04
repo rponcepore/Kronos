@@ -35,3 +35,6 @@ export DATABASE_URL
 
 echo "env variable \"DATABASE_URL\" set to:"
 printenv DATABASE_URL
+
+cd $EXPECTED_DIR
+cd migration

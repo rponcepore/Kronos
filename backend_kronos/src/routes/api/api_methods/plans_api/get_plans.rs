@@ -18,11 +18,11 @@ pub async fn get_plans(req: Json<KronosRequest>) -> Result<KronosResponse, Krono
     dprintln!("get_plans method called. ");
 
     // TODO: Delete this bad, very bad, hack, that is used only for development:
-    if req.unit.as_deref().unwrap_or("") == "tstUIC" { // This is a same unwrap because unit was already checked for None
+    if req.uic.as_deref().unwrap_or("") == "tstUIC" { // This is a same unwrap because unit was already checked for None
         let plan_vec = vec![
             plan::Model {
                 id: 1,
-                unit: "WJH8C0".to_string(),
+                uic: "WJH8C0".to_string(),
                 parent_plan: None,
                 fiscal_year: 2025,
                 serial_number: 1,
@@ -31,7 +31,7 @@ pub async fn get_plans(req: Json<KronosRequest>) -> Result<KronosResponse, Krono
             },
             plan::Model {
                 id: 2,
-                unit: "WJH8C0".to_string(),
+                uic: "WJH8C0".to_string(),
                 parent_plan: None,
                 fiscal_year: 2025,
                 serial_number: 2,
@@ -40,7 +40,7 @@ pub async fn get_plans(req: Json<KronosRequest>) -> Result<KronosResponse, Krono
             },
             plan::Model {
                 id: 3,
-                unit: "WJH8C0".to_string(),
+                uic: "WJH8C0".to_string(),
                 parent_plan: None,
                 fiscal_year: 2025,
                 serial_number: 3,
@@ -61,7 +61,7 @@ pub async fn get_plans(req: Json<KronosRequest>) -> Result<KronosResponse, Krono
             units_vec: None,
         };
         return Ok(kronos_response);
-    } //END of teh very bad hack that should be deleted. (I need to install mocking, oof.)
+    } //END of the very bad hack that should be deleted. (I need to install mocking, oof.)
 
     // NORMAL execution:
     // Connect to the database
@@ -70,14 +70,14 @@ pub async fn get_plans(req: Json<KronosRequest>) -> Result<KronosResponse, Krono
         Err(error) => return Err(KronosApiError::DbErr(error)),
     };
 
-    let unit_str = match &req.unit {
-        Some(unit) => unit.as_str(),
-        None => return Err(KronosApiError::Unknown("Deserialization error: unit string failure.".to_string())),
+    let unit_str = match &req.uic {
+        Some(uic) => uic.as_str(),
+        None => return Err(KronosApiError::Unknown("Deserialization error: uic string failure.".to_string())),
     };
 
     // Get all the plans for that unit
     let plan_vec: Vec<plan::Model> = match Plan::find()
-        .filter(plan::Column::Unit.contains(unit_str))
+        .filter(plan::Column::Uic.contains(unit_str))
         .order_by_asc(plan::Column::FiscalYear)
         .order_by_asc(plan::Column::SerialNumber)
         .all(&db)

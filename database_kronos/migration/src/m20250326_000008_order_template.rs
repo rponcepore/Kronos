@@ -32,7 +32,7 @@ impl MigrationTrait for Migration {
         let insert = Query::insert()
             .into_table(Plan::Table)
             .columns([  
-                Plan::Unit, 
+                Plan::Uic, 
                 Plan::FiscalYear, 
                 Plan::SerialNumber, 
                 Plan::Name, 
@@ -76,7 +76,7 @@ impl MigrationTrait for Migration {
         let query = Statement::from_string(
             manager.get_database_backend(),
             format!(
-                "SELECT id FROM {} WHERE unit = '{}' AND fiscal_year = {} AND serial_number = {}",
+                "SELECT id FROM {} WHERE uic = '{}' AND fiscal_year = {} AND serial_number = {}",
                 Plan::Table.to_string(),
                 plan.0, // "TEMPLT"
                 plan.1, // 0

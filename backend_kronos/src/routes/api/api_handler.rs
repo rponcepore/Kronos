@@ -45,7 +45,7 @@ use crate::routes::api::parameters::network_structs::*;
  */
 pub async fn api_handler(kronos_request_as_json: Result<web::Json<KronosRequest>, actix_web::Error>) -> impl Responder {
 
-    // Check for a valid request and that unit and api_method are not null.
+    // Check for a valid request and that uic and api_method are not null.
     let valid_req: Json<KronosRequest> = match kronos_request_as_json{
         Ok(req) => match is_request_valid(req).await{
             Ok(valid_req) => valid_req,
@@ -54,7 +54,7 @@ pub async fn api_handler(kronos_request_as_json: Result<web::Json<KronosRequest>
         Err(msg) => return HttpResponse::BadRequest().body(format!("Invalid JSON: {}\n", msg)),
     };
 
-    // a valid_req has no null values for either api_method or unit, so we can unwrap without worry.
+    // a valid_req has no null values for either api_method or uic, so we can unwrap without worry.
     // Also, even though unwrap() will panic (and crash the program) if it fails, I want to crash
     // because it means my is_valid_request function failed.
     let api_method = valid_req.api_method.as_ref().unwrap().as_str();
@@ -102,7 +102,7 @@ pub async fn api_handler(kronos_request_as_json: Result<web::Json<KronosRequest>
     }
 }
 
-// Invariant: Valid requests always have, at a minimum, a unit and an api_method.
+// Invariant: Valid requests always have, at a minimum, a uic and an api_method.
 // This method occurs AFTER deserialization is proven successful.
 async fn is_request_valid(req: Json<KronosRequest>) -> Result< Json<KronosRequest>, HttpResponse> {
     // Deserialization successful
@@ -113,8 +113,8 @@ async fn is_request_valid(req: Json<KronosRequest>) -> Result< Json<KronosReques
         return Err(HttpResponse::BadRequest().body(format!("Request api_method field is null.")));
     }
     
-    if req.unit.is_none(){
-        return Err(HttpResponse::BadRequest().body(format!("Request unit field is null.")));
+    if req.uic.is_none(){
+        return Err(HttpResponse::BadRequest().body(format!("Request uic field is null.")));
     }
 
     return Ok(req);
@@ -125,11 +125,11 @@ impl KronosRequest {
     pub fn new() -> Self {
         Self {
             api_method: None,
-            unit: None,
-            order_id: None,
-            paragraph_id: None,
-            task_id: None,
+            uic: None,
             plan_request: None,
+            order_request: None,
+            paragraph_request: None,
+            task_request: None,
         }
     }
 
@@ -138,8 +138,8 @@ impl KronosRequest {
         self
     }
 
-    pub fn with_unit(mut self, unit: String) -> Self {
-        self.unit = Some(unit);
+    pub fn with_unit(mut self, uic: String) -> Self {
+        self.uic = Some(uic);
         self
     }
 
