@@ -12,6 +12,8 @@ echo "This script also assumes that your docker daemon is running. Most commonly
 # Get the project root directory (parent of scripts directory)
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
+echo "PROJECT ROOT: ${PROJECT_ROOT}"
+
 # Important directories:
 DATABASE_DIR="${PROJECT_ROOT}/database_kronos"
 BACKEND_DIR="${PROJECT_ROOT}/backend_kronos"
@@ -46,6 +48,8 @@ if ! [ -x "$(command -v psql)" ]; then
   echo >&2 "Use:"
   if [[ "$OSTYPE" == "darwin"* ]]; then
     echo >&2 "    brew install postgresql@14"
+    brew install zstd
+    export PKG_CONFIG_PATH="/opt/homebrew/lib/pkgconfig"
   else
     echo >&2 "    sudo apt-get install postgresql-client"
   fi
