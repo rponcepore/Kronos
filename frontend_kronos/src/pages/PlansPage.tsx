@@ -7,6 +7,7 @@ import { kronosApiCall } from "../helper_methods/ApiCall";
 import { KronosRequest } from "../types/networking_types/KronosRequest";
 import OrderCard from "../components/OrderCard";
 import { KronosOrderSummary } from "../types/frontend_types/KronosOrderSummary";
+import { KronosAction } from "../types/networking_types/NetworkEnums";
 
 // Main container component for the Plans page
 const PlansPage: React.FC = () => {
@@ -34,7 +35,7 @@ const PlansPage: React.FC = () => {
         setLoading(true);
         setError(null);
         const req: KronosRequest = {
-          action: "get_plans",
+          action: KronosAction.get_plans,
           unit: "WJH8AA",
           plan_id: null,
           order_id: null,
@@ -79,7 +80,7 @@ const PlansPage: React.FC = () => {
   const handleOrderSelect = async (orderId: number) => {
     try {
       const req: KronosRequest = {
-        action: "get_order",
+        action: KronosAction.get_order,
         unit: "WJH8AA",
         plan_id: null,
         order_id: orderId,
@@ -117,7 +118,7 @@ const PlansPage: React.FC = () => {
   ) => {
     try {
       const request: KronosRequest = {
-        action: "add_paragraph",
+        action: KronosAction.create_paragraph,
         unit: selectedUnit,
         plan_id: selectedPlan?.data.id ?? null,
         order_id: selectedOrder?.data.id ?? null,

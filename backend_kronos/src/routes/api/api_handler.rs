@@ -34,11 +34,6 @@ pub struct KronosRequest {
     pub order_id: Option<i32>,
     pub paragraph_id: Option<i32>,
     pub task_id: Option<i32>,
-    pub indent_level: Option<i32>,
-    pub ordinal_sequence: Option<i32>,
-    pub parent_paragraph: Option<i32>,
-    pub title: Option<String>,
-    pub text: Option<String>,
 }
 
 #[derive(serde::Deserialize, Serialize)]
@@ -120,6 +115,14 @@ pub async fn api_handler(kronos_request_as_json: Result<web::Json<KronosRequest>
     }
 }
 
+pub async fn access_kronos_database() -> Result<DatabaseConnection, DbErr> {
+    let configuration = get_configuration().expect("Failed to read configuration.");
+    dprintln!("Configuration read successfully.");
+    let connection_string = configuration.database.connection_string();
+    dprintln!("Connection string: {}", connection_string);
+    Database::connect(connection_string).await 
+}
+
 // Invariant: Valid requests always have, at a minimum, a unit and an action.
 // This method occurs AFTER deserialization is proven successful.
 async fn is_request_valid(req: Json<KronosRequest>) -> Result< Json<KronosRequest>, HttpResponse> {
@@ -147,11 +150,6 @@ impl KronosRequest {
             order_id: None,
             paragraph_id: None,
             task_id: None,
-            indent_level: None,
-            ordinal_sequence: None,
-            parent_paragraph: None,
-            title: None,
-            text: None,
         }
     }
 

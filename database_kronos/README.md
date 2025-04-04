@@ -47,3 +47,12 @@
     ```sh
     cargo run -- status
     ```
+For mac users (OLivia)
+run this in the migrations folder (once per shell)
+# Only need to do this once per shell (or add to ~/.zshrc)
+export ZSTD_STATIC=0
+export PKG_CONFIG_PATH="/opt/homebrew/opt/zstd/lib/pkgconfig"
+
+# Then in your Rust project folder:
+cargo clean
+cargo run
