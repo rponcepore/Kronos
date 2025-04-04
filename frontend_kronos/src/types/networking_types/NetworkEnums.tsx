@@ -1,6 +1,6 @@
 //! NetworkEnums.tsx
 
-export enum KronosAction {
+export enum KronosApiMethod {
     // Plans CRUD
     get_plans = "get_plans", //Note; done in aggregate
     create_plan = "create_plan",
@@ -9,7 +9,7 @@ export enum KronosAction {
     // Orders CRUD
     get_order = "get_order",
     create_order = "create_order",
-    edit_order = "update_oder", // Probably never used.
+    edit_order = "edit_order", // Probably never used.
     delete_order = "delete_order",
     // Paragraphs CRUD
     get_paragraph = "get_paragraph", // Probably never used

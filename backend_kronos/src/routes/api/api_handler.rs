@@ -21,41 +21,22 @@ use crate::models::entity_summaries::unit_summary::UnitSummary;
 
 // Include our database configs
 use crate::configuration::get_configuration;
-use crate::routes::api::api_methods::*;
-
-#[derive(serde::Deserialize, Serialize)]
-#[derive(Debug)]
-pub struct KronosRequest {
-    //pub request_id: Integer,
-    //pub http_method: Option<String>,
-    pub action: Option<String>,
-    pub unit: Option<String>,
-    pub order_id: Option<i32>,
-    pub paragraph_id: Option<i32>,
-    pub task_id: Option<i32>,
-}
-
-#[derive(serde::Deserialize, Serialize)]
-#[derive(Debug)]
-pub struct KronosResponse {
-    pub kronos_request: KronosRequest,
-    pub plans_vec: Option< Vec<PlanSummary>>,
-    pub orders_vec: Option< Vec<KronosOrderSummary>>,
-    pub paragraphs_vec: Option< Vec<ParagraphSummary>>,
-    pub units_vec: Option< Vec<UnitSummary> >,
-}
-
-pub enum KronosApiError  {
-    DbErr(sea_orm::DbErr),
-    ActixError(actix_web::Error),
-    NotImplemented(String),
-    BadRequest(String),
-    ExpectedDataNotPresent(String),
-    Unknown(String),
-}
+use crate::routes::api::api_methods::{
+    plans_api::{
+        get_plans::*,
+        create_plan::*,
+        *
+    },
+    orders_api::{
+        get_order::*,
+        *,
+    },
+    *
+};
+use crate::routes::api::parameters::network_structs::*;
 
 /*
- * Core API call handler for the application, matching JSON "action" parameter 
+ * Core API call handler for the application, matching JSON "api_method" parameter 
  * to the correct function call.
  * This handler can only be called if the content type of the http request (in the header!) is JSON,
  * and the content of the request can be deserialized to a "KronosRequest" struct
@@ -64,7 +45,7 @@ pub enum KronosApiError  {
  */
 pub async fn api_handler(kronos_request_as_json: Result<web::Json<KronosRequest>, actix_web::Error>) -> impl Responder {
 
-    // Check for a valid request and that unit and action are not null.
+    // Check for a valid request and that unit and api_method are not null.
     let valid_req: Json<KronosRequest> = match kronos_request_as_json{
         Ok(req) => match is_request_valid(req).await{
             Ok(valid_req) => valid_req,
@@ -73,12 +54,12 @@ pub async fn api_handler(kronos_request_as_json: Result<web::Json<KronosRequest>
         Err(msg) => return HttpResponse::BadRequest().body(format!("Invalid JSON: {}\n", msg)),
     };
 
-    // a valid_req has no null values for either action or unit, so we can unwrap without worry.
+    // a valid_req has no null values for either api_method or unit, so we can unwrap without worry.
     // Also, even though unwrap() will panic (and crash the program) if it fails, I want to crash
     // because it means my is_valid_request function failed.
-    let action = valid_req.action.as_ref().unwrap().as_str();
+    let api_method = valid_req.api_method.as_ref().unwrap().as_str();
 
-    let kronos_response: Result<KronosResponse, KronosApiError> = match action {
+    let kronos_response: Result<KronosResponse, KronosApiError> = match api_method {
         // Plans actions
         "create_plan" => create_plan(valid_req).await,
         "get_plans" => get_plans(valid_req).await,
@@ -89,8 +70,8 @@ pub async fn api_handler(kronos_request_as_json: Result<web::Json<KronosRequest>
         "create_paragraph" => Err(KronosApiError::NotImplemented("create_paragraph not implemented.".to_string())),
         "edit_paragraph" => Err(KronosApiError::NotImplemented("update_paragraph not implemented.".to_string())),
         "delete_paragraph" => Err(KronosApiError::NotImplemented("update_paragraph not implemented.".to_string())),
-        // Return a BadRequest response if the action was invalid.
-        _ => return HttpResponse::BadRequest().body(format!("Invalid action: {}\n", action)),
+        // Return a BadRequest response if the api_method was invalid.
+        _ => return HttpResponse::BadRequest().body(format!("Invalid api_method: {}\n", api_method)),
     };
 
     match kronos_response {
@@ -121,15 +102,15 @@ pub async fn api_handler(kronos_request_as_json: Result<web::Json<KronosRequest>
     }
 }
 
-// Invariant: Valid requests always have, at a minimum, a unit and an action.
+// Invariant: Valid requests always have, at a minimum, a unit and an api_method.
 // This method occurs AFTER deserialization is proven successful.
 async fn is_request_valid(req: Json<KronosRequest>) -> Result< Json<KronosRequest>, HttpResponse> {
     // Deserialization successful
     dprintln!("api_handler called, request body: {:?}", req);
 
-    // First, check if the action is null
-    if req.action.is_none(){
-        return Err(HttpResponse::BadRequest().body(format!("Request action field is null.")));
+    // First, check if the api_method is null
+    if req.api_method.is_none(){
+        return Err(HttpResponse::BadRequest().body(format!("Request api_method field is null.")));
     }
     
     if req.unit.is_none(){
@@ -143,16 +124,17 @@ async fn is_request_valid(req: Json<KronosRequest>) -> Result< Json<KronosReques
 impl KronosRequest {
     pub fn new() -> Self {
         Self {
-            action: None,
+            api_method: None,
             unit: None,
             order_id: None,
             paragraph_id: None,
             task_id: None,
+            plan_request: None,
         }
     }
 
-    pub fn with_action(mut self, action: String) -> Self {
-        self.action = Some(action);
+    pub fn with_action(mut self, api_method: String) -> Self {
+        self.api_method = Some(api_method);
         self
     }
 

@@ -1,16 +1,18 @@
 //! get_plans.rs
 
+// Basic imports
 use actix_web::web::Json;
 use sea_orm::*;
 use debug_print::debug_println as dprintln;
 
-use crate::models::entity_summaries::kronos_order_summary::KronosOrderSummary;
-use crate::models::entity_summaries::plan_summary::PlanSummary;
-use crate::routes::api::api_handler::{KronosApiError, KronosRequest, KronosResponse};
+// Network utilities
+use crate::routes::api::parameters::network_structs::*;
 use crate::utilities::database_tools::access_kronos_database;
 
 // Pull in our entities,
 use crate::models::entities::{prelude::*, *};
+use crate::models::entity_summaries::kronos_order_summary::KronosOrderSummary;
+use crate::models::entity_summaries::plan_summary::PlanSummary;
 
 pub async fn get_plans(req: Json<KronosRequest>) -> Result<KronosResponse, KronosApiError>  {
     dprintln!("get_plans method called. ");
@@ -158,7 +160,6 @@ async fn pack_plan_summary(plan: plan::Model, db: &DatabaseConnection) -> Result
 }
 
 async fn pack_orders_summary(order: kronos_order::Model, _db: &DatabaseConnection) -> Result<KronosOrderSummary, KronosApiError> {
-    
 
     let paragraph_vec_single_plan: Vec<paragraph::Model> = Vec::<paragraph::Model>::new();
     // Need to make a call to the database to retrieve this!
