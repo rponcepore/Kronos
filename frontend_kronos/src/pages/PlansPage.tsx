@@ -6,7 +6,7 @@ import { PlanSummary } from "../types/frontend_types/PlanSummary";
 import { kronosApiCall } from "../helper_methods/ApiCall";
 import { KronosRequest } from "../types/networking_types/KronosRequest";
 import OrderCard from "../components/OrderCard";
-import { KronosApiMethod } from "../types/networking_types/NetworkEnums";
+import { KronosApiMethod } from "../types/networking_types/KronosApiMethodEnums";
 
 // Main container component for the Plans page
 const PlansPage: React.FC = () => {

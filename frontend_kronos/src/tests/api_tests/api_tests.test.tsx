@@ -3,7 +3,7 @@ import { KronosRequest } from '../../types/networking_types/KronosRequest.tsx'
 import { PlanSummary } from '../../types/frontend_types/PlanSummary.tsx'
 import { kronosApiCall } from '../../helper_methods/ApiCall.tsx'
 import { KronosResponse } from '../../types/networking_types/KronosResponse.tsx'
-import { KronosApiMethod } from '../../types/networking_types/NetworkEnums.tsx'
+import { KronosApiMethod } from '../../types/networking_types/KronosApiMethodEnums.tsx'
 import { KronosOrderSummary } from '../../types/frontend_types/KronosOrderSummary.tsx'
 
 

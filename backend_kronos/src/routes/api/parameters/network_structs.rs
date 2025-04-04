@@ -18,7 +18,6 @@ use crate::models::entity_summaries::{
 #[derive(Debug)]
 pub struct KronosRequest {
     //pub request_id: Integer,
-    //pub http_method: Option<String>,
     pub api_method: Option<String>,
     pub unit: Option<String>,
     pub order_id: Option<i32>,
@@ -33,8 +32,8 @@ pub struct KronosRequest {
 #[derive(Debug)]
 pub struct KronosResponse {
     pub kronos_request: KronosRequest,
-    pub plans_vec: Option< Vec< PlanSummary>>,
-    pub orders_vec: Option< Vec< KronosOrderSummary>>,
+    pub plans_vec: Option< Vec< PlanSummary> >,
+    pub orders_vec: Option< Vec< KronosOrderSummary> >,
     pub paragraphs_vec: Option< Vec< ParagraphSummary>>,
     pub units_vec: Option< Vec< UnitSummary> >,
 }

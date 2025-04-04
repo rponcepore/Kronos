@@ -1,11 +1,17 @@
 //! KronosRequest.tsx
-import { KronosApiMethod } from "./NetworkEnums";
+import { KronosApiMethod } from "./KronosApiMethodEnums";
+import { PlanRequest } from "./PlanRequest";
+import { OrderRequest } from "./OrderRequest";
+import { ParagraphRequest } from "./ParagraphRequest";
+import { TaskRequest } from "./TaskRequest";
+
 // This file defines a request sent to the backend API.
 export type KronosRequest = {
     api_method: KronosApiMethod;
-    unit: string;
-    plan_id: number | null;
-    order_id: number | null;
-    paragraph_id: number | null;
-    task_id: number | null;
+    uic: string;
+    // Note: new request subtypes.
+    plan_request: PlanRequest | null;
+    order_request: OrderRequest | null;
+    paragraph_request: ParagraphRequest | null;
+    task_request: TaskRequest | null;
 }
