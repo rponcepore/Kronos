@@ -1,2 +1,2 @@
-pub mod get_plans;
+pub mod plans_api;
 pub mod get_order;

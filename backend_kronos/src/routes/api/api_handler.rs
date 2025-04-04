@@ -21,8 +21,7 @@ use crate::models::entity_summaries::unit_summary::UnitSummary;
 
 // Include our database configs
 use crate::configuration::get_configuration;
-use crate::routes::api::api_methods::get_plans::get_plans;
-use crate::routes::api::api_methods::get_order::get_order;
+use crate::routes::api::api_methods::*;
 
 #[derive(serde::Deserialize, Serialize)]
 #[derive(Debug)]
@@ -43,7 +42,7 @@ pub struct KronosResponse {
     pub plans_vec: Option< Vec<PlanSummary>>,
     pub orders_vec: Option< Vec<KronosOrderSummary>>,
     pub paragraphs_vec: Option< Vec<ParagraphSummary>>,
-    pub units_vec: Option< Vec<UnitSummary>>,
+    pub units_vec: Option< Vec<UnitSummary> >,
 }
 
 pub enum KronosApiError  {
@@ -80,9 +79,16 @@ pub async fn api_handler(kronos_request_as_json: Result<web::Json<KronosRequest>
     let action = valid_req.action.as_ref().unwrap().as_str();
 
     let kronos_response: Result<KronosResponse, KronosApiError> = match action {
+        // Plans actions
+        "create_plan" => create_plan(valid_req).await,
         "get_plans" => get_plans(valid_req).await,
+        // Orders actions
         "get_order" => get_order(valid_req).await,
-        "update_paragraph" => Err(KronosApiError::NotImplemented("update_paragraph not implemented.".to_string())),
+        // Paragraph actions
+        "get_paragraph" => Err(KronosApiError::NotImplemented("get_paragraph not implemented.".to_string())),
+        "create_paragraph" => Err(KronosApiError::NotImplemented("create_paragraph not implemented.".to_string())),
+        "edit_paragraph" => Err(KronosApiError::NotImplemented("update_paragraph not implemented.".to_string())),
+        "delete_paragraph" => Err(KronosApiError::NotImplemented("update_paragraph not implemented.".to_string())),
         // Return a BadRequest response if the action was invalid.
         _ => return HttpResponse::BadRequest().body(format!("Invalid action: {}\n", action)),
     };
