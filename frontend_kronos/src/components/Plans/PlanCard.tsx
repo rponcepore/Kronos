@@ -24,7 +24,7 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan, selectPlan }) => {
       <p className="plan-subtitle">FY {plan.data.fiscal_year} Base Plan</p>
 
       {/* Display key metadata about the plan */}
-      <p><strong>Unit:</strong> {plan.data.unit}</p>
+      <p><strong>UIC:</strong> {plan.data.uic}</p>
       <p><strong>Classification:</strong> {plan.data.classification}</p>
 
       {/* Serial number formatted for display */}
