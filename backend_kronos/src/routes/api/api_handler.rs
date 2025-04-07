@@ -8,7 +8,6 @@ use actix_web::{
     Responder
     };
     
-use sea_orm::*;
 use serde::Serialize;
 use debug_print::debug_println as dprintln;
 
@@ -30,6 +29,11 @@ use crate::routes::api::api_methods::{
     orders_api::{
         get_order::*,
         *,
+    },
+    paragraph_api::{
+        edit_paragraph::*,
+        insert_paragraph::*,
+        delete_paragraph::*,
     },
     *
 };
@@ -67,7 +71,7 @@ pub async fn api_handler(kronos_request_as_json: Result<web::Json<KronosRequest>
         "get_order" => get_order(valid_req).await,
         // Paragraph actions
         "get_paragraph" => Err(KronosApiError::NotImplemented("get_paragraph not implemented.".to_string())),
-        "create_paragraph" => Err(KronosApiError::NotImplemented("create_paragraph not implemented.".to_string())),
+        "insert_paragraph" => insert_paragraph(valid_req).await,
         "edit_paragraph" => Err(KronosApiError::NotImplemented("update_paragraph not implemented.".to_string())),
         "delete_paragraph" => Err(KronosApiError::NotImplemented("update_paragraph not implemented.".to_string())),
         // Return a BadRequest response if the api_method was invalid.
