@@ -34,11 +34,11 @@ const PlansPage: React.FC = () => {
         setError(null);
         const req: KronosRequest = {
           api_method: KronosApiMethod.get_plans,
-          unit: "WJH8AA",
-          plan_id: null,
-          order_id: null,
-          paragraph_id: null,
-          task_id: null
+          uic: "WJH8AA",
+          plan_request: null,
+          order_request: null,
+          paragraph_request: null,
+          task_request: null
         };
         const response = await kronosApiCall(req);
         console.log('Response:', response);
@@ -79,11 +79,11 @@ const PlansPage: React.FC = () => {
     try {
       const req: KronosRequest = {
         api_method: KronosApiMethod.get_order,
-        unit: "WJH8AA",
-        plan_id: null,
-        order_id: orderId,
-        paragraph_id: null,
-        task_id: null
+        uic: "WJH8AA",
+        plan_request: null,
+        order_request:{ order_id: orderId, parent_plan_id: null, order_type: null },
+        paragraph_request: null,
+        task_request: null
       };
       const response = await kronosApiCall(req);
       if (response.orders_vec && response.orders_vec[0]) {
@@ -96,7 +96,6 @@ const PlansPage: React.FC = () => {
           setSelectedPlan({
             ...selectedPlan,
             orders: updatedOrders,
-            paragraphs: order.paragraphs || []
           });
         }
         setSelectedOrder(orderId);
@@ -106,6 +105,18 @@ const PlansPage: React.FC = () => {
     }
   };
 
+  //filtering and sorting logic for orders that are under a plan
+  const filteredOrders = selectedPlan?.orders
+  .filter((o) =>
+    o.data.order_type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    String(o.data.serial_number).includes(searchTerm)
+  )
+  .sort((a, b) => {
+    if (sortBy === "alpha") return a.data.order_type.localeCompare(b.data.order_type);
+    if (sortBy === "year") return a.data.serial_number - b.data.serial_number;
+    return 0;
+  }) || [];
+
   if (loading) {
     return <div className="p-6">Loading plans...</div>;
   }
@@ -114,16 +125,39 @@ const PlansPage: React.FC = () => {
     return <div className="p-6 text-red-500">Error: {error}</div>;
   }
 
+  //Buttons for the page where orders are displayed under a plan
+  //mirros the same format of the plans page top buttons
   return (
     <div className="plans-page-wrapper">
       {selectedPlan ? (
         <div className="plan-details">
-          {/* Header section with plan info and back button */}
-          <div className="plan-header">
-            <h1>{selectedPlan.data.name}</h1>
-            <p>Unit: {selectedPlan.data.unit}</p>
-            <p>Fiscal Year: {selectedPlan.data.fiscal_year}</p>
-            <button onClick={() => setSelectedPlan(null)}>Back to Plans</button>
+          {/* Header section with plan info and buttons*/}
+          <div className="top-controls mb-6 flex gap-4 flex-wrap">
+          <button className="control-btn" onClick={() => setSelectedPlan(null)}>← Back to Plans</button>
+          <button className="control-btn" onClick={() => setSortBy("alpha")}>
+              Order A–Z
+            </button>
+            <button className="control-btn" onClick={() => setSortBy("year")}>
+              Order by Year
+            </button>
+            <button className="control-btn" onClick={() => alert("Create WARNORD")}>
+              <span className="plus-icon">＋</span> New WARNORD
+            </button>
+            <button className="control-btn" onClick={() => alert("Create OPORD")}>
+              <span className="plus-icon">＋</span> New OPORD
+            </button>
+            <button className="control-btn" onClick={() => alert("Create FRAGORD")}>
+              <span className="plus-icon">＋</span> New FRAGORD
+            </button>
+
+            {/*search field*/} 
+            <input
+              type="text"
+              className="control-input"
+              placeholder="Search orders..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </div>
 
           {/* Orders section */}
@@ -136,7 +170,7 @@ const PlansPage: React.FC = () => {
                   order={order}
                   parentPlanFiscalYear={selectedPlan.data.fiscal_year}
                   selectOrder={() => handleOrderSelect(order.data.id)}
-                  paragraphs={selectedPlan.paragraphs?.filter((p) => p.data.order === order.data.id) || []}
+                  paragraphs={order.paragraphs || []}
                 />
               ))}
             </div>
@@ -158,6 +192,9 @@ const PlansPage: React.FC = () => {
             <button className="control-btn" onClick={() => setSortBy("year")}>
               Order by Year
             </button>
+              <button className="control-btn new-plan-btn" onClick={() => alert("Create new plan")}>
+                <span className="plus-icon">＋</span> New Plan
+              </button>
 
             {/* Search input for plan name */}
             <input

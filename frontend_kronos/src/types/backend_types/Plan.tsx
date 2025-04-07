@@ -18,7 +18,7 @@ import { Classification } from "../enums/Classification";
 export type Plan = {
 
     id: number,
-    unit: String,
+    uic: String,
     parent_plan: number | null, // can be null,
     fiscal_year: number,
     serial_number: number,
