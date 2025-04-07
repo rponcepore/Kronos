@@ -86,6 +86,7 @@ test('edit_paragraph api test', async () => {
     
 
     // This should reset all the things
+    // Honestly if one of these fails it's entirely my fault. 
     let response2_revert: KronosResponse = await kronosApiCall(req2_revert);
     expect(response2_revert.paragraphs_vec); //should not be null
     expect(response2_revert.paragraphs_vec?.length).toBe(1); //should only be of size one.
