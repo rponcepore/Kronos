@@ -35,11 +35,11 @@ const PlansPage: React.FC = () => {
         setError(null);
         const req: KronosRequest = {
           api_method: KronosApiMethod.get_plans,
-          unit: "WJH8AA",
-          plan_id: null,
-          order_id: null,
-          paragraph_id: null,
-          task_id: null
+          uic: "WJH8AA",
+          plan_request: null,
+          order_request: null,
+          paragraph_request: null,
+          task_request: null
         };
         const response = await kronosApiCall(req);
         console.log('Response:', response);
@@ -80,11 +80,15 @@ const PlansPage: React.FC = () => {
     try {
       const req: KronosRequest = {
         api_method: KronosApiMethod.get_order,
-        unit: "WJH8AA",
-        plan_id: null,
-        order_id: orderId,
-        paragraph_id: null,
-        task_id: null
+        uic: "WJH8AA",
+        plan_request: null,
+        order_request: {
+          order_id: orderId,
+          parent_plan_id: selectedPlan?.data.id ?? null,
+          order_type: null
+        },
+        paragraph_request: null,
+        task_request: null
       };
       const response = await kronosApiCall(req);
       if (response.orders_vec && response.orders_vec[0]) {
@@ -96,8 +100,7 @@ const PlansPage: React.FC = () => {
           );
           setSelectedPlan({
             ...selectedPlan,
-            orders: updatedOrders,
-            paragraphs: order.paragraphs || []
+            orders: updatedOrders
           });
         }
         setSelectedOrder(order);
@@ -117,35 +120,29 @@ const PlansPage: React.FC = () => {
   ) => {
     try {
       const request: KronosRequest = {
-        action: KronosAction.create_paragraph,
-        unit: selectedUnit,
-        plan_id: selectedPlan?.data.id ?? null,
-        order_id: selectedOrder?.data.id ?? null,
-        paragraph_id: beforeId,
-        task_id: null,
-        indent_level: indentLevel,
-        ordinal_sequence: ordinalSequence,
-        parent_paragraph: parentParagraph,
-        title: title,
-        text: text
+        api_method: KronosApiMethod.insert_paragraph,
+        uic: selectedUnit,
+        plan_request: null,
+        order_request: {
+          order_id: selectedOrder?.data.id ?? null,
+          parent_plan_id: selectedPlan?.data.id ?? null,
+          order_type: null
+        },
+        paragraph_request: {
+          paragraph_id: beforeId,
+          insert_method: "BELOW",
+          new_title: title,
+          new_text: text
+        },
+        task_request: null
       };
 
-      const response = await fetch("/api", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(request),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to add paragraph");
-      }
-
-      const data = await response.json();
-      // Refresh the paragraphs after adding a new one
-      if (selectedOrder) {
-        handleOrderSelect(selectedOrder.data.id);
+      const response = await kronosApiCall(request);
+      if (response.orders_vec) {
+        // Refresh the paragraphs after adding a new one
+        if (selectedOrder) {
+          handleOrderSelect(selectedOrder.data.id);
+        }
       }
     } catch (error) {
       console.error("Error adding paragraph:", error);
