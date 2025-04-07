@@ -4,13 +4,14 @@ use actix_web::web::Json;
 use sea_orm::*;
 use debug_print::debug_println as dprintln;
 
-use crate::models::entity_summaries::kronos_order_summary;
 use crate::models::entity_summaries::kronos_order_summary::KronosOrderSummary;
 use crate::models::entity_summaries::paragraph_summary::ParagraphSummary;
 use crate::models::entity_summaries::plan_summary::PlanSummary;
 use crate::routes::api::parameters::network_structs::*;
 use crate::utilities::database_tools::access_kronos_database;
 
+//helper methods
+use crate::routes::api::helper_methods::assemble_paragraph_summary::*;
 // Pull in our entities,
 use crate::models::entities::{prelude::*, *};
 
@@ -88,7 +89,7 @@ async fn build_order_summary(order: &kronos_order::Model, db: &DatabaseConnectio
 
     // For each paragraph returned, convert it into a ParagraphSummary. 
     for paragraph in result{
-        let paragraph_summary = assemble_paragraph(&paragraph, db).await?;
+        let paragraph_summary = assemble_paragraph_summary(&paragraph, db).await?;
         kronos_order_summary.paragraphs.as_mut().expect("Unwrapped a NONE when SOME was explicitly declared above. I'm panicking with the routine.").push(paragraph_summary);
     }
     
@@ -96,32 +97,4 @@ async fn build_order_summary(order: &kronos_order::Model, db: &DatabaseConnectio
 
 }
 
-async fn assemble_paragraph(paragraph: &paragraph::Model, db: &DatabaseConnection) -> Result<ParagraphSummary, DbErr> {
-    let mut paragraph_summary = ParagraphSummary{
-        data: paragraph.clone(),
-        subparagraphs: None,
-    };
-
-    // Get all paragraphs that have paragraph.ParentParagraph = paragraph.id
-    let result = paragraph::Entity::find()
-        .filter(paragraph::Column::ParentParagraph.eq(paragraph.id))
-        .all(db)
-        .await?;
-
-    match result.len() {
-        0 => {},
-        _ => {
-            paragraph_summary.subparagraphs = Some(Vec::<ParagraphSummary>::new());
-            for subparagraph in result{
-                let subparagraph_summary = Box::pin(async move {
-                    assemble_paragraph(&subparagraph, db)
-                    .await
-                }).await?;
-                paragraph_summary.subparagraphs.as_mut().expect("Unwrapped NONE when SOME was explicitly declared in get_order.rs").push(subparagraph_summary);
-            };
-        },
-    };
-    
-    Ok(paragraph_summary)
-}
 
