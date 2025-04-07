@@ -48,7 +48,7 @@ export enum KronosApiMethod {
 
     // Paragraphs CRUD
     get_paragraph = "get_paragraph", // Probably never used
-    create_paragraph = "create_paragraph", // Only to create subparagraphs; major paragraphs cannot be deleted/added 
+    insert_paragraph = "insert_paragraph", // Only to create subparagraphs; major paragraphs cannot be deleted/added 
     edit_paragraph = "edit_paragraph",
     delete_paragraph = "delete_paragraph",
 
