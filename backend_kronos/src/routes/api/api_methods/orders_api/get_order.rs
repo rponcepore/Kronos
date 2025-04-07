@@ -8,9 +8,7 @@ use crate::models::entity_summaries::kronos_order_summary;
 use crate::models::entity_summaries::kronos_order_summary::KronosOrderSummary;
 use crate::models::entity_summaries::paragraph_summary::ParagraphSummary;
 use crate::models::entity_summaries::plan_summary::PlanSummary;
-use crate::routes::api::api_handler::KronosApiError;
-use crate::routes::api::api_handler::KronosRequest;
-use crate::routes::api::api_handler::KronosResponse;
+use crate::routes::api::parameters::network_structs::*;
 use crate::utilities::database_tools::access_kronos_database;
 
 // Pull in our entities,
@@ -25,19 +23,22 @@ pub async fn get_order(req: Json<KronosRequest>) -> Result<KronosResponse, Krono
         Err(error) => return Err(KronosApiError::DbErr(error)),
     };
 
-    let unit_str = match &req.unit {
-        Some(unit) => unit.as_str(),
-        None => return Err(KronosApiError::Unknown("Deserialization error: unit string failure.".to_string())),
+    let unit_str = match &req.uic {
+        Some(uic) => uic.as_str(),
+        None => return Err(KronosApiError::Unknown("Deserialization error: uic string failure.".to_string())),
     };
 
-    let order_id: i32 = match &req.order_id {
-        Some(order_id) => *order_id,
-        None => return Err(KronosApiError::BadRequest("No order_id field provided with get_order request.".to_string())),
+    let order_id = match &req.order_request{
+        Some(order_request) => match &order_request.order_id {
+            Some(order_id) => order_id,
+            None => return Err(KronosApiError::BadRequest("No order_id field provided with get_order request.".to_string()))
+        },
+        None => return Err(KronosApiError::BadRequest("User did not provide an order request to initialize plan.".to_string())),
     };
 
     // We are being asked for the data within an order.
     // Get an order, serialize into an OrderSummary, and send back to the client.
-    let order: Option<kronos_order::Model> = match KronosOrder::find_by_id(order_id).one(&db).await
+    let order: Option<kronos_order::Model> = match KronosOrder::find_by_id(order_id.clone()).one(&db).await
         {
             Ok(order) => order,
             Err(msg) => return Err(KronosApiError::DbErr(msg)),

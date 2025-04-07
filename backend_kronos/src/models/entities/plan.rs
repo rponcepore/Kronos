@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i32,
-    pub unit: String,
+    pub uic: String,
     pub parent_plan: Option<i32>,
     pub fiscal_year: i32,
     pub serial_number: i32,
@@ -30,7 +30,7 @@ pub enum Relation {
     SelfRef,
     #[sea_orm(
         belongs_to = "super::unit::Entity",
-        from = "Column::Unit",
+        from = "Column::Uic",
         to = "super::unit::Column::Uic",
         on_update = "Cascade",
         on_delete = "SetNull"

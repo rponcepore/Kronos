@@ -1,83 +1,36 @@
 //! get_plans.rs
 
+// Basic imports
 use actix_web::web::Json;
 use sea_orm::*;
 use debug_print::debug_println as dprintln;
 
-use crate::models::entity_summaries::kronos_order_summary::KronosOrderSummary;
-use crate::models::entity_summaries::plan_summary::PlanSummary;
-use crate::routes::api::api_handler::KronosApiError;
-use crate::routes::api::api_handler::KronosRequest;
-use crate::routes::api::api_handler::KronosResponse;
+// Network utilities
+use crate::routes::api::parameters::network_structs::*;
 use crate::utilities::database_tools::access_kronos_database;
 
 // Pull in our entities,
 use crate::models::entities::{prelude::*, *};
+use crate::models::entity_summaries::kronos_order_summary::KronosOrderSummary;
+use crate::models::entity_summaries::plan_summary::PlanSummary;
 
 pub async fn get_plans(req: Json<KronosRequest>) -> Result<KronosResponse, KronosApiError>  {
     dprintln!("get_plans method called. ");
 
-    // TODO: Delete this bad, very bad, hack, that is used only for development:
-    if req.unit.as_deref().unwrap_or("") == "tstUIC" { // This is a same unwrap because unit was already checked for None
-        let plan_vec = vec![
-            plan::Model {
-                id: 1,
-                unit: "WJH8C0".to_string(),
-                parent_plan: None,
-                fiscal_year: 2025,
-                serial_number: 1,
-                classification: "Top Secret".to_string(),
-                name: "Operation Blackbeard".to_string(),
-            },
-            plan::Model {
-                id: 2,
-                unit: "WJH8C0".to_string(),
-                parent_plan: None,
-                fiscal_year: 2025,
-                serial_number: 2,
-                classification: "CUI".to_string(),
-                name: "Revenge Strategy".to_string(),
-            },
-            plan::Model {
-                id: 3,
-                unit: "WJH8C0".to_string(),
-                parent_plan: None,
-                fiscal_year: 2025,
-                serial_number: 3,
-                classification: "Secret".to_string(),
-                name: "Jack Sparrow's Gambit".to_string(),
-            },
-        ];
-        let mut sum_vec: Vec<PlanSummary> = Vec::new();
-        for plan in plan_vec {
-            let plan_summary: PlanSummary = PlanSummary { data: plan, orders: None, most_recent_mission: None };
-            sum_vec.push(plan_summary);
-        }
-        let kronos_response = KronosResponse {
-            kronos_request: req.into_inner(),
-            plans_vec: Some(sum_vec),
-            orders_vec: None,
-            paragraphs_vec: None,
-            units_vec: None,
-        };
-        return Ok(kronos_response);
-    } //END of teh very bad hack that should be deleted. (I need to install mocking, oof.)
-
-    // NORMAL execution:
     // Connect to the database
     let db = match access_kronos_database().await{
         Ok(db) => db,
         Err(error) => return Err(KronosApiError::DbErr(error)),
     };
 
-    let unit_str = match &req.unit {
-        Some(unit) => unit.as_str(),
-        None => return Err(KronosApiError::Unknown("Deserialization error: unit string failure.".to_string())),
+    let unit_str = match &req.uic {
+        Some(uic) => uic.as_str(),
+        None => return Err(KronosApiError::Unknown("Deserialization error: uic string failure.".to_string())),
     };
 
     // Get all the plans for that unit
     let plan_vec: Vec<plan::Model> = match Plan::find()
-        .filter(plan::Column::Unit.contains(unit_str))
+        .filter(plan::Column::Uic.contains(unit_str))
         .order_by_asc(plan::Column::FiscalYear)
         .order_by_asc(plan::Column::SerialNumber)
         .all(&db)
@@ -160,7 +113,6 @@ async fn pack_plan_summary(plan: plan::Model, db: &DatabaseConnection) -> Result
 }
 
 async fn pack_orders_summary(order: kronos_order::Model, _db: &DatabaseConnection) -> Result<KronosOrderSummary, KronosApiError> {
-    
 
     let paragraph_vec_single_plan: Vec<paragraph::Model> = Vec::<paragraph::Model>::new();
     // Need to make a call to the database to retrieve this!

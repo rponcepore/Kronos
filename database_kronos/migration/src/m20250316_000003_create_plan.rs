@@ -9,7 +9,7 @@ pub struct Migration;
 pub enum Plan {
     Table, // Special case, maped to "Unit" enum. 
     Id,
-    Unit,
+    Uic,
     ParentPlan,
     FiscalYear,
     SerialNumber,
@@ -41,11 +41,11 @@ impl MigrationTrait for Migration {
                             .on_delete(ForeignKeyAction::SetNull)
                             .on_update(ForeignKeyAction::Cascade), //TODO: is this a good idea?
                     )
-                    .col(ColumnDef::new(Plan::Unit).string().not_null())
+                    .col(ColumnDef::new(Plan::Uic).string().not_null())
                     .foreign_key(
                         ForeignKey::create() // bind the plan to the authoring unit
                             .name("fk-plan-unit-unit-uic")
-                            .from(Plan::Table, Plan::Unit)
+                            .from(Plan::Table, Plan::Uic)
                             .to(Unit::Table, Unit::Uic)
                             .on_delete(ForeignKeyAction::SetNull) // if the foreign entity is deleted, this entity is deleted.
                             .on_update(ForeignKeyAction::Cascade),

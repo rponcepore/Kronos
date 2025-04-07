@@ -1,2 +1,3 @@
-pub mod get_plans;
-pub mod get_order;
+pub mod plans_api;
+pub mod orders_api;
+pub mod paragraph_api;

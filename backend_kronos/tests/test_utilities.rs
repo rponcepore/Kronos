@@ -2,7 +2,7 @@
 
 // This file provides necessary support for the testing packages.
 use serde::{Serialize, Deserialize};
-use backend_kronos::routes::api::api_handler::KronosRequest;
+use backend_kronos::routes::api::parameters::network_structs::KronosRequest;
 use std::net::TcpListener;
 
 const RANDOM_PORT: &str = "127.0.0.1:0"; // This is a special case: says, "use local host, but bind port 0--any random port."
@@ -27,33 +27,37 @@ pub fn spawn_app() -> String {
 // This method builds a basic KronosRequest for when the database is not connected.
 pub fn no_db_plan_req() -> KronosRequest {
     KronosRequest { 
-        action: Some("get_plans".to_string()), 
-        unit: Some("tstUIC".to_string()),
-        order_id: None,
-        paragraph_id: None,
-        task_id: None
+        api_method: Some("get_plans".to_string()), 
+        uic: Some("tstUIC".to_string()),
+        plan_request: None,
+        order_request: None,
+        paragraph_request: None,
+        task_request: None,
     }
 }
 
 // This method builds a basic KronosRequest for when the database is connected.
 pub fn with_db_plan_req() -> KronosRequest {
     KronosRequest { 
-        action: Some("get_plans".to_string()), 
-        unit: Some("WJH8C0".to_string()),
-        order_id: None,
-        paragraph_id: None,
-        task_id: None
+        api_method: Some("get_plans".to_string()), 
+        uic: Some("WJH8C0".to_string()),
+        plan_request: None,
+        order_request: None,
+        paragraph_request: None,
+        task_request: None,
+        
     }
 }
 
 /* Return a dummy JSON for a post request asking for all plans */
 pub fn dummy_plan_request() -> KronosRequest {
     let result = KronosRequest{
-        action: Some("get_plans".to_string()),
-        unit: Some("WHJ8C0".to_string()),
-        order_id: None,
-        paragraph_id: None,
-        task_id: None
+        api_method: Some("get_plans".to_string()),
+        uic: Some("WHJ8C0".to_string()),
+        plan_request: None,
+        order_request: None,
+        paragraph_request: None,
+        task_request: None,
     };
     result
 }
