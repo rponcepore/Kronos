@@ -9,7 +9,6 @@ use crate::routes::api::parameters::network_structs::*;
 
 use crate::models::entities::{prelude::*, *};
 
-
 pub async fn get_target_record(
     paragraph_id: &i32,
     db: &DatabaseConnection,
@@ -90,8 +89,6 @@ pub async fn adjust_ordinal_sequence(
         ordinal_sequence: ActiveValue::Set(paragraph.ordinal_sequence + direction),
         indent_level: ActiveValue::NotSet,
     };
-
-    
 
     // Execution
     let result = match updated_paragraph.update(db).await {

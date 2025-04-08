@@ -55,7 +55,7 @@ impl DatabaseSettings {
 }
 
 mod tests {
-    
+
     #[tokio::test]
     async fn test_read_configs() {
         let result = match get_configuration() {

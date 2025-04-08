@@ -1,7 +1,6 @@
 //! edit_paragraph.rs
 //!
 
-
 /*
 // EDIT PARAGRAPH
 -> Allows you to change the text and the title of a paragraph.

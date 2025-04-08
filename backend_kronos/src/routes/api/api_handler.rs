@@ -8,10 +8,9 @@ use debug_print::debug_println as dprintln;
 
 // Pull in our entity Summaries
 
-
 // Include our database configs
 use crate::routes::api::api_methods::{
-    orders_api::{get_order::*, create_order::*},
+    orders_api::{create_order::*, get_order::*},
     paragraph_api::{delete_paragraph::*, edit_paragraph::*, insert_paragraph::*},
     plans_api::{create_plan::*, get_plans::*},
 };
