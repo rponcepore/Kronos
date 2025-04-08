@@ -1,13 +1,12 @@
 //! network_structs.rs
 
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 
 use super::order_request::OrderRequest;
 use super::paragraph_request::ParagraphRequest;
 use super::plan_request::PlanRequest;
 use super::task_request::TaskRequest;
 // For incomign requests.
-use crate::models::entities::*;
 // For outgoing responses.
 use crate::models::entity_summaries::{
     kronos_order_summary::KronosOrderSummary, paragraph_summary::ParagraphSummary,

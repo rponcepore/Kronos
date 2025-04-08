@@ -1,7 +1,6 @@
 //! edit_paragraph.rs
 //!
 
-use core::panic;
 
 /*
 // EDIT PARAGRAPH
@@ -14,8 +13,7 @@ use actix_web::web::Json;
 use debug_print::debug_println as dprintln;
 use sea_orm::*;
 
-use crate::routes::api::api_methods::paragraph_api;
-use crate::routes::api::parameters::{network_structs::*, paragraph_request};
+use crate::routes::api::parameters::network_structs::*;
 use crate::utilities::database_tools::access_kronos_database;
 
 use crate::models::entities::{prelude::*, *};

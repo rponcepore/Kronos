@@ -6,7 +6,6 @@ use sea_orm::*;
 
 use crate::models::entity_summaries::kronos_order_summary::KronosOrderSummary;
 use crate::models::entity_summaries::paragraph_summary::ParagraphSummary;
-use crate::models::entity_summaries::plan_summary::PlanSummary;
 use crate::routes::api::parameters::network_structs::*;
 use crate::utilities::database_tools::access_kronos_database;
 
@@ -24,11 +23,11 @@ pub async fn get_order(req: Json<KronosRequest>) -> Result<KronosResponse, Krono
         Err(error) => return Err(KronosApiError::DbErr(error)),
     };
 
-    let unit_str = match &req.uic {
+    let _unit_str = match &req.uic {
         Some(uic) => uic.as_str(),
         None => {
             return Err(KronosApiError::Unknown(
-                "Deserialization error: uic string failure.".to_string(),
+                "Deserialization error: uic string failure. Request appears not to have a UIC included.".to_string(),
             ))
         }
     };

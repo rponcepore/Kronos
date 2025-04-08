@@ -2,9 +2,8 @@
 
 // This file contains utility methods for building out a paragraph summary
 
-use crate::models::entities::{prelude::*, *};
+use crate::models::entities::*;
 use crate::models::entity_summaries::paragraph_summary::ParagraphSummary;
-use crate::routes::api::parameters::network_structs::KronosApiError;
 use sea_orm::*;
 
 //Recursive method that builds a paragraphsumamry, including all child paragraphs, for a paragraph.

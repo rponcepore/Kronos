@@ -1,6 +1,6 @@
 //! paragraph_request.rs
 
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 
 // Contained in a KronosRequest
 // For create, edit, delete, and get ops

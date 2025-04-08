@@ -5,22 +5,15 @@ use actix_web::web;
 use actix_web::{web::Json, HttpResponse, Responder};
 
 use debug_print::debug_println as dprintln;
-use serde::Serialize;
 
 // Pull in our entity Summaries
 
-use crate::models::entity_summaries::kronos_order_summary::KronosOrderSummary;
-use crate::models::entity_summaries::paragraph_summary::ParagraphSummary;
-use crate::models::entity_summaries::plan_summary::PlanSummary;
-use crate::models::entity_summaries::unit_summary::UnitSummary;
 
 // Include our database configs
-use crate::configuration::get_configuration;
 use crate::routes::api::api_methods::{
-    orders_api::{get_order::*, create_order::*, *},
+    orders_api::{get_order::*, create_order::*},
     paragraph_api::{delete_paragraph::*, edit_paragraph::*, insert_paragraph::*},
-    plans_api::{create_plan::*, get_plans::*, *},
-    *,
+    plans_api::{create_plan::*, get_plans::*},
 };
 use crate::routes::api::parameters::network_structs::*;
 

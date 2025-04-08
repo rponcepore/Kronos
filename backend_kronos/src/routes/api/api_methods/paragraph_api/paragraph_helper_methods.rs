@@ -3,17 +3,12 @@
 // This file defines convenient reused code in the paragraph API.
 // Future refactors should look for opportunities to include it
 
-use actix_web::web::Json;
-use debug_print::debug_println as dprintln;
 use sea_orm::*;
 
-use crate::routes::api::parameters::{network_structs::*, paragraph_request};
-use crate::utilities::database_tools::access_kronos_database;
+use crate::routes::api::parameters::network_structs::*;
 
 use crate::models::entities::{prelude::*, *};
-use crate::models::entity_summaries::paragraph_summary::ParagraphSummary;
 
-use crate::routes::api::helper_methods::assemble_paragraph_summary::*;
 
 pub async fn get_target_record(
     paragraph_id: &i32,
@@ -96,14 +91,10 @@ pub async fn adjust_ordinal_sequence(
         indent_level: ActiveValue::NotSet,
     };
 
-    // Connect to the database
-    let db = match access_kronos_database().await {
-        Ok(db) => db,
-        Err(msg) => return Err(KronosApiError::DbErr(msg)),
-    };
+    
 
     // Execution
-    let result = match updated_paragraph.update(&db).await {
+    let result = match updated_paragraph.update(db).await {
         Ok(result) => result,
         Err(msg) => return Err(KronosApiError::DbErr(msg)),
     };

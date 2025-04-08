@@ -1,4 +1,4 @@
-use crate::models::entities::{prelude, *};
+use crate::models::entities::*;
 use sea_orm::*;
 
 pub async fn get_plan_with_highest_serial(
