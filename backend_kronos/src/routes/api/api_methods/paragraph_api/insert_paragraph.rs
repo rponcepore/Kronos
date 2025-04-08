@@ -21,8 +21,8 @@ use crate::utilities::database_tools::access_kronos_database;
 use crate::models::entities::{prelude::*, *};
 use crate::models::entity_summaries::paragraph_summary::ParagraphSummary;
 
-use crate::routes::api::helper_methods::assemble_paragraph_summary::*;
 use crate::routes::api::api_methods::paragraph_api::paragraph_helper_methods::*;
+use crate::routes::api::helper_methods::assemble_paragraph_summary::*;
 
 struct InsertParagraphParams<'a> {
     paragraph_id: &'a i32,
@@ -42,7 +42,7 @@ pub async fn insert_paragraph(req: Json<KronosRequest>) -> Result<KronosResponse
     };
 
     // Identify the target paragraph
-    let target_paragraph_record = match get_target_record(checked_params.paragraph_id, &db).await{
+    let target_paragraph_record = match get_target_record(checked_params.paragraph_id, &db).await {
         Ok(target_paragraph_record) => target_paragraph_record,
         Err(msg) => return Err(msg),
     };
@@ -271,7 +271,3 @@ async fn insert_subparagraph(
 
     Ok(paragraph_summary)
 }
-
-
-
-

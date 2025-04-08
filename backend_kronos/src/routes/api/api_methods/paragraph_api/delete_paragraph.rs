@@ -10,8 +10,8 @@ use crate::utilities::database_tools::access_kronos_database;
 use crate::models::entities::{prelude::*, *};
 use crate::models::entity_summaries::paragraph_summary::ParagraphSummary;
 
-use crate::routes::api::helper_methods::assemble_paragraph_summary::*;
 use crate::routes::api::api_methods::paragraph_api::paragraph_helper_methods::*;
+use crate::routes::api::helper_methods::assemble_paragraph_summary::*;
 
 struct DeleteParagraphParams<'a> {
     paragraph_id: &'a i32,
@@ -29,7 +29,7 @@ pub async fn delete_paragraph(req: Json<KronosRequest>) -> Result<KronosResponse
     };
 
     // Identify the target paragraph
-    let target_paragraph_record = match get_target_record(checked_params.paragraph_id, &db).await{
+    let target_paragraph_record = match get_target_record(checked_params.paragraph_id, &db).await {
         Ok(target_paragraph_record) => target_paragraph_record,
         Err(msg) => return Err(msg),
     };
@@ -56,11 +56,11 @@ pub async fn delete_paragraph(req: Json<KronosRequest>) -> Result<KronosResponse
         .filter(paragraph::Column::Id.eq(parent.id))
         .all(&db)
         .await
-        {
-            Ok(para_vec) => para_vec,
-            Err(db_err) => return Err(KronosApiError::DbErr(db_err)),
-        };
-    
+    {
+        Ok(para_vec) => para_vec,
+        Err(db_err) => return Err(KronosApiError::DbErr(db_err)),
+    };
+
     //Cascade update all the paragraphs below it to add one to their numbers
     for paragraph in para_vec {
         //check if the ordinal sequence is equal to or greater than the ordinal sequence we need to insert
@@ -86,7 +86,6 @@ pub async fn delete_paragraph(req: Json<KronosRequest>) -> Result<KronosResponse
     };
 
     Ok(response)
-
 }
 
 fn check_delete_paragraph_request(
@@ -117,4 +116,3 @@ fn check_delete_paragraph_request(
         paragraph_id: paragraph_id,
     })
 }
-

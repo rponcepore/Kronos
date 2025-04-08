@@ -15,12 +15,12 @@ use crate::models::entity_summaries::paragraph_summary::ParagraphSummary;
 
 use crate::routes::api::helper_methods::assemble_paragraph_summary::*;
 
-pub async fn get_target_record(paragraph_id: &i32, db: &DatabaseConnection) -> Result<paragraph::Model, KronosApiError> {
+pub async fn get_target_record(
+    paragraph_id: &i32,
+    db: &DatabaseConnection,
+) -> Result<paragraph::Model, KronosApiError> {
     // Get target paragraph record; what a workout.
-    let target_paragraph_record = match Paragraph::find_by_id(paragraph_id.clone())
-        .one(db)
-        .await
-    {
+    let target_paragraph_record = match Paragraph::find_by_id(paragraph_id.clone()).one(db).await {
         Ok(target_paragraph_model) => match target_paragraph_model {
             Some(target_paragraph_record) => target_paragraph_record,
             None => {
@@ -78,7 +78,7 @@ pub async fn get_parent_paragraph(
     Ok(parent)
 }
 
- // This function updates the ordinal sequence of a paragraph to be one greater than it currently is.
+// This function updates the ordinal sequence of a paragraph to be one greater than it currently is.
 // Useful in cascading updates of ordinal sequence
 pub async fn adjust_ordinal_sequence(
     direction: i32,

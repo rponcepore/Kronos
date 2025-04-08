@@ -17,7 +17,7 @@ use crate::models::entity_summaries::unit_summary::UnitSummary;
 // Include our database configs
 use crate::configuration::get_configuration;
 use crate::routes::api::api_methods::{
-    orders_api::{get_order::*, *},
+    orders_api::{get_order::*, create_order::*, *},
     paragraph_api::{delete_paragraph::*, edit_paragraph::*, insert_paragraph::*},
     plans_api::{create_plan::*, get_plans::*, *},
     *,
@@ -55,17 +55,14 @@ pub async fn api_handler(
         "get_plans" => get_plans(valid_req).await,
         // Orders actions
         "get_order" => get_order(valid_req).await,
+        "create_order" => create_order(valid_req).await,
         // Paragraph actions
         "get_paragraph" => Err(KronosApiError::NotImplemented(
             "get_paragraph not implemented.".to_string(),
         )),
-        "insert_paragraph" => Err(KronosApiError::NotImplemented(
-            "insert_paragraph not implemented.".to_string(),
-        )),
+        "insert_paragraph" => insert_paragraph(valid_req).await,
         "edit_paragraph" => edit_paragraph(valid_req).await,
-        "delete_paragraph" => Err(KronosApiError::NotImplemented(
-            "delete_paragraph not implemented.".to_string(),
-        )),
+        "delete_paragraph" => delete_paragraph(valid_req).await,
         // Return a BadRequest response if the api_method was invalid.
         _ => {
             return HttpResponse::BadRequest().body(format!("Invalid api_method: {}\n", api_method))

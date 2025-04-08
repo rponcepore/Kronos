@@ -7,7 +7,7 @@ use core::panic;
 // EDIT PARAGRAPH
 -> Allows you to change the text and the title of a paragraph.
 KronosRequest: Must include the paragraph text, paragraph title, and paragraph ID (database primary key). Everything else can be inferred.
-KronosReponse: Will include the updated ParagraphSummary
+KronosResponse: Will include the updated ParagraphSummary
 Action on Frontend: Up to you. I would just re-render the ParagraphSummary Component.
 */
 use actix_web::web::Json;
