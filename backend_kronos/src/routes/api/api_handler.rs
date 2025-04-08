@@ -2,56 +2,42 @@
 
 // This file defines the api for calls from the frontend.
 use actix_web::web;
-use actix_web::{
-    web::Json,
-    HttpResponse, 
-    Responder
-    };
-    
-use serde::Serialize;
+use actix_web::{web::Json, HttpResponse, Responder};
+
 use debug_print::debug_println as dprintln;
+use serde::Serialize;
 
 // Pull in our entity Summaries
 
-use crate::models::entity_summaries::plan_summary::PlanSummary;
 use crate::models::entity_summaries::kronos_order_summary::KronosOrderSummary;
 use crate::models::entity_summaries::paragraph_summary::ParagraphSummary;
+use crate::models::entity_summaries::plan_summary::PlanSummary;
 use crate::models::entity_summaries::unit_summary::UnitSummary;
 
 // Include our database configs
 use crate::configuration::get_configuration;
 use crate::routes::api::api_methods::{
-    plans_api::{
-        get_plans::*,
-        create_plan::*,
-        *
-    },
-    orders_api::{
-        get_order::*,
-        *,
-    },
-    paragraph_api::{
-        edit_paragraph::*,
-        insert_paragraph::*,
-        delete_paragraph::*,
-    },
-    *
+    orders_api::{get_order::*, *},
+    paragraph_api::{delete_paragraph::*, edit_paragraph::*, insert_paragraph::*},
+    plans_api::{create_plan::*, get_plans::*, *},
+    *,
 };
 use crate::routes::api::parameters::network_structs::*;
 
 /*
- * Core API call handler for the application, matching JSON "api_method" parameter 
+ * Core API call handler for the application, matching JSON "api_method" parameter
  * to the correct function call.
  * This handler can only be called if the content type of the http request (in the header!) is JSON,
  * and the content of the request can be deserialized to a "KronosRequest" struct
  * @param req: must be a HttpRequest, GET, with a JSON body with parameters.
  * @return 200 OK with JSON body
  */
-pub async fn api_handler(kronos_request_as_json: Result<web::Json<KronosRequest>, actix_web::Error>) -> impl Responder {
-
+pub async fn api_handler(
+    kronos_request_as_json: Result<web::Json<KronosRequest>, actix_web::Error>,
+) -> impl Responder {
     // Check for a valid request and that uic and api_method are not null.
-    let valid_req: Json<KronosRequest> = match kronos_request_as_json{
-        Ok(req) => match is_request_valid(req).await{
+    let valid_req: Json<KronosRequest> = match kronos_request_as_json {
+        Ok(req) => match is_request_valid(req).await {
             Ok(valid_req) => valid_req,
             Err(bad_request_http_response) => return bad_request_http_response,
         },
@@ -70,59 +56,64 @@ pub async fn api_handler(kronos_request_as_json: Result<web::Json<KronosRequest>
         // Orders actions
         "get_order" => get_order(valid_req).await,
         // Paragraph actions
-        "get_paragraph" => Err(KronosApiError::NotImplemented("get_paragraph not implemented.".to_string())),
-        "insert_paragraph" => Err(KronosApiError::NotImplemented("insert_paragraph not implemented.".to_string())),
+        "get_paragraph" => Err(KronosApiError::NotImplemented(
+            "get_paragraph not implemented.".to_string(),
+        )),
+        "insert_paragraph" => Err(KronosApiError::NotImplemented(
+            "insert_paragraph not implemented.".to_string(),
+        )),
         "edit_paragraph" => edit_paragraph(valid_req).await,
-        "delete_paragraph" => Err(KronosApiError::NotImplemented("delete_paragraph not implemented.".to_string())),
+        "delete_paragraph" => Err(KronosApiError::NotImplemented(
+            "delete_paragraph not implemented.".to_string(),
+        )),
         // Return a BadRequest response if the api_method was invalid.
-        _ => return HttpResponse::BadRequest().body(format!("Invalid api_method: {}\n", api_method)),
+        _ => {
+            return HttpResponse::BadRequest().body(format!("Invalid api_method: {}\n", api_method))
+        }
     };
 
     match kronos_response {
         Ok(kronos_response) => {
             dprintln!("{:?}", kronos_response);
             HttpResponse::Ok().json(kronos_response)
-        },
-        Err(kronos_api_error) => match kronos_api_error{
+        }
+        Err(kronos_api_error) => match kronos_api_error {
             KronosApiError::DbErr(err) => {
                 HttpResponse::InternalServerError().body(format!("Database failure: {}\n", err))
             }
-            KronosApiError::ActixError(err) => {
-                HttpResponse::InternalServerError().body(format!("Internal server error: {}\n", err))
-            }
+            KronosApiError::ActixError(err) => HttpResponse::InternalServerError()
+                .body(format!("Internal server error: {}\n", err)),
             KronosApiError::NotImplemented(msg) => {
                 HttpResponse::NotImplemented().body(format!("Not implemented: {}\n", msg))
             }
             KronosApiError::BadRequest(msg) => {
                 HttpResponse::BadRequest().body(format!("Bad request to API: {}\n", msg))
             }
-            KronosApiError::ExpectedDataNotPresent(msg) => {
-                HttpResponse::InternalServerError().body(format!("Expected data not found in database: {}\n", msg))
-            }
+            KronosApiError::ExpectedDataNotPresent(msg) => HttpResponse::InternalServerError()
+                .body(format!("Expected data not found in database: {}\n", msg)),
             KronosApiError::Unknown(msg) => {
                 HttpResponse::BadRequest().body(format!("Unknown error: {}\n", msg))
             }
-        }
+        },
     }
 }
 
 // Invariant: Valid requests always have, at a minimum, a uic and an api_method.
 // This method occurs AFTER deserialization is proven successful.
-async fn is_request_valid(req: Json<KronosRequest>) -> Result< Json<KronosRequest>, HttpResponse> {
+async fn is_request_valid(req: Json<KronosRequest>) -> Result<Json<KronosRequest>, HttpResponse> {
     // Deserialization successful
     dprintln!("api_handler called, request body: {:?}", req);
 
     // First, check if the api_method is null
-    if req.api_method.is_none(){
+    if req.api_method.is_none() {
         return Err(HttpResponse::BadRequest().body(format!("Request api_method field is null.")));
     }
-    
-    if req.uic.is_none(){
+
+    if req.uic.is_none() {
         return Err(HttpResponse::BadRequest().body(format!("Request uic field is null.")));
     }
 
     return Ok(req);
-    
 }
 
 impl KronosRequest {

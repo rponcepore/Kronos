@@ -3,8 +3,8 @@
 // This file defines all tests written that create an instance of the app
 // and test against it, rather than local tests, which only test some internal
 // functionality.
+use serde::{Deserialize, Serialize};
 use serde_json::json;
-use serde::{Serialize, Deserialize};
 
 mod test_utilities;
 
@@ -13,10 +13,10 @@ use test_utilities::*;
 // `tokio::test` is the testing equivalent of `tokio::main`.
 // It also spares you from having to specify the `#[test]` attribute.
 //
-// You can inspect what code gets generated using 
+// You can inspect what code gets generated using
 // `cargo expand --test health_check` (<- name of the test file)
 #[tokio::test]
-async fn health_check_works () {
+async fn health_check_works() {
     //Arrange
     let address = spawn_app();
     //reqwest is a library tha performs HTTP requests against our application.
@@ -36,7 +36,7 @@ async fn health_check_works () {
 }
 
 #[tokio::test]
-async fn api_returns_400_for_blank_post_plan_request () {
+async fn api_returns_400_for_blank_post_plan_request() {
     let address = spawn_app();
     let client = reqwest::Client::new();
     let response = client
@@ -55,11 +55,10 @@ async fn api_returns_400_for_blank_post_plan_request () {
         status,
         body
     );
-
 }
 
 #[tokio::test]
-async fn api_returns_200_for_any_post_plan_request () {
+async fn api_returns_200_for_any_post_plan_request() {
     let address = spawn_app();
     let client = reqwest::Client::new();
 
@@ -71,8 +70,7 @@ async fn api_returns_200_for_any_post_plan_request () {
         .send()
         .await
         .expect("Failed to execute request.");
-    
-    
+
     // Extract response status and body
     let status = &response.status();
     let body = &response.text().await.expect("Failed to read response body");

@@ -83,7 +83,7 @@ impl Echelon {
             Echelon::CONTAINER => "Container for Organizing Units",
             Echelon::UNK => "Unknown",
         }
-    } 
+    }
 
     fn from_str(input: &str) -> Result<Self, &str> {
         match input {
@@ -113,5 +113,4 @@ impl Echelon {
             _ => Err("Unknown Echelon supplied. Supply as an all-caps echelon or full name, e.g., 'DIV' or 'Division'."),
         }
     }
-    
 }

@@ -15,3 +15,4 @@ export type KronosRequest = {
     paragraph_request: ParagraphRequest | null;
     task_request: TaskRequest | null;
 }
+

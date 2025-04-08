@@ -1,12 +1,11 @@
 //! paragraph_request.rs
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 // Contained in a KronosRequest
 // For create, edit, delete, and get ops
 
-#[derive(serde::Deserialize, Serialize)]
-#[derive(Debug)]
+#[derive(serde::Deserialize, Serialize, Debug)]
 pub struct ParagraphRequest {
     pub paragraph_id: Option<i32>,
     pub insert_method: Option<String>,

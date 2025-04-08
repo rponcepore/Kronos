@@ -1,18 +1,18 @@
 //! edit_paragraph.rs
-//! 
+//!
 
 use core::panic;
 
-/* 
+/*
 // EDIT PARAGRAPH
 -> Allows you to change the text and the title of a paragraph.
-KronosRequest: Must include the paragraph text, paragraph title, and paragraph ID (database primary key). Everything else can be inferred. 
+KronosRequest: Must include the paragraph text, paragraph title, and paragraph ID (database primary key). Everything else can be inferred.
 KronosReponse: Will include the updated ParagraphSummary
-Action on Frontend: Up to you. I would just re-render the ParagraphSummary Component. 
+Action on Frontend: Up to you. I would just re-render the ParagraphSummary Component.
 */
 use actix_web::web::Json;
-use sea_orm::*;
 use debug_print::debug_println as dprintln;
+use sea_orm::*;
 
 use crate::routes::api::api_methods::paragraph_api;
 use crate::routes::api::parameters::{network_structs::*, paragraph_request};
@@ -23,7 +23,7 @@ use crate::models::entity_summaries::paragraph_summary::ParagraphSummary;
 
 use crate::routes::api::helper_methods::assemble_paragraph_summary::*;
 
-struct EditParagraphParameters<'a>  {
+struct EditParagraphParameters<'a> {
     pub paragraph_id: &'a i32,
     pub new_text: &'a String,
     pub new_title: &'a String,
@@ -54,11 +54,11 @@ pub async fn edit_paragraph(req: Json<KronosRequest>) -> Result<KronosResponse, 
     };
 
     // Execution
-    let result = match updated_paragraph.update(&db).await{
+    let result = match updated_paragraph.update(&db).await {
         Ok(result) => result,
         Err(msg) => return Err(KronosApiError::DbErr(msg)),
     };
-    
+
     // Get the updated model back from the database.
     let paragraph = match Paragraph::find_by_id(result.id).one(&db).await{
         Ok(paragraph) => match paragraph {
@@ -72,13 +72,13 @@ pub async fn edit_paragraph(req: Json<KronosRequest>) -> Result<KronosResponse, 
             )
         ),
     };
-    
+
     /*
-    // Now we need the parent paragraph. 
+    // Now we need the parent paragraph.
     let inserted_paragraph = Paragraph::find_by_id(result.last_insert_id)
         .one(&db)
         .await?;
-     
+
     let parent_paragraph_id = match inserted_paragraph {
         Some(inserted_paragraph) => match inserted_paragraph.parent_paragraph {
             Some(parent_paragraph_id) => parent_paragraph_id,
@@ -86,18 +86,19 @@ pub async fn edit_paragraph(req: Json<KronosRequest>) -> Result<KronosResponse, 
         },
         None => return Err(KronosApiError::ExpectedDataNotPresent("After successful execution of insert query, could not find paragraph. Recommend a full page refresh".to_string())),
     };
-    
+
     let parent_paragraph = Paragraph::find_by_id(parent_paragraph_id).one(&db).await?;
 
     let parent_paragraph_summary: ParagraphSummary = generate_paragraph_summary().await?;
     */
 
-    let paragraph_summary: ParagraphSummary = match assemble_paragraph_summary(&paragraph, &db).await {
-        Ok(paragraph_summary) => paragraph_summary,
-        Err(msg) => return Err(KronosApiError::DbErr(msg)),
-    };
+    let paragraph_summary: ParagraphSummary =
+        match assemble_paragraph_summary(&paragraph, &db).await {
+            Ok(paragraph_summary) => paragraph_summary,
+            Err(msg) => return Err(KronosApiError::DbErr(msg)),
+        };
 
-    let response = KronosResponse{
+    let response = KronosResponse {
         kronos_request: req.into_inner(),
         plans_vec: None,
         orders_vec: None,
@@ -106,10 +107,11 @@ pub async fn edit_paragraph(req: Json<KronosRequest>) -> Result<KronosResponse, 
     };
 
     Ok(response)
-
 }
 
-fn check_edit_paragraph_request(req: &Json<KronosRequest>) -> Result<EditParagraphParameters, KronosApiError> {
+fn check_edit_paragraph_request(
+    req: &Json<KronosRequest>,
+) -> Result<EditParagraphParameters, KronosApiError> {
     let paragraph_request = match &req.paragraph_request {
         Some(paragraph_request) => paragraph_request,
         None => return Err(KronosApiError::BadRequest("edit_paragraph request was submitted with null paragraph_request parameter in the KronosRequest.".to_string())),
@@ -131,9 +133,9 @@ fn check_edit_paragraph_request(req: &Json<KronosRequest>) -> Result<EditParagra
     };
 
     let checked_struct: EditParagraphParameters = EditParagraphParameters {
-         paragraph_id: target_paragraph_id, 
-         new_text: target_paragraph_text, 
-         new_title: target_paragraph_title 
+        paragraph_id: target_paragraph_id,
+        new_text: target_paragraph_text,
+        new_title: target_paragraph_title,
     };
 
     Ok(checked_struct)

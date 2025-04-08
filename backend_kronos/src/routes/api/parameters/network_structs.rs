@@ -1,24 +1,20 @@
 //! network_structs.rs
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use super::order_request::OrderRequest;
-use super::plan_request::PlanRequest;
 use super::paragraph_request::ParagraphRequest;
+use super::plan_request::PlanRequest;
 use super::task_request::TaskRequest;
 // For incomign requests.
 use crate::models::entities::*;
 // For outgoing responses.
 use crate::models::entity_summaries::{
-    unit_summary::UnitSummary,
-    paragraph_summary::ParagraphSummary,
-    kronos_order_summary::KronosOrderSummary,
-    plan_summary::PlanSummary,
+    kronos_order_summary::KronosOrderSummary, paragraph_summary::ParagraphSummary,
+    plan_summary::PlanSummary, unit_summary::UnitSummary,
 };
 
-
-#[derive(serde::Deserialize, Serialize)]
-#[derive(Debug)]
+#[derive(serde::Deserialize, Serialize, Debug)]
 pub struct KronosRequest {
     //pub request_id: Integer,
     pub api_method: Option<String>,
@@ -30,17 +26,16 @@ pub struct KronosRequest {
     pub task_request: Option<TaskRequest>,
 }
 
-#[derive(serde::Deserialize, Serialize)]
-#[derive(Debug)]
+#[derive(serde::Deserialize, Serialize, Debug)]
 pub struct KronosResponse {
     pub kronos_request: KronosRequest,
-    pub plans_vec: Option< Vec< PlanSummary> >,
-    pub orders_vec: Option< Vec< KronosOrderSummary> >,
-    pub paragraphs_vec: Option< Vec< ParagraphSummary>>,
-    pub units_vec: Option< Vec< UnitSummary> >,
+    pub plans_vec: Option<Vec<PlanSummary>>,
+    pub orders_vec: Option<Vec<KronosOrderSummary>>,
+    pub paragraphs_vec: Option<Vec<ParagraphSummary>>,
+    pub units_vec: Option<Vec<UnitSummary>>,
 }
 
-pub enum KronosApiError  {
+pub enum KronosApiError {
     DbErr(sea_orm::DbErr),
     ActixError(actix_web::Error),
     NotImplemented(String),

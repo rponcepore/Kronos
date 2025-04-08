@@ -1,6 +1,6 @@
 //! calendar_math.rs
 
-use chrono::{Local, Datelike};
+use chrono::{Datelike, Local};
 
 // Some utility methods to help with calculations around dates and times.
 

@@ -1,12 +1,13 @@
 //! healthchecks.rs
 
-// This file contains the various healthcheck routes employed by the server. 
+// This file contains the various healthcheck routes employed by the server.
 
 use actix_web::{
-    http::{header::ContentType, StatusCode}, 
-    HttpRequest, HttpResponse, Responder};
-use sea_orm::*;
+    http::{header::ContentType, StatusCode},
+    HttpRequest, HttpResponse, Responder,
+};
 use debug_print::debug_println as dprintln;
+use sea_orm::*;
 
 use crate::configuration::get_configuration;
 
@@ -52,8 +53,7 @@ pub async fn database_health_check(_req: HttpRequest) -> impl Responder {
             dprintln!("Failed to connect to the database: {}", err);
             return HttpResponse::build(StatusCode::INTERNAL_SERVER_ERROR)
                 .insert_header(ContentType::html())
-                .body(format!("Failed to connect to the database: {}", err))
+                .body(format!("Failed to connect to the database: {}", err));
         }
     };
 }
-

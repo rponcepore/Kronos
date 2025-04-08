@@ -5,9 +5,8 @@ mod test_utilities;
 
 use test_utilities::*;
 
-
 #[tokio::test]
-async fn api_returns_200_for_a_valid_no_database_post_plan_request () {
+async fn api_returns_200_for_a_valid_no_database_post_plan_request() {
     let address = spawn_app();
     let client = reqwest::Client::new();
 
@@ -19,8 +18,7 @@ async fn api_returns_200_for_a_valid_no_database_post_plan_request () {
         .send()
         .await
         .expect("Failed to execute request.");
-    
-    
+
     // Extract response status and body
     let status = &response.status();
     let body = &response.text().await.expect("Failed to read response body");
@@ -34,7 +32,7 @@ async fn api_returns_200_for_a_valid_no_database_post_plan_request () {
 }
 
 #[tokio::test]
-async fn api_returns_200_for_a_valid_open_database_post_plan_request () {
+async fn api_returns_200_for_a_valid_open_database_post_plan_request() {
     let address = spawn_app();
     let client = reqwest::Client::new();
 
@@ -46,8 +44,7 @@ async fn api_returns_200_for_a_valid_open_database_post_plan_request () {
         .send()
         .await
         .expect("Failed to execute request.");
-    
-    
+
     // Extract response status and body
     let status = &response.status();
     let body = &response.text().await.expect("Failed to read response body");
