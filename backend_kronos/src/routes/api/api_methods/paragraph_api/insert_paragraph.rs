@@ -22,6 +22,7 @@ use crate::models::entities::{prelude::*, *};
 use crate::models::entity_summaries::paragraph_summary::ParagraphSummary;
 
 use crate::routes::api::helper_methods::assemble_paragraph_summary::*;
+use crate::routes::api::api_methods::paragraph_api::paragraph_helper_methods::*;
 
 struct InsertParagraphParams<'a> {
     paragraph_id: &'a i32,
@@ -40,21 +41,10 @@ pub async fn insert_paragraph(req: Json<KronosRequest>) -> Result<KronosResponse
         Err(msg) => return Err(KronosApiError::DbErr(msg)),
     };
 
-    // Get target paragraph record; what a workout.
-    let target_paragraph_record = match Paragraph::find_by_id(checked_params.paragraph_id.clone())
-        .one(&db)
-        .await
-    {
-        Ok(target_paragraph_model) => match target_paragraph_model {
-            Some(target_paragraph_record) => target_paragraph_record,
-            None => {
-                return Err(KronosApiError::ExpectedDataNotPresent(format!(
-                    "Database has no entry for paragraph with id {}",
-                    &checked_params.paragraph_id
-                )))
-            }
-        },
-        Err(msg) => return Err(KronosApiError::DbErr(msg)),
+    // Identify the target paragraph
+    let target_paragraph_record = match get_target_record(checked_params.paragraph_id, &db).await{
+        Ok(target_paragraph_record) => target_paragraph_record,
+        Err(msg) => return Err(msg),
     };
 
     //Match the case to the function.
@@ -186,11 +176,11 @@ async fn insert_sibling(
 
     // Find what the new paragraph's sequence needs to be
     let new_ordinal_sequence = match insert_above_case {
-        // In the true case, we need to insert the paragraph above. So give it the same ordinal sequence as the 
+        // In the true case, we need to insert the paragraph above. So give it the same ordinal sequence as the
         // target, and adjust everything else down.
         true => target_paragraph_record.ordinal_sequence,
-        // In the false case, we need to insert the paragraph below. 
-        // Give it an ordinal sequence once greater than the target, and push everything else down. 
+        // In the false case, we need to insert the paragraph below.
+        // Give it an ordinal sequence once greater than the target, and push everything else down.
         false => target_paragraph_record.ordinal_sequence + 1,
     };
 
@@ -213,11 +203,11 @@ async fn insert_sibling(
         // if yes, +=1 , else ignore
         if paragraph.ordinal_sequence >= new_ordinal_sequence {
             // Ensure we send this to the database!
-            add_one_to_ordinal_sequence(paragraph, db).await?;
+            adjust_ordinal_sequence(1, paragraph, db).await?;
         }
     }
 
-    // Finally, create the incoming paragraph and add it. 
+    // Finally, create the incoming paragraph and add it.
     let new_paragraph = paragraph::ActiveModel {
         id: ActiveValue::NotSet,
         title: ActiveValue::Set(checked_params.new_title.to_owned()),
@@ -233,13 +223,12 @@ async fn insert_sibling(
         Err(db_err) => return Err(KronosApiError::DbErr(db_err)),
     };
 
-    // Finally, get the parent paragraph, wrap it, and send it.
+    // Finally, get the parent paragraph, wrap it, and return it.
     let updated_parent = get_parent_paragraph(target_paragraph_record, db).await?;
-    let paragraph_summary = match assemble_paragraph_summary(&updated_parent, db).await
-        {
-            Ok(paragraph_summary) => paragraph_summary,
-            Err(db_err) => return Err(KronosApiError::DbErr(db_err)),
-        };
+    let paragraph_summary = match assemble_paragraph_summary(&updated_parent, db).await {
+        Ok(paragraph_summary) => paragraph_summary,
+        Err(db_err) => return Err(KronosApiError::DbErr(db_err)),
+    };
     Ok(paragraph_summary)
 }
 
@@ -272,7 +261,7 @@ async fn insert_subparagraph(
     };
 
     // Return the parent paragraph
-    let parent  = get_parent_paragraph(target_paragraph_record, db).await?;
+    let parent = get_parent_paragraph(target_paragraph_record, db).await?;
 
     // Build paragraph summary
     let paragraph_summary: ParagraphSummary = match assemble_paragraph_summary(&parent, db).await {
@@ -283,71 +272,6 @@ async fn insert_subparagraph(
     Ok(paragraph_summary)
 }
 
-// This method gets a parent paragraph of a target paragraph using a pre-connected database connection.
-async fn get_parent_paragraph(
-    target_paragraph: &paragraph::Model,
-    db: &DatabaseConnection,
-) -> Result<paragraph::Model, KronosApiError> {
-    let parent_paragraph_id = match target_paragraph.parent_paragraph {
-        Some(parent_paragraph_id) => parent_paragraph_id,
-        None => {
-            return Err(KronosApiError::ExpectedDataNotPresent(format!(
-                "In attempting to locate the parent paragraph of the target paragraph, \
-                 Kronos could not find the parent's id in the target paragraph's data. \
-                 This means that either (1) you have made a call to insert a sibling \
-                 paragraph on a major paragraph, which is not allowed, or an invariant \
-                 of paragraph data has occurred, in which case, panic."
-            )))
-        }
-    };
-    let parent_option: Option<paragraph::Model> =
-        match Paragraph::find_by_id(parent_paragraph_id.to_owned())
-            .one(db)
-            .await
-        {
-            Ok(parent_option) => parent_option ,
-            Err(msg) => return Err(KronosApiError::DbErr(msg)),
-        };
-    
-    let parent = match parent_option {
-        Some(parent) => parent,
-        None => return Err(KronosApiError::ExpectedDataNotPresent(format!(
-            "In attempting to locate the parent paragraph of the target paragraph, \
-             Kronos could not find the parent's record, despite the child paragraph \
-             recording a valid integer primary key. This is not due to a database \
-             connectino failure, but rather to a foreign key pointing to nothing. Panic."
-        )))
-    };
 
-    Ok(parent)
 
-}
 
-// This function updates the ordinal sequence of a paragraph to be one greater than it currently is. 
-// Useful in cascading updates of ordinal sequence
-async fn add_one_to_ordinal_sequence(paragraph: paragraph::Model, db: &DatabaseConnection) -> Result<paragraph::Model, KronosApiError> {
-    // Build the SeaORM query
-    let updated_paragraph = paragraph::ActiveModel {
-        id: ActiveValue::Set(paragraph.id.to_owned()), //no change
-        title: ActiveValue::NotSet,
-        text: ActiveValue::NotSet,
-        kronos_order: ActiveValue::NotSet,
-        parent_paragraph: ActiveValue::NotSet,
-        ordinal_sequence: ActiveValue::Set(paragraph.ordinal_sequence + 1),
-        indent_level: ActiveValue::NotSet,
-    };
-
-    // Connect to the database
-    let db = match access_kronos_database().await {
-        Ok(db) => db,
-        Err(msg) => return Err(KronosApiError::DbErr(msg)),
-    };
-
-    // Execution
-    let result = match updated_paragraph.update(&db).await {
-        Ok(result) => result,
-        Err(msg) => return Err(KronosApiError::DbErr(msg)),
-    };
-
-    Ok(result)
-}
