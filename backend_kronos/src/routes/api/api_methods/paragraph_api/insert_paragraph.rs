@@ -22,7 +22,7 @@ use crate::models::entities::{prelude::*, *};
 use crate::models::entity_summaries::paragraph_summary::ParagraphSummary;
 
 use crate::routes::api::api_methods::paragraph_api::paragraph_helper_methods::*;
-use crate::routes::api::helper_methods::assemble_paragraph_summary::*;
+use crate::routes::api::helper_methods::build_paragraph_summary::*;
 
 struct InsertParagraphParams<'a> {
     paragraph_id: &'a i32,
@@ -225,7 +225,7 @@ async fn insert_sibling(
 
     // Finally, get the parent paragraph, wrap it, and return it.
     let updated_parent = get_parent_paragraph(target_paragraph_record, db).await?;
-    let paragraph_summary = match assemble_paragraph_summary(&updated_parent, db).await {
+    let paragraph_summary = match build_paragraph_summary(&updated_parent, db).await {
         Ok(paragraph_summary) => paragraph_summary,
         Err(db_err) => return Err(KronosApiError::DbErr(db_err)),
     };
@@ -264,7 +264,7 @@ async fn insert_subparagraph(
     let parent = get_parent_paragraph(target_paragraph_record, db).await?;
 
     // Build paragraph summary
-    let paragraph_summary: ParagraphSummary = match assemble_paragraph_summary(&parent, db).await {
+    let paragraph_summary: ParagraphSummary = match build_paragraph_summary(&parent, db).await {
         Ok(paragraph_summary) => paragraph_summary,
         Err(msg) => return Err(KronosApiError::DbErr(msg)),
     };

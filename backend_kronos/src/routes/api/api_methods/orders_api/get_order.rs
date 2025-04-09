@@ -6,11 +6,18 @@ use sea_orm::*;
 
 use crate::models::entity_summaries::kronos_order_summary::KronosOrderSummary;
 use crate::models::entity_summaries::paragraph_summary::ParagraphSummary;
-use crate::routes::api::parameters::network_structs::*;
+use crate::routes::api::{
+    parameters::network_structs::*,
+    helper_methods::*,
+};
 use crate::utilities::database_tools::access_kronos_database;
 
 //helper methods
-use crate::routes::api::helper_methods::assemble_paragraph_summary::*;
+use crate::routes::api::helper_methods::{
+    build_paragraph_summary::*,
+    build_order_summary::*
+    };
+
 // Pull in our entities,
 use crate::models::entities::{prelude::*, *};
 
@@ -67,10 +74,7 @@ pub async fn get_order(req: Json<KronosRequest>) -> Result<KronosResponse, Krono
     };
 
     // We now have the model itself of kronos_order. Now we need to construct an order summary from this order.
-    let order_summary = match build_order_summary(&kronos_order, &db).await {
-        Ok(order_summary) => order_summary,
-        Err(msg) => return Err(KronosApiError::DbErr(msg)),
-    };
+    let order_summary = build_order_summary(&kronos_order, &db).await?;
 
     // Unwrap json<KronosRequest> into just a KronosRequest to avoid de-re-de-se-re-serialization issues.
     let plain_kronos_request = req.into_inner();
@@ -87,27 +91,4 @@ pub async fn get_order(req: Json<KronosRequest>) -> Result<KronosResponse, Krono
     Ok(kronos_response)
 }
 
-async fn build_order_summary(
-    order: &kronos_order::Model,
-    db: &DatabaseConnection,
-) -> Result<KronosOrderSummary, DbErr> {
-    // Repeated, recursive database calls...
-    let mut kronos_order_summary = KronosOrderSummary {
-        data: order.clone(),
-        paragraphs: Some(Vec::<ParagraphSummary>::new()),
-    };
 
-    // Get all paragraphs that have paragraph.KronosOrder = order.id
-    let result = paragraph::Entity::find()
-        .filter(paragraph::Column::KronosOrder.eq(order.id))
-        .all(db)
-        .await?;
-
-    // For each paragraph returned, convert it into a ParagraphSummary.
-    for paragraph in result {
-        let paragraph_summary = assemble_paragraph_summary(&paragraph, db).await?;
-        kronos_order_summary.paragraphs.as_mut().expect("Unwrapped a NONE when SOME was explicitly declared above. I'm panicking with the routine.").push(paragraph_summary);
-    }
-
-    Ok(kronos_order_summary)
-}

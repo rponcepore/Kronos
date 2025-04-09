@@ -6,19 +6,21 @@ use actix_web::web::Json;
 use debug_print::debug_println as dprintln;
 use sea_orm::*;
 
+use crate::models::entity_summaries::kronos_order_summary;
+use crate::routes::api::helper_methods::summarizers::{pack_order_summary, pack_plan_summary};
 use crate::routes::api::parameters::network_structs::*;
 use crate::utilities::database_tools::access_kronos_database;
 
 use crate::models::entities::{prelude::*, *};
-use crate::models::entity_summaries::paragraph_summary::ParagraphSummary;
+use crate::models::entity_summaries::{
+    kronos_order_summary::KronosOrderSummary, paragraph_summary::ParagraphSummary,
+    plan_summary::PlanSummary,
+};
 
 use crate::routes::api::api_methods::paragraph_api::paragraph_helper_methods::*;
-use crate::routes::api::helper_methods::assemble_paragraph_summary::*;
+use crate::routes::api::helper_methods::build_paragraph_summary::*;
 
-use crate::{
-    models::{entities::plan, entity_summaries::kronos_order_summary::KronosOrderSummary},
-    routes::api::parameters::network_structs::*, 
-};
+use crate::{models::entities::plan, routes::api::parameters::network_structs::*};
 
 struct CreateOrderParams<'a> {
     plan_id: &'a i32,
@@ -39,15 +41,44 @@ pub async fn create_order(req: Json<KronosRequest>) -> Result<KronosResponse, Kr
     // If this is a WARNORD or a FRAGORD, we just need to increment the current count for that thing,
     // and then number it accordingly. If it is an OPORD, then we need to make sure that there is only one OPORD.
     let order_summary_wrapped = match checked_params.order_type.as_str() {
-        "OPORD" => create_opord(checked_params, &db).await,
-        "FRAGORD" => create_non_opord(checked_params, &db).await,
-        "WARNORD" => create_non_opord(checked_params, &db).await,
+        "OPORD" => create_opord(&checked_params, &db).await,
+        "FRAGORD" => create_non_opord(&checked_params, &db).await,
+        "WARNORD" => create_non_opord(&checked_params, &db).await,
         _ => {
-            return Err(KronosApiError::BadRequest(
-                format!("Illegal order_type specified: {}", checked_params.order_type),
-            ))
+            return Err(KronosApiError::BadRequest(format!(
+                "Illegal order_type specified: {}",
+                checked_params.order_type
+            )))
         }
     };
+
+    // Go get the parent plan again. We will resend the entire plan to the frontend.
+    let parent_plan = match Plan::find_by_id(checked_params.plan_id.to_owned())
+        .one(&db)
+        .await
+        {
+            Ok(parent_plan_option) => match parent_plan_option {
+                Some(parent_plan) => parent_plan,
+                None => return Err(KronosApiError::ExpectedDataNotPresent("While creating an order, the plan owning the order could not be found. Suggest panicking.".to_string())),
+            },
+            Err(db_err) => return Err(KronosApiError::DbErr(db_err)),
+        };
+
+    let plan_summary = pack_plan_summary(parent_plan, &db).await?;
+
+    // Unwrap json<KronosRequest> into just a KronosRequest to avoid de-re-de-se-re-serialization issues.
+    let plain_kronos_request = req.into_inner();
+
+    // Encode them into a KronosResponse Object
+    let kronos_response = KronosResponse {
+        kronos_request: plain_kronos_request,
+        plans_vec: Some(vec![plan_summary]),
+        orders_vec: None,
+        paragraphs_vec: None,
+        units_vec: None,
+    };
+    // Send back to the client
+    Ok(kronos_response)
 }
 
 fn check_create_order_params(
@@ -102,7 +133,7 @@ fn check_create_order_params(
 }
 
 async fn create_opord(
-    params: CreateOrderParams<'_>,
+    params: &CreateOrderParams<'_>,
     db: &DatabaseConnection,
 ) -> Result<KronosOrderSummary, KronosApiError> {
     // There can only be one OPORD. Check this now.
@@ -110,31 +141,44 @@ async fn create_opord(
         .filter(plan::Column::Id.eq(params.plan_id.clone()))
         .one(db)
         .await
-        {
-            Ok(plan) => match plan {
-                Some(plan) => plan,
-                None => return Err(
-                    KronosApiError::ExpectedDataNotPresent(
-                        format!("Could not find a plan record that matched plan_id {}", params.plan_id)
-                    ))
-            },
-            Err(db_err) => return Err(KronosApiError::DbErr(db_err)),
-        };
-    
+    {
+        Ok(plan) => match plan {
+            Some(plan) => plan,
+            None => {
+                return Err(KronosApiError::ExpectedDataNotPresent(format!(
+                    "Could not find a plan record that matched plan_id {}",
+                    params.plan_id
+                )))
+            }
+        },
+        Err(db_err) => return Err(KronosApiError::DbErr(db_err)),
+    };
+
     // check to see if there are any opords (there should only be one!)
     let orders_vec = match KronosOrder::find()
         .filter(kronos_order::Column::ParentPlan.eq(params.plan_id.to_owned()))
         .filter(kronos_order::Column::OrderType.eq("OPORD"))
         .all(db)
-        .await{
-            Ok(orders_vec)=>orders_vec,
-            Err(db_err) => return Err(KronosApiError::DbErr(db_err)),
-        };
-    
+        .await
+    {
+        Ok(orders_vec) => orders_vec,
+        Err(db_err) => return Err(KronosApiError::DbErr(db_err)),
+    };
+
     match orders_vec.len() {
-        0 => {},// base case, we need to create an order
-        1 => return Err(KronosApiError::BadRequest("Client is requesting to create a new OPORD for a plan that already has an OPORD.".to_string())),
-        _ => return Err(KronosApiError::Unknown(format!("This plan indicates that it has multiple ({}) OPORDs associated with it.", orders_vec.len()))),
+        0 => {} // base case, we need to create an order
+        1 => {
+            return Err(KronosApiError::BadRequest(
+                "Client is requesting to create a new OPORD for a plan that already has an OPORD."
+                    .to_string(),
+            ))
+        }
+        _ => {
+            return Err(KronosApiError::Unknown(format!(
+                "This plan indicates that it has multiple ({}) OPORDs associated with it.",
+                orders_vec.len()
+            )))
+        }
     };
 
     let new_order = kronos_order::ActiveModel {
@@ -152,46 +196,40 @@ async fn create_opord(
         Err(db_err) => return Err(KronosApiError::DbErr(db_err)),
     };
 
-    // Go get the parent plan again.
-    let parent_plan = match Plan::find_by_id(params.plan_id.to_owned())
-        .one(db)
-        .await
-        {
-            Ok(parent_plan_option) => match parent_plan_option {
-                Some(parent_plan) => parent_plan,
-                None => return Err(KronosApiError::ExpectedDataNotPresent("While creating an order, the plan owning the order could not be found. Suggest panicking.".to_string())),
-            },
-            Err(db_err) => return Err(KronosApiError::DbErr(db_err)),
-        };
-    
+    // This is an OPORD, so build it with the standard opord contents.
+    let opord: kronos_order::Model = attach_standard_opord_paragraphs(result.id, db).await?;
 
-    
+    // Now pack this order and return it as an order summary
+    let order_summary = pack_order_summary(opord, db).await?;
 
+    Ok(order_summary)
     
 }
 
-
-
 //For creating either FRAGORDs or WARNORDS
 async fn create_non_opord(
-    params: CreateOrderParams<'_>,
+    params: &CreateOrderParams<'_>,
     db: &DatabaseConnection,
 ) -> Result<KronosOrderSummary, KronosApiError> {
-
-    //get the plan 
+    //get the plan
     let plan = match Plan::find()
         .filter(plan::Column::Id.eq(params.plan_id.clone()))
         .one(db)
         .await
-        {
-            Ok(plan) => plan,
-            Err(db_err) => return Err(KronosApiError::DbErr(db_err)),
-        };
+    {
+        Ok(plan) => plan,
+        Err(db_err) => return Err(KronosApiError::DbErr(db_err)),
+    };
 
     todo!()
 }
 
+async fn attach_standard_opord_paragraphs(
+    opord_id: i32,
+    db: &DatabaseConnection,
+) -> Result<kronos_order::Model, KronosApiError> {
 
-async fn generate_plan_summary(plan : plan::Model, db: &DatabaseConnection) -> Result<PlanSummary, KronosApiError> {
-    // get all the prders that belong ot this plan, serialize them, and return teh summary.
+    // Read in from yaml file.
+    todo!()
+
 }

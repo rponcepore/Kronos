@@ -10,7 +10,7 @@ use crate::utilities::database_tools::access_kronos_database;
 use crate::models::entities::{prelude::*, *};
 
 use crate::routes::api::api_methods::paragraph_api::paragraph_helper_methods::*;
-use crate::routes::api::helper_methods::assemble_paragraph_summary::*;
+use crate::routes::api::helper_methods::build_paragraph_summary::*;
 
 struct DeleteParagraphParams<'a> {
     paragraph_id: &'a i32,
@@ -72,7 +72,7 @@ pub async fn delete_paragraph(req: Json<KronosRequest>) -> Result<KronosResponse
 
     // Return the updated parent paragraph
     let updated_parent = get_parent_paragraph(&target_paragraph_record, &db).await?;
-    let paragraph_summary = match assemble_paragraph_summary(&updated_parent, &db).await {
+    let paragraph_summary = match build_paragraph_summary(&updated_parent, &db).await {
         Ok(paragraph_summary) => paragraph_summary,
         Err(db_err) => return Err(KronosApiError::DbErr(db_err)),
     };

@@ -18,7 +18,7 @@ use crate::utilities::database_tools::access_kronos_database;
 use crate::models::entities::{prelude::*, *};
 use crate::models::entity_summaries::paragraph_summary::ParagraphSummary;
 
-use crate::routes::api::helper_methods::assemble_paragraph_summary::*;
+use crate::routes::api::helper_methods::build_paragraph_summary::*;
 
 struct EditParagraphParameters<'a> {
     pub paragraph_id: &'a i32,
@@ -90,7 +90,7 @@ pub async fn edit_paragraph(req: Json<KronosRequest>) -> Result<KronosResponse, 
     */
 
     let paragraph_summary: ParagraphSummary =
-        match assemble_paragraph_summary(&paragraph, &db).await {
+        match build_paragraph_summary(&paragraph, &db).await {
             Ok(paragraph_summary) => paragraph_summary,
             Err(msg) => return Err(KronosApiError::DbErr(msg)),
         };

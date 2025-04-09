@@ -43,7 +43,7 @@ pub fn default_order_template() -> OrderTemplate {
         paragraphs: vec![
             MigrationParagraph {
                 title: "Situation",
-                text: "",
+                text: "The situation paragraph describes the conditions of the operational environment that impact operations in the following subparagraphs:",
                 subparagraphs: Some(vec![
                     MigrationParagraph {
                         title: "Area of Interest",

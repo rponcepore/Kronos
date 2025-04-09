@@ -7,7 +7,7 @@ use crate::models::entity_summaries::paragraph_summary::ParagraphSummary;
 use sea_orm::*;
 
 //Recursive method that builds a paragraphsumamry, including all child paragraphs, for a paragraph.
-pub async fn assemble_paragraph_summary(
+pub async fn build_paragraph_summary(
     paragraph: &paragraph::Model,
     db: &DatabaseConnection,
 ) -> Result<ParagraphSummary, DbErr> {
@@ -28,7 +28,7 @@ pub async fn assemble_paragraph_summary(
             paragraph_summary.subparagraphs = Some(Vec::<ParagraphSummary>::new());
             for subparagraph in result {
                 let subparagraph_summary =
-                    Box::pin(async move { assemble_paragraph_summary(&subparagraph, db).await })
+                    Box::pin(async move { build_paragraph_summary(&subparagraph, db).await })
                         .await?;
                 paragraph_summary
                     .subparagraphs
