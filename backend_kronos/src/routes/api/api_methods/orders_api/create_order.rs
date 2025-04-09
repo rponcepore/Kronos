@@ -7,6 +7,7 @@ use debug_print::debug_println as dprintln;
 use sea_orm::*;
 
 use crate::models::entity_summaries::kronos_order_summary;
+use crate::routes::api::helper_methods::build_order_import::make_standard_order;
 use crate::routes::api::helper_methods::summarizers::{pack_order_summary, pack_plan_summary};
 use crate::routes::api::parameters::network_structs::*;
 use crate::utilities::database_tools::access_kronos_database;
@@ -230,6 +231,6 @@ async fn attach_standard_opord_paragraphs(
 ) -> Result<kronos_order::Model, KronosApiError> {
 
     // Read in from yaml file.
-    todo!()
+    let order_import = make_standard_order()?;
 
 }

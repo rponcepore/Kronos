@@ -40,5 +40,6 @@ pub enum KronosApiError {
     NotImplemented(String),
     BadRequest(String),
     ExpectedDataNotPresent(String),
+    InternalServerError(String),
     Unknown(String),
 }

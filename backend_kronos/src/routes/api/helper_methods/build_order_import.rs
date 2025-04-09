@@ -13,6 +13,7 @@ use crate::models::entity_summaries::{
     kronos_order_summary::*,
     paragraph_summary::*,
 };
+use crate::routes::api::parameters::network_structs::KronosApiError;
 
 const PATH_TO_OPORD_FILE: &str = "../../../../../configs/standard_opord_contents.yaml";
 
@@ -69,9 +70,15 @@ pub struct ImportParagraph{
     subparagraphs: Vec<ImportParagraph>
 }
 
-pub fn make_standard_order() -> Result<ImportOrder, Box<dyn std::error::Error>> {
-    let yaml_str = fs::read_to_string(PATH_TO_OPORD_FILE)?;
-    let opord: ImportOrder = serde_yaml::from_str(&yaml_str)?; //I don't know of a serde_yaml library or crate?
+pub fn make_standard_order() -> Result<ImportOrder, KronosApiError> {
+    let yaml_str = match fs::read_to_string(PATH_TO_OPORD_FILE){
+        Ok(yaml_str) => yaml_str,
+        Err(msg) => return Err(KronosApiError::Unknown(format!("Failed to read file at {}", PATH_TO_OPORD_FILE))),
+    };
+    let opord: ImportOrder = match serde_yaml::from_str(&yaml_str) { // crate deprecated but unlikely to change soon.
+        Ok(opord) => opord,
+        Err(msg) => return Err(KronosApiError::Unknown(format!("Failed to serialize string to ImportOpord. 7str: {}", yaml_str))),
+    };
 
     println!("{:#?}", opord);
     Ok(opord)

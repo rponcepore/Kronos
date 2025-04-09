@@ -26,7 +26,7 @@ pub async fn build_order_summary(
         .await {
             Ok(result) => result,
             Err(db_err) => return Err(KronosApiError::DbErr(db_err)),
-        }
+        };
 
     // For each paragraph returned, convert it into a ParagraphSummary.
     for paragraph in result {
