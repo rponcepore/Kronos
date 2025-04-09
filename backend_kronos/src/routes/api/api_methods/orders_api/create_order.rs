@@ -7,8 +7,11 @@ use debug_print::debug_println as dprintln;
 use sea_orm::*;
 
 use crate::models::entity_summaries::kronos_order_summary;
-use crate::routes::api::helper_methods::build_order_import::make_standard_order;
-use crate::routes::api::helper_methods::summarizers::{pack_order_summary, pack_plan_summary};
+use crate::routes::api::helper_methods::build_order_import::{
+    make_standard_order, ImportParagraph,
+};
+use crate::routes::api::helper_methods::build_order_summary::build_order_summary;
+use crate::routes::api::helper_methods::summarizers::pack_plan_summary;
 use crate::routes::api::parameters::network_structs::*;
 use crate::utilities::database_tools::access_kronos_database;
 
@@ -201,10 +204,9 @@ async fn create_opord(
     let opord: kronos_order::Model = attach_standard_opord_paragraphs(result.id, db).await?;
 
     // Now pack this order and return it as an order summary
-    let order_summary = pack_order_summary(opord, db).await?;
+    let order_summary = build_order_summary(&opord, db).await?;
 
     Ok(order_summary)
-    
 }
 
 //For creating either FRAGORDs or WARNORDS
@@ -226,11 +228,101 @@ async fn create_non_opord(
 }
 
 async fn attach_standard_opord_paragraphs(
-    opord_id: i32,
+    order_id: i32,
     db: &DatabaseConnection,
 ) -> Result<kronos_order::Model, KronosApiError> {
-
     // Read in from yaml file.
     let order_import = make_standard_order()?;
 
+    // Start building out paragraphs
+    for paragraph in &order_import.paragraphs {
+        // Create a paragraph in the database, return it's id
+        let paragraph_model = add_major_paragraph_to_db(&order_id, &paragraph, db).await?;
+        let para_id = paragraph_model.id;
+        // Now check if the Import paragraph has subparagraphs. If it did, repeat ad nauseum.
+        let indent_level = 1;
+        for subparagraph in &paragraph.subparagraphs {
+            let _new_paragraph =
+                add_subparagraph_to_db(&para_id, &order_id, &indent_level, &subparagraph, db)
+                    .await?;
+        }
+    }
+
+    let order_model =
+        match KronosOrder::find_by_id(order_id).one(db).await {
+            Ok(order_model) => match order_model {
+                Some(order_model) => order_model,
+                None => return Err(KronosApiError::ExpectedDataNotPresent(
+                    "Although a new order was just inserted, the database cannot find it. Panic?"
+                        .to_string(),
+                )),
+            },
+            Err(db_err) => return Err(KronosApiError::DbErr(db_err)),
+        };
+    
+    Ok(order_model)
+}
+
+async fn add_major_paragraph_to_db(
+    order_id: &i32,
+    paragraph: &ImportParagraph,
+    db: &DatabaseConnection,
+) -> Result<paragraph::Model, KronosApiError> {
+    // Build the SeaORM query
+    let new_paragraph = paragraph::ActiveModel {
+        id: ActiveValue::default(),
+        title: ActiveValue::Set(paragraph.title.to_owned()),
+        text: ActiveValue::Set(paragraph.text.to_owned()),
+        kronos_order: ActiveValue::Set(order_id.to_owned()),
+        parent_paragraph: ActiveValue::Set(None),
+        ordinal_sequence: ActiveValue::Set(paragraph.ordinal_sequence.to_owned()),
+        indent_level: ActiveValue::Set(0),
+    };
+
+    // Execute the insertion.
+    let result_paragraph = match new_paragraph.insert(db).await {
+        Ok(result) => result,
+        Err(db_err) => return Err(KronosApiError::DbErr(db_err)),
+    };
+    Ok(result_paragraph)
+}
+
+async fn add_subparagraph_to_db(
+    parent_paragraph_id: &i32,
+    order_id: &i32,
+    indent_level: &i32,
+    paragraph: &ImportParagraph,
+    db: &DatabaseConnection,
+) -> Result<paragraph::Model, KronosApiError> {
+    let new_paragraph = paragraph::ActiveModel {
+        id: ActiveValue::default(),
+        title: ActiveValue::Set(paragraph.title.to_owned()),
+        text: ActiveValue::Set(paragraph.text.to_owned()),
+        kronos_order: ActiveValue::Set(order_id.to_owned()),
+        parent_paragraph: ActiveValue::Set(Some(parent_paragraph_id.to_owned())),
+        ordinal_sequence: ActiveValue::Set(paragraph.ordinal_sequence.to_owned()),
+        indent_level: ActiveValue::Set(indent_level.to_owned()),
+    };
+
+    // Execute the insertion.
+    let result_paragraph = match new_paragraph.insert(db).await {
+        Ok(result) => result,
+        Err(db_err) => return Err(KronosApiError::DbErr(db_err)),
+    };
+    let child_indent_level = indent_level + 1;
+    for subparagraph in &paragraph.subparagraphs {
+        let _ignored_value = Box::pin(async move {
+            add_subparagraph_to_db(
+                &result_paragraph.id,
+                order_id,
+                &child_indent_level,
+                &subparagraph,
+                db,
+            )
+            .await
+        }).await?;
+        
+    }
+
+    Ok(result_paragraph)
 }

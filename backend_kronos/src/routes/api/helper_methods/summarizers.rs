@@ -5,6 +5,7 @@ use crate::models::entity_summaries::{
     kronos_order_summary::KronosOrderSummary, paragraph_summary::ParagraphSummary,
     plan_summary::PlanSummary,
 };
+use crate::routes::api::helper_methods::build_order_summary::build_order_summary;
 use crate::routes::api::parameters::network_structs::*;
 use sea_orm::*;
 
@@ -39,7 +40,7 @@ pub async fn pack_plan_summary(
             let mut packed_orders = Vec::<KronosOrderSummary>::new();
             for db_order_ref in &order_vec_single_plan {
                 let db_order = db_order_ref.clone();
-                let packed_order = match pack_order_summary(db_order, &db).await {
+                let packed_order = match build_order_summary(&db_order, &db).await {
                     Ok(packed_order) => packed_order,
                     Err(err) => return Err(err),
                 };
@@ -64,6 +65,7 @@ pub async fn pack_plan_summary(
 
 // At this time, the orders summary arrives without including its child paragraphs.
 // This can be relatively easily added if desired.
+/*
 pub async fn pack_order_summary(
     order: kronos_order::Model,
     _db: &DatabaseConnection,
@@ -84,6 +86,7 @@ pub async fn pack_order_summary(
 
     Ok(order_summary)
 }
+*/
 
 async fn get_most_recent_mission(
     order_vec: Vec<kronos_order::Model>,

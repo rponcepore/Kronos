@@ -89,11 +89,10 @@ pub async fn edit_paragraph(req: Json<KronosRequest>) -> Result<KronosResponse, 
     let parent_paragraph_summary: ParagraphSummary = generate_paragraph_summary().await?;
     */
 
-    let paragraph_summary: ParagraphSummary =
-        match build_paragraph_summary(&paragraph, &db).await {
-            Ok(paragraph_summary) => paragraph_summary,
-            Err(msg) => return Err(KronosApiError::DbErr(msg)),
-        };
+    let paragraph_summary: ParagraphSummary = match build_paragraph_summary(&paragraph, &db).await {
+        Ok(paragraph_summary) => paragraph_summary,
+        Err(msg) => return Err(KronosApiError::DbErr(msg)),
+    };
 
     let response = KronosResponse {
         kronos_request: req.into_inner(),

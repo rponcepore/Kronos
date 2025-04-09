@@ -68,33 +68,23 @@ pub async fn api_handler(
         }
         Err(kronos_api_error) => match kronos_api_error {
             KronosApiError::DbErr(err) => {
-                HttpResponse::InternalServerError()
-                    .body(format!("Database failure: {}\n", err))
-            },
-            KronosApiError::ActixError(err) => {
-                HttpResponse::InternalServerError()
-                    .body(format!("Internal server error: {}\n", err))
-            },
+                HttpResponse::InternalServerError().body(format!("Database failure: {}\n", err))
+            }
+            KronosApiError::ActixError(err) => HttpResponse::InternalServerError()
+                .body(format!("Internal server error: {}\n", err)),
             KronosApiError::NotImplemented(msg) => {
-                HttpResponse::NotImplemented()
-                    .body(format!("Not implemented: {}\n", msg))
-            },
+                HttpResponse::NotImplemented().body(format!("Not implemented: {}\n", msg))
+            }
             KronosApiError::BadRequest(msg) => {
-                HttpResponse::BadRequest()
-                    .body(format!("Bad request to API: {}\n", msg))
-            },
-            KronosApiError::ExpectedDataNotPresent(msg) => {
-                HttpResponse::InternalServerError()
-                    .body(format!("Expected data not found in database: {}\n", msg))
-            },
-            KronosApiError::InternalServerError(msg) => {
-                HttpResponse::InternalServerError()
-                    .body(format!("Internal server error: {}\n", msg))
-            },
+                HttpResponse::BadRequest().body(format!("Bad request to API: {}\n", msg))
+            }
+            KronosApiError::ExpectedDataNotPresent(msg) => HttpResponse::InternalServerError()
+                .body(format!("Expected data not found in database: {}\n", msg)),
+            KronosApiError::InternalServerError(msg) => HttpResponse::InternalServerError()
+                .body(format!("Internal server error: {}\n", msg)),
             KronosApiError::Unknown(msg) => {
-                HttpResponse::InternalServerError()
-                    .body(format!("Unknown error: {}\n", msg))
-            },
+                HttpResponse::InternalServerError().body(format!("Unknown error: {}\n", msg))
+            }
         },
     }
 }
