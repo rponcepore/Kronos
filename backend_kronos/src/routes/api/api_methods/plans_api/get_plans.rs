@@ -39,7 +39,7 @@ pub async fn get_plans(req: Json<KronosRequest>) -> Result<KronosResponse, Krono
     let plan_vec: Vec<plan::Model> = match Plan::find()
         .filter(plan::Column::Uic.contains(unit_str))
         .order_by_asc(plan::Column::FiscalYear)
-        .order_by_asc(plan::Column::SerialNumber)
+        .order_by_desc(plan::Column::SerialNumber)
         .all(&db)
         .await
     {

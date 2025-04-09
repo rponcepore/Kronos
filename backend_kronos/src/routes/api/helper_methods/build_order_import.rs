@@ -10,6 +10,7 @@ use serde::{Deserialize, Serialize};
 use std::fs;
 
 const PATH_TO_OPORD_FILE: &str = "../../../../../configs/standard_opord_contents.yaml";
+const PATH_TO_FRAGORD_FILE: &str = "../../../../../configs/standard_fragord_contents.yaml";
 
 /* TYPES
 pub struct KronosOrderSummary {
@@ -80,7 +81,7 @@ pub fn make_standard_order() -> Result<ImportOrder, KronosApiError> {
         Ok(opord) => opord,
         Err(msg) => {
             return Err(KronosApiError::Unknown(format!(
-                "Failed to serialize string to ImportOpord. Error: {}, &str: {}",
+                "Failed to serialize string to ImportOrder struct. Error: {}, &str: {}",
                 msg,
                 yaml_str
             )))
@@ -89,4 +90,31 @@ pub fn make_standard_order() -> Result<ImportOrder, KronosApiError> {
 
     println!("{:#?}", opord);
     Ok(opord)
+}
+
+pub fn make_standard_fragord() -> Result<ImportOrder, KronosApiError> {
+    let yaml_str = match fs::read_to_string(PATH_TO_FRAGORD_FILE) {
+        Ok(yaml_str) => yaml_str,
+        Err(msg) => {
+            return Err(KronosApiError::Unknown(format!(
+                "Failed to read file at {}, Error Message: {}",
+                PATH_TO_OPORD_FILE,
+                msg
+            )))
+        }
+    };
+    let fragord: ImportOrder = match serde_yaml::from_str(&yaml_str) {
+        // crate deprecated but unlikely to change soon.
+        Ok(opord) => opord,
+        Err(msg) => {
+            return Err(KronosApiError::Unknown(format!(
+                "Failed to serialize string to ImportOrder struct. Error: {}, &str: {}",
+                msg,
+                yaml_str
+            )))
+        }
+    };
+
+    println!("{:#?}", fragord);
+    Ok(fragord)
 }

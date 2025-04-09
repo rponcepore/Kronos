@@ -8,7 +8,7 @@ use sea_orm::*;
 
 use crate::models::entity_summaries::kronos_order_summary;
 use crate::routes::api::helper_methods::build_order_import::{
-    make_standard_order, ImportParagraph,
+    make_standard_order, make_standard_fragord, ImportParagraph,
 };
 use crate::routes::api::helper_methods::build_order_summary::build_order_summary;
 use crate::routes::api::helper_methods::summarizers::pack_plan_summary;
@@ -46,8 +46,8 @@ pub async fn create_order(req: Json<KronosRequest>) -> Result<KronosResponse, Kr
     // and then number it accordingly. If it is an OPORD, then we need to make sure that there is only one OPORD.
     let order_summary_wrapped = match checked_params.order_type.as_str() {
         "OPORD" => create_opord(&checked_params, &db).await,
-        "FRAGORD" => create_non_opord(&checked_params, &db).await,
-        "WARNORD" => create_non_opord(&checked_params, &db).await,
+        "FRAGORD" => create_fragord(&checked_params, &db).await,
+        "WARNORD" => create_warnord(&checked_params, &db).await,
         _ => {
             return Err(KronosApiError::BadRequest(format!(
                 "Illegal order_type specified: {}",
@@ -141,22 +141,7 @@ async fn create_opord(
     db: &DatabaseConnection,
 ) -> Result<KronosOrderSummary, KronosApiError> {
     // There can only be one OPORD. Check this now.
-    let plan: plan::Model = match Plan::find()
-        .filter(plan::Column::Id.eq(params.plan_id.clone()))
-        .one(db)
-        .await
-    {
-        Ok(plan) => match plan {
-            Some(plan) => plan,
-            None => {
-                return Err(KronosApiError::ExpectedDataNotPresent(format!(
-                    "Could not find a plan record that matched plan_id {}",
-                    params.plan_id
-                )))
-            }
-        },
-        Err(db_err) => return Err(KronosApiError::DbErr(db_err)),
-    };
+    let plan = get_plan_model(params.plan_id, db).await?;
 
     // check to see if there are any opords (there should only be one!)
     let orders_vec = match KronosOrder::find()
@@ -210,21 +195,76 @@ async fn create_opord(
 }
 
 //For creating either FRAGORDs or WARNORDS
-async fn create_non_opord(
+async fn create_warnord(
     params: &CreateOrderParams<'_>,
     db: &DatabaseConnection,
 ) -> Result<KronosOrderSummary, KronosApiError> {
     //get the plan
-    let plan = match Plan::find()
-        .filter(plan::Column::Id.eq(params.plan_id.clone()))
-        .one(db)
+    let plan = get_plan_model(params.plan_id, db).await?;
+
+    // WARNORDS are mercifully easy. Five paragraphs.
+    // First, deduce the number of the warnord.
+    let warnords_vec = match KronosOrder::find()
+        .filter(kronos_order::Column::ParentPlan.eq(params.plan_id.to_owned()))
+        .filter(kronos_order::Column::OrderType.eq("WARNORD"))
+        .order_by_desc(kronos_order::Column::SerialNumber)
+        .all(db)
         .await
     {
-        Ok(plan) => plan,
+        Ok(warnords_vec) => warnords_vec,
         Err(db_err) => return Err(KronosApiError::DbErr(db_err)),
     };
 
-    todo!()
+    let mut highest_known_serial = 0;
+    let vec_length = (&warnords_vec.len()).clone();
+    if vec_length > 0 {
+        let latest_warnord = &warnords_vec[vec_length-1];
+        highest_known_serial = latest_warnord.serial_number;
+    }
+
+    let new_serial_number = highest_known_serial+1;
+
+    //Create the order
+    let new_order = kronos_order::ActiveModel {
+        parent_plan: ActiveValue::Set(params.plan_id.to_owned()),
+        order_type: ActiveValue::Set("FRAGORD".to_owned()),
+        serial_number: ActiveValue::Set(new_serial_number),
+        is_published: ActiveValue::Set(false),
+        derived_from: ActiveValue::NotSet,
+        ..Default::default() //do not set auto incrementing uuid pk
+    };
+
+    // Send it to the database
+    let result = match new_order.insert(db).await {
+        Ok(result) => result,
+        Err(db_err) => return Err(KronosApiError::DbErr(db_err)),
+    };
+
+    // This is a warnord, so only add the first five paragraphs.
+    let fragord_import = make_standard_fragord()?;
+
+    // Start building out paragraphs
+    for paragraph in &fragord_import.paragraphs {
+        // Create a paragraph in the database, return it's id
+        let paragraph_model = add_major_paragraph_to_db(&result.id, &paragraph, db).await?;
+    }
+
+    // Now pack this order and return it as an order summary
+    let order_summary = build_order_summary(&result, db).await?;
+
+    Ok(order_summary)
+
+
+}
+
+
+//For creating either FRAGORDs or WARNORDS
+async fn create_fragord(
+    params: &CreateOrderParams<'_>,
+    db: &DatabaseConnection,
+) -> Result<KronosOrderSummary, KronosApiError> {
+    
+    Err(KronosApiError::NotImplemented("New FRAGORDS are not implemented at this time.".to_string()))
 }
 
 async fn attach_standard_opord_paragraphs(
@@ -325,4 +365,24 @@ async fn add_subparagraph_to_db(
     }
 
     Ok(result_paragraph)
+}
+
+async fn get_plan_model(plan_id: &i32, db: &DatabaseConnection) -> Result<plan::Model, KronosApiError> {
+    let plan: plan::Model = match Plan::find()
+        .filter(plan::Column::Id.eq(plan_id.clone()))
+        .one(db)
+        .await
+    {
+        Ok(plan) => match plan {
+            Some(plan) => plan,
+            None => {
+                return Err(KronosApiError::ExpectedDataNotPresent(format!(
+                    "Could not find a plan record that matched plan_id {}",
+                    plan_id
+                )))
+            }
+        },
+        Err(db_err) => return Err(KronosApiError::DbErr(db_err)),
+    };
+    Ok(plan)
 }
