@@ -31,7 +31,6 @@ pub fn no_db_plan_req() -> KronosRequest {
         order_request: None,
         paragraph_request: None,
         task_request: None,
-
     }
 }
 
@@ -42,7 +41,7 @@ pub fn with_db_plan_req() -> KronosRequest {
         uic: Some("WJH8C0".to_string()),
         admin_request: None,
         unit_request: None,
-        
+
         plan_request: None,
         order_request: None,
         paragraph_request: None,
@@ -57,7 +56,7 @@ pub fn dummy_plan_request() -> KronosRequest {
         uic: Some("WHJ8C0".to_string()),
         admin_request: None,
         unit_request: None,
-        
+
         plan_request: None,
         order_request: None,
         paragraph_request: None,

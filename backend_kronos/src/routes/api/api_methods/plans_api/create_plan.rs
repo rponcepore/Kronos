@@ -63,7 +63,7 @@ pub async fn create_plan(valid_req: Json<KronosRequest>) -> Result<KronosRespons
     };
 
     // Now, check if that UIC even exists:
-    if check_if_uic_exists(&uic, &db).await? != true{
+    if check_if_uic_exists(&uic, &db).await? != true {
         return Err(KronosApiError::BadRequest("The uic that you have provided does not exist in the database. To create it, send a create_uic request.".to_string()));
     }
 
@@ -122,4 +122,3 @@ pub async fn create_plan(valid_req: Json<KronosRequest>) -> Result<KronosRespons
 
     Ok(response)
 }
-

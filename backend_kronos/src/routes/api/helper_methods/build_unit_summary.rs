@@ -4,25 +4,17 @@ use sea_orm::*;
 
 use crate::{
     models::{
-        entities::{
-            prelude::*,
-            unit::*, 
-            plan::*,
-            *
-        },
-        entity_summaries::{
-            unit_summary::UnitSummary,
-            plan_summary::PlanSummary,
-        }
+        entities::{plan::*, prelude::*, unit::*, *},
+        entity_summaries::{plan_summary::PlanSummary, unit_summary::UnitSummary},
     },
-    routes::api::{
-        parameters::network_structs::KronosApiError,
-        helper_methods::summarizers::*,
-    }
+    routes::api::{helper_methods::summarizers::*, parameters::network_structs::KronosApiError},
 };
 
 // Shallow. Just get shallow plan summaries
-pub async fn build_unit_summary(unit: &unit::Model, db: &DatabaseConnection) -> Result<UnitSummary, KronosApiError> {
+pub async fn build_unit_summary(
+    unit: &unit::Model,
+    db: &DatabaseConnection,
+) -> Result<UnitSummary, KronosApiError> {
     // Get all the plans for that unit
     let plan_vec: Vec<plan::Model> = match Plan::find()
         .filter(plan::Column::Uic.contains(unit.uic.to_owned()))

@@ -1,6 +1,6 @@
 //! army_echelons_enum.rs
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 // Echelons for units in the US Army
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]

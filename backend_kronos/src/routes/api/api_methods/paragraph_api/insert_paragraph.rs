@@ -49,13 +49,13 @@ pub async fn insert_paragraph(req: Json<KronosRequest>) -> Result<KronosResponse
 
     let siblingship = checked_params.insert_method.as_str();
 
-    // Check a quick invariant: No calls to insert siblings on major paragraphs. 
+    // Check a quick invariant: No calls to insert siblings on major paragraphs.
     if (target_paragraph_record.indent_level == 0) && (siblingship != "SUBPARAGRAPH") {
-        return Err(KronosApiError::BadRequest(
-            format!("You cannot insert a sibling paragraph on a major paragraph; \
+        return Err(KronosApiError::BadRequest(format!(
+            "You cannot insert a sibling paragraph on a major paragraph; \
                     you may insert subpararaphs on major paragraphs. (i.e., it's a five \
                     paragraph OPORD, and KRONOS enforces this."
-                )));
+        )));
     }
 
     // Match the case to the function.

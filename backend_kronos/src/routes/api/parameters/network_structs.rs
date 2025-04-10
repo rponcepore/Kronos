@@ -1,15 +1,11 @@
 //! network_structs.rs
 
-use serde::Serialize;
 use actix_web::web::Json;
+use serde::Serialize;
 
 use super::{
-    admin_request::AdminRequest,
-    unit_request::UnitRequest,
-    plan_request::PlanRequest,
-    order_request::OrderRequest,
-    paragraph_request::ParagraphRequest,
-    task_request::TaskRequest,
+    admin_request::AdminRequest, order_request::OrderRequest, paragraph_request::ParagraphRequest,
+    plan_request::PlanRequest, task_request::TaskRequest, unit_request::UnitRequest,
 };
 
 // For incomign requests.
@@ -18,8 +14,9 @@ use crate::models::entity_summaries::{
     kronos_order_summary::KronosOrderSummary, 
     paragraph_summary::ParagraphSummary,
     plan_summary::PlanSummary, 
+    task_summary::TaskSummary, 
     unit_summary::UnitSummary,
-    task_summary::TaskSummary,
+    admin_summary::AdminSummary,
 };
 
 #[derive(serde::Deserialize, Serialize, Debug)]
@@ -44,6 +41,7 @@ pub struct KronosResponse {
     pub paragraphs_vec: Option<Vec<ParagraphSummary>>,
     pub units_vec: Option<Vec<UnitSummary>>,
     pub tasks_vec: Option<Vec<TaskSummary>>,
+    pub admin_vec: Option<Vec<AdminSummary>>,
 }
 
 pub enum KronosApiError {
@@ -57,7 +55,7 @@ pub enum KronosApiError {
 }
 
 impl KronosResponse {
-    pub fn new(req : Json<KronosRequest>) -> Self {
+    pub fn new(req: Json<KronosRequest>) -> Self {
         Self {
             kronos_request: req.into_inner(),
             plans_vec: None,
@@ -65,29 +63,39 @@ impl KronosResponse {
             paragraphs_vec: None,
             units_vec: None,
             tasks_vec: None,
+            admin_vec: None,
         }
     }
 
-    pub fn with_plan(mut self, plan_summary : PlanSummary) -> Self  {
+    pub fn with_plan(mut self, plan_summary: PlanSummary) -> Self {
         self.plans_vec = Some(vec![plan_summary]);
         self
     }
 
-    pub fn with_order(mut self, order : KronosOrderSummary) -> Self  {
+    pub fn with_order(mut self, order: KronosOrderSummary) -> Self {
         self.orders_vec = Some(vec![order]);
         self
     }
 
-    pub fn with_paragraph(mut self, paragraph_summary : ParagraphSummary) -> Self  {
+    pub fn with_paragraph(mut self, paragraph_summary: ParagraphSummary) -> Self {
         self.paragraphs_vec = Some(vec![paragraph_summary]);
         self
     }
 
-    pub fn with_unit(mut self, unit : UnitSummary) -> Self  {
+    pub fn with_unit(mut self, unit: UnitSummary) -> Self {
         self.units_vec = Some(vec![unit]);
         self
     }
 
+    pub fn with_admin(mut self, admin: AdminSummary) -> Self {
+        self.admin_vec = Some(vec![admin]);
+        self
+    }
+
+    pub fn with_task(mut self, task: TaskSummary) -> Self {
+        self.tasks_vec = Some(vec![task]);
+        self
+    }
 }
 
 impl KronosRequest {

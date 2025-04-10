@@ -3,8 +3,8 @@
 // This file defines convenient reused code in the paragraph API.
 // Future refactors should look for opportunities to include it
 
-use sea_orm::*;
 use debug_print::debug_println as dprintln;
+use sea_orm::*;
 
 use crate::routes::api::parameters::network_structs::*;
 
@@ -39,7 +39,13 @@ pub async fn get_parent_paragraph(
     let parent_paragraph_id = match target_paragraph.parent_paragraph {
         Some(parent_paragraph_id) => parent_paragraph_id,
         None => {
-            dprintln!("{}", format!("Returning error. parent_paragraph_id is null for target paragraph id {}", target_paragraph.id));
+            dprintln!(
+                "{}",
+                format!(
+                    "Returning error. parent_paragraph_id is null for target paragraph id {}",
+                    target_paragraph.id
+                )
+            );
             dprintln!("{}", format!("Target paragraph: {:?}", target_paragraph));
             return Err(KronosApiError::ExpectedDataNotPresent(format!(
                 "In attempting to locate the parent paragraph of the target paragraph, \
@@ -48,7 +54,7 @@ pub async fn get_parent_paragraph(
                  paragraph on a major paragraph, or (2) to delete a major paragraph, \
                  neither of which is allowed. Aternatively, an invariant \
                  of paragraph data has been violated, in which case, panic."
-            )))
+            )));
         }
     };
     let parent_option: Option<paragraph::Model> =

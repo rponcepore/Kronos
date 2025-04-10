@@ -26,6 +26,7 @@ impl MigrationTrait for Migration {
         plan_vec.push(("WJH8AA", 25, 2, "Revenge", "CUI"));
         plan_vec.push(("WJH8AA", 25, 3, "Jack Sparrow", "CUI"));
         plan_vec.push(("WJH8AA", 25, 3, "Pirate's Life", "CUI"));
+        plan_vec.push(("WJH8AA", 25, 1, "Aces in Black", "CUI"));
 
         for plan in plan_vec{
             let insert = Query::insert()

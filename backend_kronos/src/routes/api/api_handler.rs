@@ -9,12 +9,16 @@ use debug_print::debug_println as dprintln;
 // Pull in our entity Summaries
 
 // Include our database configs
-use crate::routes::api::api_methods::{
-    orders_api::{create_order::*, get_order::*},
-    paragraph_api::{delete_paragraph::*, edit_paragraph::*, insert_paragraph::*},
-    plans_api::{create_plan::*, get_plans::*},
+use crate::routes::api::{
+    api_methods::{
+        admin_api::admin_request_handler::*,
+        orders_api::{create_order::*, get_order::*},
+        paragraph_api::{delete_paragraph::*, edit_paragraph::*, insert_paragraph::*},
+        plans_api::{create_plan::*, get_plans::*},
+        units_api::{create_unit::*, *},
+    },
+    parameters::network_structs::*,
 };
-use crate::routes::api::parameters::network_structs::*;
 
 /*
  * Core API call handler for the application, matching JSON "api_method" parameter
@@ -42,6 +46,11 @@ pub async fn api_handler(
     let api_method = valid_req.api_method.as_ref().unwrap().as_str();
 
     let kronos_response: Result<KronosResponse, KronosApiError> = match api_method {
+        // Admin actions
+        "admin_request" => admin_request_handler(valid_req).await,
+
+        // Unit actions
+        "create_unit" => create_unit(valid_req).await,
         // Plans actions
         "create_plan" => create_plan(valid_req).await,
         "get_plans" => get_plans(valid_req).await,
@@ -55,6 +64,8 @@ pub async fn api_handler(
         "insert_paragraph" => insert_paragraph(valid_req).await,
         "edit_paragraph" => edit_paragraph(valid_req).await,
         "delete_paragraph" => delete_paragraph(valid_req).await,
+        //
+
         // Return a BadRequest response if the api_method was invalid.
         _ => {
             return HttpResponse::BadRequest().body(format!("Invalid api_method: {}\n", api_method))
@@ -106,4 +117,3 @@ async fn is_request_valid(req: Json<KronosRequest>) -> Result<Json<KronosRequest
 
     return Ok(req);
 }
-

@@ -5,26 +5,12 @@ pub struct Migration;
 
 // Bring plans table into scope
 use super::m20250316_000002_create_unit::Unit;
-/*
-pub enum Unit { 
-     .col(
-                        ColumnDef::new(Unit::Uic)
-                        .string()
-                        .not_null()
-                        .primary_key(),
-                    )
-                    .col(ColumnDef::new(Unit::Echelon).string().not_null())
-                    .col(ColumnDef::new(Unit::Nickname).string().not_null())
-                    .col(ColumnDef::new(Unit::DisplayName).string().not_null())
-                    .col(ColumnDef::new(Unit::ShortName).string().not_null())
-                    .col(ColumnDef::new(Unit::Component).string().not_null())
-}
-*/
+
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
 
-        //Step 0: Create a unit for this plan to live in. We'll call that unit "TEMPLT" and it will house orders templates.
+        // Step 0: Create a unit for this plan to live in. We'll call that unit "TEMPLT" and it will house orders templates.
         // Hacky but deal with it.
         let template_unit = ("TEMPLT", "UNK", "TEMPLATES", "ORDERS TEMPLATS", "TEMPLATES", "Active");
         let insert_template = Query::insert()

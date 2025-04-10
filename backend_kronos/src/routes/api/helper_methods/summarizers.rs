@@ -2,8 +2,7 @@
 
 use crate::models::entities::{prelude::*, *};
 use crate::models::entity_summaries::{
-    kronos_order_summary::KronosOrderSummary,
-    plan_summary::PlanSummary,
+    kronos_order_summary::KronosOrderSummary, plan_summary::PlanSummary,
 };
 use crate::routes::api::helper_methods::build_order_summary::*;
 use crate::routes::api::parameters::network_structs::*;

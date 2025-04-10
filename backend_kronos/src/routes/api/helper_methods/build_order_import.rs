@@ -67,8 +67,7 @@ pub fn make_standard_order() -> Result<ImportOrder, KronosApiError> {
         Err(msg) => {
             return Err(KronosApiError::Unknown(format!(
                 "Failed to read file at {}, Error Message: {}",
-                PATH_TO_OPORD_FILE,
-                msg
+                PATH_TO_OPORD_FILE, msg
             )))
         }
     };
@@ -78,8 +77,7 @@ pub fn make_standard_order() -> Result<ImportOrder, KronosApiError> {
         Err(msg) => {
             return Err(KronosApiError::Unknown(format!(
                 "Failed to serialize string to ImportOrder struct. Error: {}, &str: {}",
-                msg,
-                yaml_str
+                msg, yaml_str
             )))
         }
     };
@@ -94,8 +92,7 @@ pub fn make_standard_fragord() -> Result<ImportOrder, KronosApiError> {
         Err(msg) => {
             return Err(KronosApiError::Unknown(format!(
                 "Failed to read file at {}, Error Message: {}",
-                PATH_TO_OPORD_FILE,
-                msg
+                PATH_TO_OPORD_FILE, msg
             )))
         }
     };
@@ -105,8 +102,7 @@ pub fn make_standard_fragord() -> Result<ImportOrder, KronosApiError> {
         Err(msg) => {
             return Err(KronosApiError::Unknown(format!(
                 "Failed to serialize string to ImportOrder struct. Error: {}, &str: {}",
-                msg,
-                yaml_str
+                msg, yaml_str
             )))
         }
     };

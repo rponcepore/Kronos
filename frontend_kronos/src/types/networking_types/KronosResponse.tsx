@@ -11,10 +11,11 @@ import { AdminSummary } from "../frontend_types/AdminSummary";
 
 export type KronosResponse = {
     kronos_request: KronosRequest;
-    admin_response: AdminSummary | null;
+    
     units_vec: UnitSummary[] | null;
     plans_vec: PlanSummary[] | null;
     orders_vec: KronosOrderSummary[] | null;
     paragraphs_vec: ParagraphSummary[] | null;
     tasks_vec: TaskSummary[] | null;
+    admin_vec: AdminSummary[] | null;
 }

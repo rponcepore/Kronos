@@ -44,10 +44,9 @@ pub async fn build_order_summary(
     Ok(kronos_order_summary)
 }
 
-
-// This is for providing the plans page with something to leverage. 
-// Loading all orders is really unnecessary considering most users will only want one. 
-// Even loading these is dubiously useful. 
+// This is for providing the plans page with something to leverage.
+// Loading all orders is really unnecessary considering most users will only want one.
+// Even loading these is dubiously useful.
 pub async fn build_order_summary_shallow(
     order: &kronos_order::Model,
     _db: &DatabaseConnection,

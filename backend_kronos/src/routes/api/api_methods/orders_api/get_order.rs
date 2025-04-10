@@ -69,7 +69,7 @@ pub async fn get_order(req: Json<KronosRequest>) -> Result<KronosResponse, Krono
     let order_summary = build_order_summary(&kronos_order, &db).await?;
 
     let kronos_response = KronosResponse::new(req).with_order(order_summary);
-    
+
     // Send back to the client
     Ok(kronos_response)
 }
