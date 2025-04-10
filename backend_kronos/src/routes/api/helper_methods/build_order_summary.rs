@@ -2,7 +2,7 @@
 
 use sea_orm::*;
 
-use crate::models::entities::{prelude::*, *};
+use crate::models::entities::*;
 use crate::models::entity_summaries::*;
 use crate::routes::api::helper_methods::build_order_summary::kronos_order_summary::KronosOrderSummary;
 use crate::routes::api::helper_methods::build_order_summary::paragraph_summary::ParagraphSummary;
@@ -24,6 +24,7 @@ pub async fn build_order_summary(
     let result = match paragraph::Entity::find()
         .filter(paragraph::Column::KronosOrder.eq(order.id))
         .filter(paragraph::Column::IndentLevel.eq(0))
+        .order_by_asc(paragraph::Column::OrdinalSequence)
         .all(db)
         .await
     {
@@ -49,11 +50,11 @@ pub async fn build_order_summary(
 // Even loading these is dubiously useful. 
 pub async fn build_order_summary_shallow(
     order: &kronos_order::Model,
-    db: &DatabaseConnection,
+    _db: &DatabaseConnection,
 ) -> Result<KronosOrderSummary, KronosApiError> {
-    let mut kronos_order_summary = KronosOrderSummary {
+    let kronos_order_summary = KronosOrderSummary {
         data: order.clone(),
-        paragraphs: Some(Vec::<ParagraphSummary>::new()),
+        paragraphs: None,
     };
 
     Ok(kronos_order_summary)

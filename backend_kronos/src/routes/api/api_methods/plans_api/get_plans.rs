@@ -14,7 +14,6 @@ use crate::routes::api::helper_methods::summarizers::*;
 
 // Pull in our entities,
 use crate::models::entities::{prelude::*, *};
-use crate::models::entity_summaries::kronos_order_summary::KronosOrderSummary;
 use crate::models::entity_summaries::plan_summary::PlanSummary;
 
 pub async fn get_plans(req: Json<KronosRequest>) -> Result<KronosResponse, KronosApiError> {

@@ -42,6 +42,7 @@ test('insert_subparagraph api test', async () => {
     expect(order.paragraphs.length).toBe(5);
     console.log(order.paragraphs);
     const target : ParagraphSummary = order.paragraphs[0]; // the situation paragraph
+    expect(target.data.title.toUpperCase()).toBe("SITUATION");
 
     // How many subparagraphs does it currently have? 
     const targetSubParaArrLen = target.subParagraphs.length;

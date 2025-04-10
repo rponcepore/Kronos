@@ -6,7 +6,6 @@ use actix_web::web::Json;
 use debug_print::debug_println as dprintln;
 use sea_orm::*;
 
-use crate::models::entity_summaries::kronos_order_summary;
 use crate::routes::api::helper_methods::build_order_import::{
     make_standard_order, make_standard_fragord, ImportParagraph,
 };
@@ -16,15 +15,10 @@ use crate::routes::api::parameters::network_structs::*;
 use crate::utilities::database_tools::access_kronos_database;
 
 use crate::models::entities::{prelude::*, *};
-use crate::models::entity_summaries::{
-    kronos_order_summary::KronosOrderSummary, paragraph_summary::ParagraphSummary,
-    plan_summary::PlanSummary,
-};
+use crate::models::entity_summaries::kronos_order_summary::KronosOrderSummary;
 
-use crate::routes::api::api_methods::paragraph_api::paragraph_helper_methods::*;
-use crate::routes::api::helper_methods::build_paragraph_summary::*;
 
-use crate::{models::entities::plan, routes::api::parameters::network_structs::*};
+use crate::models::entities::plan;
 
 struct CreateOrderParams<'a> {
     plan_id: &'a i32,
@@ -44,7 +38,9 @@ pub async fn create_order(req: Json<KronosRequest>) -> Result<KronosResponse, Kr
 
     // If this is a WARNORD or a FRAGORD, we just need to increment the current count for that thing,
     // and then number it accordingly. If it is an OPORD, then we need to make sure that there is only one OPORD.
-    let order_summary_wrapped = match checked_params.order_type.as_str() {
+    // Ignore the return value, sinc'e we're going to return the plan anyway. 
+    // (Is this a good idea? Feels a little redundant/unnecessary.)
+    let _order_summary_wrapped = match checked_params.order_type.as_str() {
         "OPORD" => create_opord(&checked_params, &db).await,
         "FRAGORD" => create_fragord(&checked_params, &db).await,
         "WARNORD" => create_warnord(&checked_params, &db).await,
