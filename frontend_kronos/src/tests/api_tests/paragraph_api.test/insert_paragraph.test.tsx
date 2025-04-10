@@ -13,7 +13,10 @@ import { ParagraphRequest } from '../../../types/networking_types/ParagraphReque
 import { ParagraphSummary } from '../../../types/frontend_types/ParagraphSummary.tsx'
 import { Classification } from '../../../types/enums/Classification.tsx'
 
-
+/*
+ * This test is kind of a mess, but it tests
+ * get_order, and insert_subparagraph, and delete_paragraph. 
+ */
 
 test('insert_subparagraph api test', async () => {
     //first, get an order
@@ -30,6 +33,8 @@ test('insert_subparagraph api test', async () => {
         order_request: order_request,
         paragraph_request: null,
         task_request: null,
+        admin_request: null,
+        unit_request: null,
     };
 
     let response: KronosResponse = await kronosApiCall(req);
@@ -70,6 +75,8 @@ test('insert_subparagraph api test', async () => {
         order_request: null,
         paragraph_request: paragraph_request,
         task_request: null,
+        admin_request: null,
+        unit_request: null,
     }
     let response2: KronosResponse = await kronosApiCall(req2);
     expect(response2.paragraphs_vec).not.toBeNull(); //should not be null
@@ -106,6 +113,8 @@ test('insert_subparagraph api test', async () => {
         order_request: null,
         paragraph_request: paragraph_request_revert,
         task_request: null,
+        admin_request: null,
+        unit_request: null,
     }
     
 

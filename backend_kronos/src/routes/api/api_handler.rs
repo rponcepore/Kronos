@@ -112,6 +112,8 @@ impl KronosRequest {
         Self {
             api_method: None,
             uic: None,
+            admin_request: None,
+            unit_request: None,
             plan_request: None,
             order_request: None,
             paragraph_request: None,

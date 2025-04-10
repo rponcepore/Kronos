@@ -19,6 +19,8 @@ pub struct KronosRequest {
     pub api_method: Option<String>,
     pub uic: Option<String>,
     // Basic fields for easy access
+    pub admin_request: Option<AdminRequest>,
+    pub unit_request: Option<UnitRequest>,
     pub plan_request: Option<PlanRequest>,
     pub order_request: Option<OrderRequest>,
     pub paragraph_request: Option<ParagraphRequest>,

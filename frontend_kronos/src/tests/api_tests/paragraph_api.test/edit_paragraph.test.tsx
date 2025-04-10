@@ -1,17 +1,14 @@
 import { expect, test } from 'vitest'
 import { KronosRequest } from '../../../types/networking_types/KronosRequest.tsx'
-import { PlanSummary } from '../../../types/frontend_types/PlanSummary.tsx'
 import { kronosApiCall } from '../../../helper_methods/ApiCall.tsx'
 import { KronosResponse } from '../../../types/networking_types/KronosResponse.tsx'
 import { KronosApiMethod } from '../../../types/networking_types/KronosApiMethodEnums.tsx'
 import { KronosOrderSummary } from '../../../types/frontend_types/KronosOrderSummary.tsx'
-import { PlanRequest } from '../../../types/networking_types/PlanRequest.tsx'
 import { OrderRequest } from '../../../types/networking_types/OrderRequest.tsx'
 import { ParagraphRequest } from '../../../types/networking_types/ParagraphRequest.tsx'
 
 
 import { ParagraphSummary } from '../../../types/frontend_types/ParagraphSummary.tsx'
-import { Classification } from '../../../types/enums/Classification.tsx'
 
 
 
@@ -30,6 +27,8 @@ test('edit_paragraph api test', async () => {
         order_request: order_request,
         paragraph_request: null,
         task_request: null,
+        admin_request: null,
+        unit_request: null,
     };
     let response: KronosResponse = await kronosApiCall(req);
     expect(response.orders_vec); // This should not be null, and ~should~ print to the console.
@@ -58,6 +57,8 @@ test('edit_paragraph api test', async () => {
         order_request: null,
         paragraph_request: paragraph_request,
         task_request: null,
+        admin_request: null,
+        unit_request: null,
     }
     let response2: KronosResponse = await kronosApiCall(req2);
     expect(response2.paragraphs_vec); //should not be null
@@ -82,6 +83,8 @@ test('edit_paragraph api test', async () => {
         order_request: null,
         paragraph_request: paragraph_request_revert,
         task_request: null,
+        admin_request: null,
+        unit_request: null,
     }
     
 
