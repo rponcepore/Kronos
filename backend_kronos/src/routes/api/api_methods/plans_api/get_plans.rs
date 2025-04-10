@@ -10,7 +10,7 @@ use crate::routes::api::parameters::network_structs::*;
 use crate::utilities::database_tools::access_kronos_database;
 
 //Helper utilities
-use crate::routes::api::helper_methods::summarizers::pack_plan_summary;
+use crate::routes::api::helper_methods::summarizers::*;
 
 // Pull in our entities,
 use crate::models::entities::{prelude::*, *};
@@ -50,7 +50,7 @@ pub async fn get_plans(req: Json<KronosRequest>) -> Result<KronosResponse, Krono
     let mut plan_summary_vec: Vec<PlanSummary> = Vec::new();
     // For each plan returned, get it's associated orders
     for plan in plan_vec {
-        let packed_plan_summary = match pack_plan_summary(plan, &db).await {
+        let packed_plan_summary = match pack_plan_summary_shallow(plan, &db).await {
             Ok(packed_plan_summary) => packed_plan_summary,
             Err(err) => return Err(err),
         };

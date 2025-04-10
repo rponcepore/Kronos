@@ -11,7 +11,7 @@ use crate::routes::api::helper_methods::build_order_import::{
     make_standard_order, make_standard_fragord, ImportParagraph,
 };
 use crate::routes::api::helper_methods::build_order_summary::build_order_summary;
-use crate::routes::api::helper_methods::summarizers::pack_plan_summary;
+use crate::routes::api::helper_methods::summarizers::*;
 use crate::routes::api::parameters::network_structs::*;
 use crate::utilities::database_tools::access_kronos_database;
 
@@ -68,7 +68,7 @@ pub async fn create_order(req: Json<KronosRequest>) -> Result<KronosResponse, Kr
             Err(db_err) => return Err(KronosApiError::DbErr(db_err)),
         };
 
-    let plan_summary = pack_plan_summary(parent_plan, &db).await?;
+    let plan_summary = pack_plan_summary_deep(parent_plan, &db).await?;
 
     // Unwrap json<KronosRequest> into just a KronosRequest to avoid de-re-de-se-re-serialization issues.
     let plain_kronos_request = req.into_inner();

@@ -20,8 +20,10 @@ pub async fn build_order_summary(
     };
 
     // Get all paragraphs that have paragraph.KronosOrder = order.id
+    // AND are in the big five, i.e., indent 0.
     let result = match paragraph::Entity::find()
         .filter(paragraph::Column::KronosOrder.eq(order.id))
+        .filter(paragraph::Column::IndentLevel.eq(0))
         .all(db)
         .await
     {
@@ -37,6 +39,22 @@ pub async fn build_order_summary(
         };
         kronos_order_summary.paragraphs.as_mut().expect("Unwrapped a NONE when SOME was explicitly declared above. I'm panicking with the routine.").push(paragraph_summary);
     }
+
+    Ok(kronos_order_summary)
+}
+
+
+// This is for providing the plans page with something to leverage. 
+// Loading all orders is really unnecessary considering most users will only want one. 
+// Even loading these is dubiously useful. 
+pub async fn build_order_summary_shallow(
+    order: &kronos_order::Model,
+    db: &DatabaseConnection,
+) -> Result<KronosOrderSummary, KronosApiError> {
+    let mut kronos_order_summary = KronosOrderSummary {
+        data: order.clone(),
+        paragraphs: Some(Vec::<ParagraphSummary>::new()),
+    };
 
     Ok(kronos_order_summary)
 }
