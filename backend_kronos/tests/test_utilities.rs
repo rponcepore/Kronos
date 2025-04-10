@@ -25,10 +25,13 @@ pub fn no_db_plan_req() -> KronosRequest {
     KronosRequest {
         api_method: Some("get_plans".to_string()),
         uic: Some("tstUIC".to_string()),
+        admin_request: None,
+        unit_request: None,
         plan_request: None,
         order_request: None,
         paragraph_request: None,
         task_request: None,
+
     }
 }
 
@@ -37,6 +40,9 @@ pub fn with_db_plan_req() -> KronosRequest {
     KronosRequest {
         api_method: Some("get_plans".to_string()),
         uic: Some("WJH8C0".to_string()),
+        admin_request: None,
+        unit_request: None,
+        
         plan_request: None,
         order_request: None,
         paragraph_request: None,
@@ -49,6 +55,9 @@ pub fn dummy_plan_request() -> KronosRequest {
     let result = KronosRequest {
         api_method: Some("get_plans".to_string()),
         uic: Some("WHJ8C0".to_string()),
+        admin_request: None,
+        unit_request: None,
+        
         plan_request: None,
         order_request: None,
         paragraph_request: None,

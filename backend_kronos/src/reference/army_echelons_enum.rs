@@ -1,7 +1,9 @@
 //! army_echelons_enum.rs
 
+use serde::{Serialize, Deserialize};
+
 // Echelons for units in the US Army
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Echelon {
     TM,
     SQD,

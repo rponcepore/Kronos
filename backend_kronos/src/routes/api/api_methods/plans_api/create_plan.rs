@@ -18,16 +18,24 @@ use crate::models::entity_summaries::plan_summary::PlanSummary;
 use crate::routes::api::api_methods::plans_api::plans_api_utilities::*;
 use crate::utilities::calendar_math::get_federal_fiscal_year;
 
+// Other utilites
+use crate::routes::api::helper_methods::uic_helpers::*;
+
 pub async fn create_plan(valid_req: Json<KronosRequest>) -> Result<KronosResponse, KronosApiError> {
     // Read out unit name.
-    let uic = match &valid_req.uic {
-        Some(uic) => uic,
+    let mut uic = match &valid_req.uic {
+        Some(uic) => uic.clone(),
         None => {
             return Err(KronosApiError::Unknown(
                 "Deserialization error: unit string failure.".to_string(),
             ))
         }
     };
+
+    //For testing, all blank uic's "" are changed to "WJH8AA"
+    if uic.as_str() == "" {
+        uic = "WJH8AA".to_string();
+    }
 
     let plan_name = match &valid_req.plan_request {
         Some(plan_request) => match &plan_request.plan_name {
@@ -53,8 +61,14 @@ pub async fn create_plan(valid_req: Json<KronosRequest>) -> Result<KronosRespons
         Ok(db) => db,
         Err(msg) => return Err(KronosApiError::DbErr(msg)),
     };
+
+    // Now, check if that UIC even exists:
+    if check_if_uic_exists(&uic, &db).await? != true{
+        return Err(KronosApiError::BadRequest("The uic that you have provided does not exist in the database. To create it, send a create_uic request.".to_string()));
+    }
+
     let max_current_plan_number: i32 =
-        match get_plan_with_highest_serial(&db, uic, &fiscal_year).await {
+        match get_plan_with_highest_serial(&db, &uic, &fiscal_year).await {
             Ok(plan) => match plan {
                 Some(max_current_plan) => max_current_plan.serial_number,
                 None => 0,
@@ -108,3 +122,4 @@ pub async fn create_plan(valid_req: Json<KronosRequest>) -> Result<KronosRespons
 
     Ok(response)
 }
+
