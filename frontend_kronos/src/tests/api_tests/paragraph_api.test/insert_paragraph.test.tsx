@@ -84,7 +84,8 @@ test('insert_subparagraph api test', async () => {
 
     // We've checked basics. This assertion actually checks our operation.
     expect(return_paragraph_summary.subparagraphs.length).toBe(targetSubParaArrLen + 1); 
-    const newSubParagraph = return_paragraph_summary.subparagraphs![0];
+    const lastElementIndex = return_paragraph_summary.subparagraphs.length -1;
+    const newSubParagraph = return_paragraph_summary.subparagraphs![lastElementIndex];
     expect(newSubParagraph.data.text).toBe("Testing insert subparagraph for Test of the Situation Paragraph");
     expect(newSubParagraph.data.title).toBe("Testing insert subparagraph for the Title of the Situation Paragraph");
 
