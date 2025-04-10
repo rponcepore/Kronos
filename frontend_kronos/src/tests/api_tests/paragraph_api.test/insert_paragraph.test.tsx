@@ -31,22 +31,28 @@ test('insert_subparagraph api test', async () => {
         paragraph_request: null,
         task_request: null,
     };
+
     let response: KronosResponse = await kronosApiCall(req);
     expect(response.orders_vec); // This should not be null, and ~should~ print to the console.
     expect(response.orders_vec).not.toBeNull();
     expect(response.orders_vec?.length).toBeGreaterThan(0); // Ensure it contains at least one order
 
     const order: KronosOrderSummary = response.orders_vec![0]; // Use '!' since we've checked it above
-    console.dir(order, { depth: null });
+    expect(order.paragraphs).not.toBeNull();
+    expect(order.paragraphs.length).toBe(5);
+    console.log(order.paragraphs);
+    const target : ParagraphSummary = order.paragraphs[0]; // the situation paragraph
 
-    // Now that we have an order, get a paragraph.
-
-    const target = order.paragraphs[0]; // the situation paragraph
+    // How many subparagraphs does it currently have? 
+    const targetSubParaArrLen = target.subParagraphs.length;
+    const targetId = target.data.id;
+    const targetText = target.data.text;
+    const targetTitle = target.data.title;
     
     const paragraph_request: ParagraphRequest = {
         paragraph_id: target.data.id,
-        new_text: "Testing the Situation Paragraph insert subparagraph",
-        new_title: "Testing the Title of the Situation Paragraph insert subparagraph",
+        new_text: "Testing insert subparagraph for Test of the Situation Paragraph",
+        new_title: "Testing insert subparagraph for the Title of the Situation Paragraph",
         insert_method: "SUBPARAGRAPH",
     }
 
@@ -59,23 +65,33 @@ test('insert_subparagraph api test', async () => {
         task_request: null,
     }
     let response2: KronosResponse = await kronosApiCall(req2);
-    expect(response2.paragraphs_vec); //should not be null
-    expect(response2.paragraphs_vec?.length).toBe(1); //should only be of size one.
-    let return_paragraph_summary : ParagraphSummary | undefined = response2.paragraphs_vec?.[0] ?? undefined; // This is strictly to satisfy the compiler. Undefined behavior would already have been caught.
-    expect(return_paragraph_summary?.data.text).toBe("Testing the Situation Paragraph insert subparagraph");
-    expect(return_paragraph_summary?.data.title).toBe("Testing the Title of the Situation Paragraph insert subparagraph");
+    expect(response2.paragraphs_vec).not.toBeNull(); //should not be null
+    expect(response2.paragraphs_vec!.length).toBe(1); //should only be of size one. (The parent paragraph)
+    // This is strictly to satisfy the compiler. Undefined behavior would already have been caught.
+    let return_paragraph_summary : ParagraphSummary = response2.paragraphs_vec![0]; 
+    // The subparagraph contract dictates that the parent paragraph is returned. 
+    expect(return_paragraph_summary.data.text).toBe(targetText);
+    expect(return_paragraph_summary.data.title).toBe(targetTitle);
+    expect(return_paragraph_summary.data.id).toBe(targetId);
 
+    // We've checked basics. This assertion actually checks our operation.
+    expect(return_paragraph_summary.subParagraphs.length).toBe(targetSubParaArrLen + 1); 
+    const newSubParagraph = return_paragraph_summary.subParagraphs![0];
+    expect(newSubParagraph.data.text).toBe("Testing insert subparagraph for Test of the Situation Paragraph");
+    expect(newSubParagraph.data.title).toBe("Testing insert subparagraph for the Title of the Situation Paragraph");
 
-    // Reset
+    // Are all numbers in serial length?
+
+    // We're checking a delete now. 
     const paragraph_request_revert: ParagraphRequest = {
-        paragraph_id: target.data.id,
-        new_text: old_text,
-        new_title: old_title,
+        paragraph_id: newSubParagraph.data.id,
+        new_text: null,
+        new_title: null,
         insert_method: null,
     }
 
     const req2_revert: KronosRequest = {
-        api_method : KronosApiMethod.edit_paragraph,
+        api_method : KronosApiMethod.delete_paragraph,
         uic: "WJH8AA",
         plan_request: null,
         order_request: null,
@@ -86,11 +102,14 @@ test('insert_subparagraph api test', async () => {
 
     // This should reset all the things
     // Honestly if one of these fails it's entirely my fault. 
+    // This is sending back the parent paragraph.
     let response2_revert: KronosResponse = await kronosApiCall(req2_revert);
-    expect(response2_revert.paragraphs_vec); //should not be null
-    expect(response2_revert.paragraphs_vec?.length).toBe(1); //should only be of size one.
-    let revert_summary : ParagraphSummary | undefined = response2_revert.paragraphs_vec?.[0] ?? undefined; // This is strictly to satisfy the compiler. Undefined behavior would already have been caught.
-    expect(revert_summary?.data.text).toBe(old_text);
-    expect(revert_summary?.data.title).toBe(old_title);
+    expect(response2_revert); //should not be null
+    expect(response2_revert.paragraphs_vec).not.toBeNull();
+    expect(response2_revert.paragraphs_vec!.length).toBe(1); //should only be of size one.
+    const newTargetParagraph = response2_revert.paragraphs_vec![0];
+    expect(newTargetParagraph.subParagraphs.length).toBe(targetSubParaArrLen);
+    expect(newTargetParagraph.data.text).toBe(targetText);
+    expect(newTargetParagraph.data.title).toBe(targetTitle);
 
 })
