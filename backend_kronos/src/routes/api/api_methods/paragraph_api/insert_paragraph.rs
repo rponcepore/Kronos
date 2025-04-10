@@ -47,7 +47,18 @@ pub async fn insert_paragraph(req: Json<KronosRequest>) -> Result<KronosResponse
         Err(msg) => return Err(msg),
     };
 
-    //Match the case to the function.
+    let siblingship = checked_params.insert_method.as_str();
+
+    // Check a quick invariant: No calls to insert siblings on major paragraphs. 
+    if (target_paragraph_record.indent_level == 0) && (siblingship != "SUBPARAGRAPH") {
+        return Err(KronosApiError::BadRequest(
+            format!("You cannot insert a sibling paragraph on a major paragraph; \
+                    you may insert subpararaphs on major paragraphs. (i.e., it's a five \
+                    paragraph OPORD, and KRONOS enforces this."
+                )));
+    }
+
+    // Match the case to the function.
     // These variants are defined on teh frontend as an enum: string (typescript) as
     // insert_method: "ABOVE" | "BELOW" | "SUBPARAGRAPH" | null,
     let paragraph_summary_res: Result<ParagraphSummary, KronosApiError> = match checked_params
@@ -237,6 +248,7 @@ async fn insert_subparagraph(
     target_paragraph_record: &paragraph::Model,
     db: &DatabaseConnection,
 ) -> Result<ParagraphSummary, KronosApiError> {
+    dprintln!("Executing logic for inserting a subparagraph.");
     // Find the last paragraph, if it exists, and get it's number
     let greatest_subparagraph_number =
         find_greatest_paragraph_number(&target_paragraph_record, db).await?;
@@ -255,13 +267,13 @@ async fn insert_subparagraph(
 
     // Execute the insertion.
 
-    let _result = match new_paragraph.insert(db).await {
+    let result = match new_paragraph.insert(db).await {
         Ok(result) => result,
         Err(db_err) => return Err(KronosApiError::DbErr(db_err)),
     };
 
     // Return the parent paragraph
-    let parent = get_parent_paragraph(target_paragraph_record, db).await?;
+    let parent = get_parent_paragraph(&result, db).await?;
 
     // Build paragraph summary
     let paragraph_summary: ParagraphSummary = match build_paragraph_summary(&parent, db).await {

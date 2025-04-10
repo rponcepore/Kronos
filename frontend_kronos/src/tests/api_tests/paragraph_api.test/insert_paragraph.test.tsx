@@ -40,15 +40,21 @@ test('insert_subparagraph api test', async () => {
     const order: KronosOrderSummary = response.orders_vec![0]; // Use '!' since we've checked it above
     expect(order.paragraphs).not.toBeNull();
     expect(order.paragraphs.length).toBe(5);
-    console.log(order.paragraphs);
+    
+    console.log("Order successfully retrieved.");
+
     const target : ParagraphSummary = order.paragraphs[0]; // the situation paragraph
     expect(target.data.title.toUpperCase()).toBe("SITUATION");
-
+    expect(target.subparagraphs).not.toBeNull();
+    expect(target.subparagraphs).toBeDefined(); 
+    const subparagraphs : ParagraphSummary[] = target.subparagraphs!;
     // How many subparagraphs does it currently have? 
-    const targetSubParaArrLen = target.subParagraphs.length;
+    const targetSubParaArrLen = subparagraphs.length; 
     const targetId = target.data.id;
     const targetText = target.data.text;
     const targetTitle = target.data.title;
+
+    console.log("Sending call to insert subparagraph.");
     
     const paragraph_request: ParagraphRequest = {
         paragraph_id: target.data.id,
@@ -58,7 +64,7 @@ test('insert_subparagraph api test', async () => {
     }
 
     const req2: KronosRequest = {
-        api_method : KronosApiMethod.edit_paragraph,
+        api_method : KronosApiMethod.insert_paragraph,
         uic: "WJH8AA",
         plan_request: null,
         order_request: null,
@@ -70,14 +76,15 @@ test('insert_subparagraph api test', async () => {
     expect(response2.paragraphs_vec!.length).toBe(1); //should only be of size one. (The parent paragraph)
     // This is strictly to satisfy the compiler. Undefined behavior would already have been caught.
     let return_paragraph_summary : ParagraphSummary = response2.paragraphs_vec![0]; 
+    console.log(return_paragraph_summary);
     // The subparagraph contract dictates that the parent paragraph is returned. 
     expect(return_paragraph_summary.data.text).toBe(targetText);
     expect(return_paragraph_summary.data.title).toBe(targetTitle);
     expect(return_paragraph_summary.data.id).toBe(targetId);
 
     // We've checked basics. This assertion actually checks our operation.
-    expect(return_paragraph_summary.subParagraphs.length).toBe(targetSubParaArrLen + 1); 
-    const newSubParagraph = return_paragraph_summary.subParagraphs![0];
+    expect(return_paragraph_summary.subparagraphs.length).toBe(targetSubParaArrLen + 1); 
+    const newSubParagraph = return_paragraph_summary.subparagraphs![0];
     expect(newSubParagraph.data.text).toBe("Testing insert subparagraph for Test of the Situation Paragraph");
     expect(newSubParagraph.data.title).toBe("Testing insert subparagraph for the Title of the Situation Paragraph");
 
@@ -109,7 +116,7 @@ test('insert_subparagraph api test', async () => {
     expect(response2_revert.paragraphs_vec).not.toBeNull();
     expect(response2_revert.paragraphs_vec!.length).toBe(1); //should only be of size one.
     const newTargetParagraph = response2_revert.paragraphs_vec![0];
-    expect(newTargetParagraph.subParagraphs.length).toBe(targetSubParaArrLen);
+    expect(newTargetParagraph.subparagraphs.length).toBe(targetSubParaArrLen);
     expect(newTargetParagraph.data.text).toBe(targetText);
     expect(newTargetParagraph.data.title).toBe(targetTitle);
 
