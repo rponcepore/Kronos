@@ -7,6 +7,7 @@ import { kronosApiCall } from "../helper_methods/ApiCall";
 import { KronosRequest } from "../types/networking_types/KronosRequest";
 import OrderCard from "../components/OrderCard";
 import { KronosApiMethod } from "../types/networking_types/KronosApiMethodEnums";
+import NewPlanModal from "../components/Plans/NewPlanModal";
 
 // Main container component for the Plans page
 const PlansPage: React.FC = () => {
@@ -22,6 +23,8 @@ const PlansPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedOrder, setSelectedOrder] = useState<number | null>(null);
+  const [showNewPlanModal, setShowNewPlanModal] = useState(false);
+
 
   // ----------------------------
   // Extract data from dummyData
@@ -106,7 +109,7 @@ const PlansPage: React.FC = () => {
   };
 
   //filtering and sorting logic for orders that are under a plan
-  const filteredOrders = selectedPlan?.orders
+  const filteredOrders = (selectedPlan?.orders || [])
   .filter((o) =>
     o.data.order_type.toLowerCase().includes(searchTerm.toLowerCase()) ||
     String(o.data.serial_number).includes(searchTerm)
@@ -115,7 +118,7 @@ const PlansPage: React.FC = () => {
     if (sortBy === "alpha") return a.data.order_type.localeCompare(b.data.order_type);
     if (sortBy === "year") return a.data.serial_number - b.data.serial_number;
     return 0;
-  }) || [];
+  });
 
   if (loading) {
     return <div className="p-6">Loading plans...</div>;
@@ -129,7 +132,7 @@ const PlansPage: React.FC = () => {
   //mirros the same format of the plans page top buttons
   return (
     <div className="plans-page-wrapper">
-      {selectedPlan ? (
+      {selectedPlan && selectedPlan.data ? (
         <div className="plan-details">
           {/* Header section with plan info and buttons*/}
           <div className="top-controls mb-6 flex gap-4 flex-wrap">
@@ -160,11 +163,19 @@ const PlansPage: React.FC = () => {
             />
           </div>
 
+          {/* Plan info section */}
+          <div className="plan-info mb-4">
+            <h1>{selectedPlan.data.name}</h1>
+            <p><strong>UIC:</strong> {selectedPlan.data.uic}</p>
+            <p><strong>Classification:</strong> {selectedPlan.data.classification}</p>
+            <p><strong>Fiscal Year:</strong> FY {selectedPlan.data.fiscal_year}</p>
+          </div>
+
           {/* Orders section */}
           <div className="orders-section">
             <h2>Orders</h2>
             <div className="orders-grid">
-              {selectedPlan.orders.map((order) => (
+            {(selectedPlan.orders || []).map((order) => (
                 <OrderCard
                   key={order.data.id}
                   order={order}
@@ -174,6 +185,11 @@ const PlansPage: React.FC = () => {
                 />
               ))}
             </div>
+            {(selectedPlan.orders?.length ?? 0) === 0 && (
+              <p style={{ fontStyle: "italic", opacity: 0.7, paddingTop: "1rem" }}>
+                This plan has no orders yet.
+              </p>
+            )}
           </div>
         </div>
       ) : (
@@ -192,7 +208,8 @@ const PlansPage: React.FC = () => {
             <button className="control-btn" onClick={() => setSortBy("year")}>
               Order by Year
             </button>
-              <button className="control-btn new-plan-btn" onClick={() => alert("Create new plan")}>
+            {/*button for creating a new plan. Links to new modal for plan creation*/}
+              <button className="control-btn new-plan-btn" onClick={() => setShowNewPlanModal(true)}>
                 <span className="plus-icon">＋</span> New Plan
               </button>
 
@@ -208,6 +225,13 @@ const PlansPage: React.FC = () => {
 
           {/* Render list of plans after filtering/sorting */}
           <PlansList plans={filteredPlans} selectPlan={setSelectedPlan} />
+
+          {showNewPlanModal && (
+            <NewPlanModal
+              onClose={() => setShowNewPlanModal(false)}
+              onSuccess={() => window.location.reload()}
+            />
+         )}
         </>
       )}
     </div>
