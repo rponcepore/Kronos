@@ -60,6 +60,7 @@ impl MigrationTrait for Migration {
         unit_vec.push(("WJH8A0", "CO", "Ace High", "Ace Troop", "A TRP", "Active"));
         unit_vec.push(("WJH8B0", "CO", "Bounty Hunter", "Bounty Troop", "B TRP", "Active"));
         unit_vec.push(("WJH8T0", "CO", "Diablo", "Diablo Troop", "D TRP", "Active"));
+        unit_vec.push(("WJH8H0", "CO", "HeadHunter", "Headhunter Troop", "HHT", "Active"));
         
         for unit in unit_vec{
             let insert = Query::insert()
