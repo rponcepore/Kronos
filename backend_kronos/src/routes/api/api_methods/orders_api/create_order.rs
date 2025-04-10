@@ -66,17 +66,8 @@ pub async fn create_order(req: Json<KronosRequest>) -> Result<KronosResponse, Kr
 
     let plan_summary = pack_plan_summary_deep(parent_plan, &db).await?;
 
-    // Unwrap json<KronosRequest> into just a KronosRequest to avoid de-re-de-se-re-serialization issues.
-    let plain_kronos_request = req.into_inner();
-
     // Encode them into a KronosResponse Object
-    let kronos_response = KronosResponse {
-        kronos_request: plain_kronos_request,
-        plans_vec: Some(vec![plan_summary]),
-        orders_vec: None,
-        paragraphs_vec: None,
-        units_vec: None,
-    };
+    let kronos_response = KronosResponse::new(req).with_plan(plan_summary);
     // Send back to the client
     Ok(kronos_response)
 }
@@ -137,7 +128,7 @@ async fn create_opord(
     db: &DatabaseConnection,
 ) -> Result<KronosOrderSummary, KronosApiError> {
     // There can only be one OPORD. Check this now.
-    let plan = get_plan_model(params.plan_id, db).await?;
+    let _plan = get_plan_model(params.plan_id, db).await?;
 
     // check to see if there are any opords (there should only be one!)
     let orders_vec = match KronosOrder::find()
@@ -195,8 +186,8 @@ async fn create_warnord(
     params: &CreateOrderParams<'_>,
     db: &DatabaseConnection,
 ) -> Result<KronosOrderSummary, KronosApiError> {
-    //get the plan
-    let plan = get_plan_model(params.plan_id, db).await?;
+    //get the plan 
+    let _plan = get_plan_model(params.plan_id, db).await?;
 
     // WARNORDS are mercifully easy. Five paragraphs.
     // First, deduce the number of the warnord.
@@ -242,7 +233,7 @@ async fn create_warnord(
     // Start building out paragraphs
     for paragraph in &fragord_import.paragraphs {
         // Create a paragraph in the database, return it's id
-        let paragraph_model = add_major_paragraph_to_db(&result.id, &paragraph, db).await?;
+        let _paragraph_model = add_major_paragraph_to_db(&result.id, &paragraph, db).await?;
     }
 
     // Now pack this order and return it as an order summary
@@ -256,8 +247,8 @@ async fn create_warnord(
 
 //For creating either FRAGORDs or WARNORDS
 async fn create_fragord(
-    params: &CreateOrderParams<'_>,
-    db: &DatabaseConnection,
+    _params: &CreateOrderParams<'_>,
+    _db: &DatabaseConnection,
 ) -> Result<KronosOrderSummary, KronosApiError> {
     
     Err(KronosApiError::NotImplemented("New FRAGORDS are not implemented at this time.".to_string()))

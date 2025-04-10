@@ -107,31 +107,3 @@ async fn is_request_valid(req: Json<KronosRequest>) -> Result<Json<KronosRequest
     return Ok(req);
 }
 
-impl KronosRequest {
-    pub fn new() -> Self {
-        Self {
-            api_method: None,
-            uic: None,
-            admin_request: None,
-            unit_request: None,
-            plan_request: None,
-            order_request: None,
-            paragraph_request: None,
-            task_request: None,
-        }
-    }
-
-    pub fn with_action(mut self, api_method: String) -> Self {
-        self.api_method = Some(api_method);
-        self
-    }
-
-    pub fn with_unit(mut self, uic: String) -> Self {
-        self.uic = Some(uic);
-        self
-    }
-
-    pub fn build(self) -> Self {
-        self
-    }
-}

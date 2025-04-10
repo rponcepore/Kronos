@@ -79,15 +79,9 @@ pub async fn insert_paragraph(req: Json<KronosRequest>) -> Result<KronosResponse
         Err(msg) => return Err(msg),
     };
 
-    let response = KronosResponse {
-        kronos_request: req.into_inner(),
-        plans_vec: None,
-        orders_vec: None,
-        paragraphs_vec: Some(vec![paragraph_summary]),
-        units_vec: None,
-    };
+    let kronos_response = KronosResponse::new(req).with_paragraph(paragraph_summary);
 
-    Ok(response)
+    Ok(kronos_response)
 }
 
 fn check_insert_paragraph_request(

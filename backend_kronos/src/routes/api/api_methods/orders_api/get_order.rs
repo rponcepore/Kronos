@@ -68,17 +68,8 @@ pub async fn get_order(req: Json<KronosRequest>) -> Result<KronosResponse, Krono
     // We now have the model itself of kronos_order. Now we need to construct an order summary from this order.
     let order_summary = build_order_summary(&kronos_order, &db).await?;
 
-    // Unwrap json<KronosRequest> into just a KronosRequest to avoid de-re-de-se-re-serialization issues.
-    let plain_kronos_request = req.into_inner();
-
-    // Encode them into a KronosResponse Object
-    let kronos_response = KronosResponse {
-        kronos_request: plain_kronos_request,
-        plans_vec: None,
-        orders_vec: Some(vec![order_summary]),
-        paragraphs_vec: None,
-        units_vec: None,
-    };
+    let kronos_response = KronosResponse::new(req).with_order(order_summary);
+    
     // Send back to the client
     Ok(kronos_response)
 }

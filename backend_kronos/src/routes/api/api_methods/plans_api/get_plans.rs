@@ -56,17 +56,11 @@ pub async fn get_plans(req: Json<KronosRequest>) -> Result<KronosResponse, Krono
         plan_summary_vec.push(packed_plan_summary);
     }
 
-    // Unwrap json<KronosRequest> into just a KronosRequest to avoid de-re-de-se-re-serialization issues.
-    let plain_kronos_request = req.into_inner();
+    let mut kronos_response = KronosResponse::new(req);
 
     // Encode them into a KronosResponse Object
-    let kronos_response = KronosResponse {
-        kronos_request: plain_kronos_request,
-        plans_vec: Some(plan_summary_vec),
-        orders_vec: None,
-        paragraphs_vec: None,
-        units_vec: None,
-    };
+    kronos_response.plans_vec = Some(plan_summary_vec);
+
     // Send back to the client
     Ok(kronos_response)
 }

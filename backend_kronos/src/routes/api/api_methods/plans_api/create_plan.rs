@@ -103,17 +103,8 @@ pub async fn create_plan(valid_req: Json<KronosRequest>) -> Result<KronosRespons
         most_recent_mission: None, // Don't bother with the lookup; nothing has been created yet.
     };
 
-    // Unwrap json<KronosRequest> into just a KronosRequest to avoid de-re-de-se-re-serialization issues.
-    let plain_kronos_request = valid_req.into_inner();
-
     // Return a KronosResponse with the confirmed data: plan name, fiscal year, serial number, unit
-    let response = KronosResponse {
-        kronos_request: plain_kronos_request,
-        plans_vec: Some(vec![plan_summary]),
-        orders_vec: None,
-        paragraphs_vec: None,
-        units_vec: None,
-    };
+    let response = KronosResponse::new(valid_req).with_plan(plan_summary);
 
     Ok(response)
 }

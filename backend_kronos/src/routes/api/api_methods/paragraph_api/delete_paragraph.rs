@@ -76,15 +76,10 @@ pub async fn delete_paragraph(req: Json<KronosRequest>) -> Result<KronosResponse
         Ok(paragraph_summary) => paragraph_summary,
         Err(db_err) => return Err(KronosApiError::DbErr(db_err)),
     };
-    let response = KronosResponse {
-        kronos_request: req.into_inner(),
-        plans_vec: None,
-        orders_vec: None,
-        paragraphs_vec: Some(vec![paragraph_summary]),
-        units_vec: None,
-    };
 
-    Ok(response)
+    let kronos_response = KronosResponse::new(req).with_paragraph(paragraph_summary);
+
+    Ok(kronos_response)
 }
 
 fn check_delete_paragraph_request(

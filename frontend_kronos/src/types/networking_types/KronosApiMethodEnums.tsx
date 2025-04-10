@@ -6,6 +6,14 @@
  */
 
 export enum KronosApiMethod {
+
+    // Admin
+    admin_request = "admin_request",
+
+    // Units CRUD
+    create_unit = "create_unit",
+    delete_unit = "delete_unit",
+
     // Plans CRUD
     get_plans = "get_plans", 
     /* get_plans is written. It requires:
