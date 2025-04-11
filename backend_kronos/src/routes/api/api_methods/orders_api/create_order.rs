@@ -39,10 +39,10 @@ pub async fn create_order(req: Json<KronosRequest>) -> Result<KronosResponse, Kr
     // and then number it accordingly. If it is an OPORD, then we need to make sure that there is only one OPORD.
     // Ignore the return value, sinc'e we're going to return the plan anyway.
     // (Is this a good idea? Feels a little redundant/unnecessary.)
-    let _order_summary_wrapped = match checked_params.order_type.as_str() {
-        "OPORD" => create_opord(&checked_params, &db).await,
-        "FRAGORD" => create_fragord(&checked_params, &db).await,
-        "WARNORD" => create_warnord(&checked_params, &db).await,
+    let order_summary: KronosOrderSummary = match checked_params.order_type.as_str() {
+        "OPORD" => create_opord(&checked_params, &db).await?,
+        "FRAGORD" => create_fragord(&checked_params, &db).await?,
+        "WARNORD" => create_warnord(&checked_params, &db).await?,
         _ => {
             return Err(KronosApiError::BadRequest(format!(
                 "Illegal order_type specified: {}",
@@ -63,10 +63,13 @@ pub async fn create_order(req: Json<KronosRequest>) -> Result<KronosResponse, Kr
             Err(db_err) => return Err(KronosApiError::DbErr(db_err)),
         };
 
-    let plan_summary = pack_plan_summary_deep(parent_plan, &db).await?;
+    let plan_summary = pack_plan_summary_shallow(parent_plan, &db).await?;
+
+    // For convenience, also send just the order. 
+    
 
     // Encode them into a KronosResponse Object
-    let kronos_response = KronosResponse::new(req).with_plan(plan_summary);
+    let kronos_response = KronosResponse::new(req).with_plan(plan_summary).with_order(order_summary);
     // Send back to the client
     Ok(kronos_response)
 }
