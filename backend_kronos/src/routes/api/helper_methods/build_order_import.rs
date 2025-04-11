@@ -25,7 +25,7 @@ pub struct ImportParagraph {
 
 pub fn make_standard_order() -> Result<ImportOrder, KronosApiError> {
     let path = get_opord_path()?;
-    let yaml_str = match fs::read_to_string(PATH_TO_OPORD_FILE) {
+    let yaml_str = match fs::read_to_string(path) {
         Ok(yaml_str) => yaml_str,
         Err(msg) => {
             return Err(KronosApiError::Unknown(format!(

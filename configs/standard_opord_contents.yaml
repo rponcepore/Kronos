@@ -1,7 +1,4 @@
-#! standard_opord_contents.yaml
-
-
-opord:
+paragraphs:
   - ordinal_sequence: 1
     title: "Situation"
     text: "The situation paragraph describes the conditions of the operational environment that impact operations in the following subparagraphs:"
@@ -60,7 +57,7 @@ opord:
     subparagraphs: []
   - ordinal_sequence: 3
     title: "Execution"
-    text: "Describe how the commander intends to accomplish the mission in terms of the commander\'s intent, concept of operations, schemes of support, tasks to subordinate units, and coordinating instructions in the subparagraphs below"
+    text: "Describe how the commander intends to accomplish the mission in terms of the commander's intent, concept of operations, schemes of support, tasks to subordinate units, and coordinating instructions in the subparagraphs below"
     subparagraphs:
       - ordinal_sequence: 1
         title: "NOTE TO PLANNERS"
@@ -84,7 +81,7 @@ opord:
             subparagraphs: []
       - ordinal_sequence: 3
         title: "Concept of the Operation"
-        text: "Describe the combination of offense, defense, and stability operations (or defense support of civil authorities tasks) and the sequence of actions the force will use to achieve the operation's end state. Use components of the operational framework (deep, close, rear, and support areas; decisive, shaping, and sustaining operations; and main and supporting efforts) as required. If the concept of operations is phased, describe each phase in a subparagraph. Label these subparagraphs as \"Phase\" followed by the appropriate Roman numeral, for example, “Phase I.” If the operation is phased, all paragraphs and subparagraphs of the base order and all attachments must mirror the phasing established in the concept of operations. Refer to Appendix 2 (Operations Overlay) to Annex C (Operations) and other attachments to Annex C (Operations) as required."
+        text: "Describe the combination of offense, defense, and stability operations (or defense support of civil authorities tasks) and the sequence of actions the force will use to achieve the operation's end state. Use components of the operational framework (deep, close, rear, and support areas; decisive, shaping, and sustaining operations; and main and supporting efforts) as required. If the concept of operations is phased, describe each phase in a subparagraph. Label these subparagraphs as 'Phase' followed by the appropriate Roman numeral, for example, “Phase I.” If the operation is phased, all paragraphs and subparagraphs of the base order and all attachments must mirror the phasing established in the concept of operations. Refer to Appendix 2 (Operations Overlay) to Annex C (Operations) and other attachments to Annex C (Operations) as required."
         subparagraphs:
           - ordinal_sequence: 1
             title: "NOTE TO PLANNERS"
@@ -152,11 +149,11 @@ opord:
         subparagraphs: []
       - ordinal_sequence: 11
         title: "Tasks to Subordinate Units"
-        text: "Note: This software provides an interface for assigning tasks. When utilized correctly, it will automatically create a task tracker and Troops-to-Task shell for use by the operations staff. Tasks must be explicitly allocated by unit. As the task populates, the software will aggregate tasks by unit.\n\n State the tasks assigned to each unit that reports directly to the headquarters issuing the order. Each task must include who (the subordinate unit assigned the task), what (the task itself), when, where, and why (purpose). Use a separate subparagraph for each unit. List units in task organization sequence."
+        text: "Note: This software provides an interface for assigning tasks. When utilized correctly, it will automatically create a task tracker and Troops-to-Task shell for use by the operations staff. Tasks must be explicitly allocated by unit. As the task populates, the software will aggregate tasks by unit. State the tasks assigned to each unit that reports directly to the headquarters issuing the order. Each task must include who (the subordinate unit assigned the task), what (the task itself), when, where, and why (purpose). Use a separate subparagraph for each unit. List units in task organization sequence."
         subparagraphs: []
       - ordinal_sequence: 12
         title: "Coordinating Instructions"
-        text: "Note: This software provides an interface for assigning tasks. When utilized correctly, it will automatically create a task tracker and Troops-to-Task shell for use by the operations staff. \n\n List only instructions and tasks applicable to two or more units not covered in unit standard operating procedures (SOPs)."
+        text: "Note: This software provides an interface for assigning tasks. When utilized correctly, it will automatically create a task tracker and Troops-to-Task shell for use by the operations staff. List only instructions and tasks applicable to two or more units not covered in unit standard operating procedures (SOPs)."
         subparagraphs:
           - ordinal_sequence: 1
             title: "Operational Timeline"
@@ -164,7 +161,7 @@ opord:
             subparagraphs: []
           - ordinal_sequence: 2
             title: "Commander's Critical Information Requirements"
-            text: "CCIR is composed of PIR (Priority Information Requirements) and FFIR (Friendly Force Information Requirements). Per FM 3-98, there are standards for development of CCIR. \nCCIR are tied directly to the scheme of maneuver and decision points. CCIR that do not support decision making are trivial. \nCCIR is limited to critical intelligence and combat information needs. \nCCIR include the latest time the information is of value (LTIOV) to aid in timely reporting and decision making.\nCCIR is continuously updated, especially as LTIOV passes."
+            text: "CCIR is composed of PIR (Priority Information Requirements) and FFIR (Friendly Force Information Requirements). Per FM 3-98, there are standards for development of CCIR. CCIR are tied directly to the scheme of maneuver and decision points. CCIR that do not support decision making are trivial. CCIR is limited to critical intelligence and combat information needs. CCIR include the latest time the information is of value (LTIOV) to aid in timely reporting and decision making.CCIR is continuously updated, especially as LTIOV passes."
             subparagraphs:
               - ordinal_sequence: 1
                 title: "Priority Information Requirements"
