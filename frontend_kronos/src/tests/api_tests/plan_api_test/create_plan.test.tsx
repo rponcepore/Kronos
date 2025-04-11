@@ -12,7 +12,7 @@ import { delete_test_unit } from '../../test_helpers/delete_test_unit.tsx'
 import { UnitSummary } from '../../../types/frontend_types/UnitSummary.tsx'
 import { PlanRequest } from '../../../types/networking_types/PlanRequest.tsx'
 
-test('Create Plan', async () => {
+test('create_plan', async () => {
 
     const test_unit : UnitSummary = await create_test_unit();
 

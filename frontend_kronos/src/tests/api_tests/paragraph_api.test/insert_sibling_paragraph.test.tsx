@@ -11,10 +11,11 @@ import { KronosOrderSummary } from '../../../types/frontend_types/KronosOrderSum
 import { ParagraphSummary } from '../../../types/frontend_types/ParagraphSummary';
 import { deleteTestOrderComplete } from '../../test_helpers/delete_test_order';
 
-export type invariantParameters = {
+export type InvariantParameters = {
     target: ParagraphSummary,
     new_title: string,
     new_text: string,
+    number_of_children: number,
 };
 
 test('Inserting below a major paragraph fails.', async () => {
@@ -69,47 +70,4 @@ test('Inserting above a major paragraph fails.', async () => {
         }
     }
 
-})
-
-test('Inserting onto a subparagraph succeeds.', async () => {
-    // Get an order
-    let uic: string | undefined;
-    try {
-        const result = await getTestOrder();
-        uic = result.uic;
-        const { order } = result;
-        // Get the situation paragraph
-        const situationParagraph = extractParagraphFromOrderSummary(1, order);
-        
-        // Make sure the situation paragraph has subparagraphs
-        if (doesTargetParagraphHaveChildren(situationParagraph) != true) {
-            throw new Error(
-                `Expected the paragraph id: ${situationParagraph.data.id}, ` +
-                `${situationParagraph.data.title}:${situationParagraph.data.text} ` +
-                `to have children, but it does not.`
-            );
-        }
-        // Invariants:
-        const invariant : invariantParameters = {
-            target : situationParagraph,
-            new_title: "New Title",
-            new_text: "New Text",
-        }
-        // Insert a subparagraph named TERRY
-        const terry = await insertSubparagraph(situationParagraph, invariant.new_title, invariant.new_text);
-
-        // Insert a BELOW paragraph on the subparagraph
-        
-        // Insert an ABOVE paragraph on the BELOW paragraph
-        
-        // Check the order
-        
-        // Now, brass balls, delete TERRY and ensure that it cascade deletes.
-        
-        // Check that we're back to normal.
-    } finally {
-        if (uic) {
-            await deleteTestOrderComplete(uic);
-        }
-    }
 })

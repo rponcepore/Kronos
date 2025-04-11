@@ -19,6 +19,7 @@ pub async fn build_paragraph_summary(
     // Get all paragraphs that have paragraph.ParentParagraph = paragraph.id
     let result = paragraph::Entity::find()
         .filter(paragraph::Column::ParentParagraph.eq(paragraph.id))
+        .order_by_asc(paragraph::Column::OrdinalSequence)
         .all(db)
         .await?;
 

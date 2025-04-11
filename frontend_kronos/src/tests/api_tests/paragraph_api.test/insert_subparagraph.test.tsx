@@ -20,7 +20,7 @@ import { getTestOrder } from '../order_api.test/order_test_helpers.tsx'
  * get_order, and insert_subparagraph, and delete_paragraph. 
  */
 
-test('insert_subparagraph api test', async () => {
+test('insert_subparagraph', async () => {
     //first, get an order
     let uic: string | undefined;
     try {
@@ -36,7 +36,7 @@ test('insert_subparagraph api test', async () => {
         
         const req: KronosRequest = {
             api_method: KronosApiMethod.get_order,
-            uic: "WJH8AA",
+            uic: uic,
             plan_request: null,
             order_request: order_request,
             paragraph_request: null,

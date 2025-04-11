@@ -5,7 +5,7 @@ import { count_units_in_db } from '../../test_helpers/count_units_in_db.tsx'
 import { create_test_unit } from '../../test_helpers/create_test_unit.tsx'
 import { delete_test_unit } from '../../test_helpers/delete_test_unit.tsx';
 import { UnitSummary } from '../../../types/frontend_types/UnitSummary.tsx';
-test('Create a unit', async () => {
+test('create_unit', async () => {
     //let startingCount = await count_units_in_db();
     // ignore the result, but create a unit
     const test_unit : UnitSummary = await create_test_unit();
