@@ -152,7 +152,7 @@ async fn find_greatest_paragraph_number(
 ) -> Result<i32, KronosApiError> {
     let subparagraph_vec: Vec<paragraph::Model> = match Paragraph::find()
         .filter(paragraph::Column::ParentParagraph.eq(target_paragraph_record.id))
-        .order_by_asc(paragraph::Column::OrdinalSequence)
+        .order_by_desc(paragraph::Column::OrdinalSequence)
         .all(db)
         .await
     {
@@ -246,6 +246,7 @@ async fn insert_subparagraph(
     // Find the last paragraph, if it exists, and get it's number
     let greatest_subparagraph_number =
         find_greatest_paragraph_number(&target_paragraph_record, db).await?;
+
     let new_subparagraph_number = greatest_subparagraph_number + 1;
 
     // Build the SeaORM query
