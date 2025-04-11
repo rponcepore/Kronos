@@ -6,10 +6,20 @@ import { KronosOrderSummary } from "../../../types/frontend_types/KronosOrderSum
 import { kronosApiCall } from "../../../helper_methods/ApiCall";
 import { KronosResponse } from "../../../types/networking_types/KronosResponse";
 import { OrderRequest } from '../../../types/networking_types/OrderRequest';
+import { create_test_unit } from '../../test_helpers/create_test_unit';
+import { UnitSummary } from '../../../types/frontend_types/UnitSummary';
+import { PlanSummary } from '../../../types/frontend_types/PlanSummary';
+import { create_test_order } from '../../test_helpers/create_test_order';
+import { create_test_plan } from '../../test_helpers/create_test_plan';
 
-export async function getTestOrder() : Promise<KronosOrderSummary> {
-    let order = await getOrder(6);
-    return order;
+export async function getTestOrder() : Promise<{uic: string, order : KronosOrderSummary}> {
+    let unit : UnitSummary = await create_test_unit();
+    let plan : PlanSummary = await create_test_plan(unit.data.uic);
+    let order : KronosOrderSummary = await create_test_order(unit.data.uic, plan.data.id); 
+    return {
+        uic: unit.data.uic,
+        order: order,
+    }
 }
 
 export async function getOrder(order_id : number) : Promise<KronosOrderSummary> {

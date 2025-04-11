@@ -15,7 +15,7 @@ use crate::routes::api::{
         orders_api::{create_order::*, get_order::*},
         paragraph_api::{delete_paragraph::*, edit_paragraph::*, insert_paragraph::*},
         plans_api::{create_plan::*, get_plans::*},
-        units_api::{create_unit::*, *},
+        units_api::{create_unit::*, delete_unit::*, *},
     },
     parameters::network_structs::*,
 };
@@ -51,6 +51,7 @@ pub async fn api_handler(
 
         // Unit actions
         "create_unit" => create_unit(valid_req).await,
+        "delete_unit" => delete_unit(valid_req).await,
         // Plans actions
         "create_plan" => create_plan(valid_req).await,
         "get_plans" => get_plans(valid_req).await,

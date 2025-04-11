@@ -44,6 +44,7 @@ pub struct KronosResponse {
     pub admin_vec: Option<Vec<AdminSummary>>,
 }
 
+#[derive(Debug)]
 pub enum KronosApiError {
     DbErr(sea_orm::DbErr),
     ActixError(actix_web::Error),

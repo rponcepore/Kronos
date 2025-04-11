@@ -162,7 +162,7 @@ async fn create_opord(
     let new_order = kronos_order::ActiveModel {
         parent_plan: ActiveValue::Set(params.plan_id.to_owned()),
         order_type: ActiveValue::Set(params.order_type.to_owned()),
-        serial_number: ActiveValue::NotSet,
+        serial_number: ActiveValue::Set(0),
         is_published: ActiveValue::Set(false),
         derived_from: ActiveValue::NotSet,
         ..Default::default() //do not set auto incrementing uuid pk

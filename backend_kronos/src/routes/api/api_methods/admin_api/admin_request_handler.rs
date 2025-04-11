@@ -49,6 +49,7 @@ async fn count_units_in_db() -> Result<AdminSummary, KronosApiError> {
     })?;
 
     let admin = AdminSummary {
+        rows_affected: None,
         number_response: Some(count_i32),
         string_response: None,
     };

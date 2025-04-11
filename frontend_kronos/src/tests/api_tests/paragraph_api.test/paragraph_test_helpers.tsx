@@ -31,10 +31,6 @@ export function checkSubparagraphsAreInOrder(target: ParagraphSummary) : boolean
     return true;
 }
 
-
-
-
-
 export function extractParagraphFromOrderSummary(paragraphNumber : number,  order : KronosOrderSummary ) : ParagraphSummary {
     expect(order.paragraphs).not.toBeNull();
     expect(order.paragraphs.length).toBeGreaterThan(0);

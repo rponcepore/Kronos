@@ -8,4 +8,5 @@ use serde::{Serialize, Deserialize};
 pub struct AdminSummary{
     pub number_response: Option<i32>,
     pub string_response: Option<String>,
+    pub rows_affected: Option<i32>,
 }

@@ -1,6 +1,6 @@
 //! database_tools.rs
 //!
-use crate::configuration::get_configuration;
+use crate::{configuration::get_configuration, routes::api::parameters::network_structs::KronosApiError};
 use debug_print::debug_println as dprintln;
 use sea_orm::{Database, DatabaseConnection, DbErr};
 
@@ -18,4 +18,13 @@ pub async fn access_kronos_database() -> Result<DatabaseConnection, DbErr> {
     let connection_string = configuration.database.connection_string();
     dprintln!("Connection string: {}", connection_string);
     Database::connect(connection_string).await
+}
+
+
+pub async fn api_access_kronos_database() -> Result<DatabaseConnection, KronosApiError> {
+    let db = match access_kronos_database().await {
+        Ok(db) => db,
+        Err(msg) => return Err(KronosApiError::DbErr(msg)),
+    };
+    Ok(db)
 }
