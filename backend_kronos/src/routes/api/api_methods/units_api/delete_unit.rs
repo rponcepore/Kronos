@@ -60,9 +60,9 @@ fn wrap_delete_request(result: DeleteResult, req: Json<KronosRequest>) -> Result
     let rows_affected = convert_u64_to_i32(result.rows_affected)?;
     
     let admin_summary : AdminSummary = AdminSummary {
-         number_response: Some(rows_affected), 
+         number_response: None, 
          string_response: None, 
-         rows_affected: None, 
+         rows_affected: Some(rows_affected), 
     };
     let kronos_response: KronosResponse = KronosResponse { 
         kronos_request: req.into_inner(), 

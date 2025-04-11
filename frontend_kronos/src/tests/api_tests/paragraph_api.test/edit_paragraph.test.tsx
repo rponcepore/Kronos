@@ -36,7 +36,7 @@ test('edit_paragraph api test', async () => {
     expect(response.orders_vec?.length).toBeGreaterThan(0); // Ensure it contains at least one order
 
     const order: KronosOrderSummary = response.orders_vec![0]; // Use '!' since we've checked it above
-    console.dir(order, { depth: null });
+    //console.dir(order, { depth: null });
 
     // Now that we have an order, get a paragraph.
 

@@ -21,7 +21,7 @@ export async function kronosApiCall(request: KronosRequest): Promise<KronosRespo
         }
 
         const kronosResponse: KronosResponse = await response.json(); 
-        console.log(kronosResponse); 
+        //console.log(kronosResponse); 
 
         return kronosResponse;
 

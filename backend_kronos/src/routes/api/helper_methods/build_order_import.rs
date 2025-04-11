@@ -5,9 +5,6 @@ use crate::routes::api::parameters::network_structs::KronosApiError;
 use serde::{Deserialize, Serialize};
 use std::fs;
 
-const PATH_TO_OPORD_FILE: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/configs/standard_opord_contents.yaml");
-const PATH_TO_FRAGORD_FILE: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/configs/standard_fragord_contents.yaml");
-
 use std::path::PathBuf;
 
 
@@ -25,12 +22,12 @@ pub struct ImportParagraph {
 
 pub fn make_standard_order() -> Result<ImportOrder, KronosApiError> {
     let path = get_opord_path()?;
-    let yaml_str = match fs::read_to_string(path) {
+    let yaml_str = match fs::read_to_string(&path) {
         Ok(yaml_str) => yaml_str,
         Err(msg) => {
             return Err(KronosApiError::Unknown(format!(
                 "Failed to read file at {}, Error Message: {}",
-                PATH_TO_OPORD_FILE, msg
+                path.display(), msg
             )))
         }
     };
@@ -52,12 +49,12 @@ pub fn make_standard_order() -> Result<ImportOrder, KronosApiError> {
 
 pub fn make_standard_fragord() -> Result<ImportOrder, KronosApiError> {
     let path = get_fragord_path()?;
-    let yaml_str = match fs::read_to_string(path) {
+    let yaml_str = match fs::read_to_string(&path) {
         Ok(yaml_str) => yaml_str,
         Err(msg) => {
             return Err(KronosApiError::Unknown(format!(
                 "Failed to read file at {}, Error Message: {}",
-                PATH_TO_OPORD_FILE, msg
+                path.display(), msg
             )))
         }
     };

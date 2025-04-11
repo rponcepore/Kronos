@@ -87,7 +87,7 @@ export function stringToEchelon(input: string): Echelon | null {
         case "DIVISION":
             return Echelon.DIV;
         case "CORPS":
-        case "CORPS":
+        // case "CORPS": // Duplicate because no long name
             return Echelon.CORPS;
         case "MACOM":
         case "MAJOR COMMAND":
@@ -96,7 +96,7 @@ export function stringToEchelon(input: string): Echelon | null {
         case "CENTER":
             return Echelon.CNTR;
         case "ARMY":
-        case "ARMY":
+        // case "ARMY": // Duplicate because no long name
             return Echelon.ARMY;
         case "DRU":
         case "DIRECT REPORTIGN UNIT":

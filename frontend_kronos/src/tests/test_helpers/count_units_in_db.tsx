@@ -25,7 +25,7 @@ export async function count_units_in_db(): Promise<number> {
     };
 
     let response : KronosResponse = await kronosApiCall(req);
-    console.log(response)
+    //console.log(response)
 
     expect(response).not.toBeNull();
     expect(response.admin_vec).not.toBeNull();
