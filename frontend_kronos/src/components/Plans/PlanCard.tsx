@@ -16,7 +16,13 @@ interface PlanCardProps {
 const PlanCard: React.FC<PlanCardProps> = ({ plan, selectPlan }) => {
   return (
     // When clicked, call selectPlan with this specific plan object
-    <div className="plan-card" onClick={() => selectPlan(plan)}>
+    <div
+      className="plan-card"
+      onClick={() => {
+        console.log("Clicked plan:", plan);
+        selectPlan(plan);
+      }}
+>
       {/* Plan title */}
       <h2>{plan.data.name}</h2>
 
